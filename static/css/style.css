@@ -1,5 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap');
 
+:root {
+  --primary-color: #023e8a;
+  --secondary-color: #0077b6;
+  --neutral-color: #00b4d8;
+  --utility-color: #ff9e00;
+  --tertiary-color: #ff6d00;
+
+  --transition: 0.5s ease-in-out;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -10,4 +20,112 @@
 html,
 body {
   height: 100%;
+}
+
+body {
+  background-color: #ffffff;
+  color: #000000;
+  transition: var(--transition);
+}
+
+.dark-theme {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+header,
+.navbar {
+  width: 100%;
+  z-index: 10;
+  position: fixed;
+  top: 0;
+  background-color: #ffffff;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  transition: var(--transition);
+}
+
+body.dark-theme header,
+body.dark-theme .navbar {
+  background-color: #000000;
+  box-shadow: 0 5px 10px rgba(255, 255, 255, 0.1);
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 20px;
+}
+
+.navbar .logo a {
+  font-size: 2rem;
+  font-weight: 900;
+  text-decoration: none;
+  color: var(--primary-color);
+}
+
+.navbar .right-container {
+  width: 45%;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: end;
+  row-gap: 20px;
+  padding: 0 0 10px 0;
+}
+
+.right-container .auth-container {
+  display: flex;
+  column-gap: 25px;
+}
+
+.right-container .auth-container a {
+  font-size: 1.25rem;
+  text-decoration: none;
+  border-radius: 10px;
+  padding: 5px 30px;
+  transition: var(--transition);
+}
+
+.right-container .auth-container a:first-child {
+  border: 2px solid var(--secondary-color);
+  color: var(--secondary-color);
+}
+
+.right-container .auth-container a:last-child {
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.right-container .auth-container a:first-child:hover {
+  background-color: var(--secondary-color);
+  color: #ffffff;
+}
+
+.right-container .auth-container a:last-child:hover {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.theme-toggler {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggler ion-icon {
+  color: var(--primary-color);
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.theme-toggler .sunny {
+  display: none;
+}
+
+.theme-toggler.active .sunny {
+  display: flex;
+}
+
+.theme-toggler.active .moon {
+  display: none;
 }
