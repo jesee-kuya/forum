@@ -197,6 +197,7 @@ body.dark-theme .sidebar a {
 
 .sidebar a:hover {
   color: var(--primary-color);
+  border-bottom: 2px solid var(--utility-color);
 }
 
 .create-post {
