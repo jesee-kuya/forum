@@ -23,3 +23,14 @@ const savedTheme = localStorage.getItem('theme') || 'light';
 applyTheme(savedTheme);
 
 themeToggler.addEventListener('click', toggleTheme);
+
+document.querySelectorAll('.comment-button').forEach((button) => {
+  button.addEventListener('click', () => {
+    const post = button.closest('.post');
+    const commentsSection = post.querySelector('.comments-section');
+    commentsSection.classList.toggle('hidden');
+    commentsSection.style.display = commentsSection.classList.contains('hidden')
+      ? 'none'
+      : 'block';
+  });
+});
