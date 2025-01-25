@@ -27,6 +27,10 @@ body {
   transition: var(--transition);
   height: 100vh;
   padding-top: 80px;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 1rem;
 }
 
 body.dark-theme {
@@ -128,4 +132,119 @@ body.dark-theme .navbar {
 
 .theme-toggler.active .moon {
   display: none;
+}
+
+.sidebar {
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-right: 1px solid #ccc;
+  height: calc(100vh - 80px);
+}
+
+.sidebar h2 {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar li {
+  margin-bottom: 0.75rem;
+}
+
+.sidebar a {
+  text-decoration: none;
+  color: var(--secondary-color);
+  font-weight: bold;
+  transition: var(--transition);
+}
+
+.sidebar a:hover {
+  color: var(--primary-color);
+}
+
+.posts {
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.post {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.post img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.post h3 {
+  font-size: 1.25rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.post p {
+  color: #333;
+  line-height: 1.5;
+}
+
+.post-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+}
+
+.post-actions button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--primary-color);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.post-actions button:hover {
+  color: var(--utility-color);
+}
+
+.post-actions button.active {
+  color: var(--utility-color);
+}
+
+.profile {
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-left: 1px solid #ccc;
+  height: calc(100vh - 80px);
+}
+
+.profile h2 {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.profile img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.profile p {
+  color: #333;
+  line-height: 1.5;
 }
