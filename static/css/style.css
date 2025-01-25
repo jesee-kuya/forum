@@ -17,8 +17,7 @@
   font-family: 'League Spartan', sans-serif;
 }
 
-html,
-body {
+html {
   height: 100%;
 }
 
@@ -26,6 +25,7 @@ body {
   background-color: #ffffff;
   color: #000000;
   transition: var(--transition);
+  height: 100vh;
 }
 
 .dark-theme {
