@@ -34,3 +34,12 @@ document.querySelectorAll('.comment-button').forEach((button) => {
       : 'block';
   });
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const createPostSection = document.querySelector('.create-post');
+  const createPostBtn = document.querySelector('.floating-create-post-btn');
+
+  createPostBtn.addEventListener('click', () => {
+    createPostSection.classList.toggle('hidden');
+  });
+});
