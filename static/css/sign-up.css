@@ -1,13 +1,3 @@
-:root {
-  --primary-color: #023e8a;
-  --secondary-color: #0077b6;
-  --neutral-color: #00b4d8;
-  --utility-color: #ff9e00;
-  --tertiary-color: #ff6d00;
-
-  --transition: 0.5s ease-in-out;
-}
-
 body {
   display: flex;
   justify-content: center;
@@ -23,6 +13,11 @@ body {
   max-width: 400px;
   width: 100%;
   transition: var(--transition);
+}
+
+body.dark-theme .signup-container {
+  background-color: var(--dark-bg-color);
+  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
 }
 
 .signup-container h1 {
