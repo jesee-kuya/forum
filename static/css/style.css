@@ -7,6 +7,11 @@
   --utility-color: #ff9e00;
   --tertiary-color: #ff6d00;
 
+  --dark-bg-color: #121212;
+  --dark-neutral-color: #1e1e1e;
+  --dark-text-color: #e0e0e0;
+  --dark-border-color: #333;
+
   --transition: 0.5s ease-in-out;
 }
 
@@ -34,8 +39,8 @@ body {
 }
 
 body.dark-theme {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: var(--dark-bg-color);
+  color: var(--dark-text-color);
 }
 
 header,
@@ -51,7 +56,7 @@ header,
 
 body.dark-theme header,
 body.dark-theme .navbar {
-  background-color: #000000;
+  background-color: var(--dark-neutral-color);
   box-shadow: 0 5px 10px rgba(255, 255, 255, 0.1);
 }
 
@@ -67,6 +72,10 @@ body.dark-theme .navbar {
   font-weight: bold;
   text-decoration: none;
   color: var(--primary-color);
+}
+
+body.dark-theme .navbar .logo a {
+  color: var(--dark-text-color);
 }
 
 .navbar .right-container {
@@ -95,9 +104,17 @@ body.dark-theme .navbar {
   color: var(--secondary-color);
 }
 
+body.dark-theme .right-container .auth-container a:first-child {
+  color: var(--dark-text-color);
+}
+
 .right-container .auth-container a:last-child {
   border-color: var(--primary-color);
   color: var(--primary-color);
+}
+
+body.dark-theme .right-container .auth-container a:last-child {
+  color: var(--dark-text-color);
 }
 
 .right-container .auth-container a:first-child:hover {
@@ -129,6 +146,7 @@ body.dark-theme .navbar {
 
 body.dark-theme .theme-toggler .sunny {
   display: block;
+  color: var(--dark-text-color);
 }
 
 body.dark-theme .theme-toggler .moon {
@@ -140,12 +158,22 @@ body.dark-theme .theme-toggler .moon {
   background-color: #f9f9f9;
   border-right: 1px solid #ccc;
   height: calc(100vh - 80px);
+  transition: var(--transition);
+}
+
+body.dark-theme .sidebar {
+  background-color: var(--dark-neutral-color);
+  border-right: 1px solid var(--dark-border-color);
 }
 
 .sidebar h2 {
   font-size: 1.5rem;
   color: var(--primary-color);
   margin-bottom: 1rem;
+}
+
+body.dark-theme .sidebar h2 {
+  color: var(--dark-text-color);
 }
 
 .sidebar ul {
@@ -163,6 +191,10 @@ body.dark-theme .theme-toggler .moon {
   transition: var(--transition);
 }
 
+body.dark-theme .sidebar a {
+  color: var(--dark-text-color);
+}
+
 .sidebar a:hover {
   color: var(--primary-color);
 }
@@ -178,6 +210,12 @@ body.dark-theme .theme-toggler .moon {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
+  transition: var(--transition);
+}
+
+body.dark-theme .post {
+  background-color: var(--dark-neutral-color);
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
 }
 
 .post img {
@@ -193,9 +231,17 @@ body.dark-theme .theme-toggler .moon {
   margin-bottom: 0.5rem;
 }
 
+body.dark-theme .post h3 {
+  color: var(--dark-text-color);
+}
+
 .post p {
   color: #333;
   line-height: 1.5;
+}
+
+body.dark-theme .post p {
+  color: var(--dark-text-color);
 }
 
 .post-actions {
@@ -216,6 +262,10 @@ body.dark-theme .theme-toggler .moon {
   transition: var(--transition);
 }
 
+body.dark-theme .post-actions button {
+  color: var(--dark-text-color);
+}
+
 .post-actions button:hover {
   color: var(--utility-color);
 }
@@ -229,12 +279,22 @@ body.dark-theme .theme-toggler .moon {
   background-color: #f9f9f9;
   border-left: 1px solid #ccc;
   height: calc(100vh - 80px);
+  transition: var(--transition);
+}
+
+body.dark-theme .profile {
+  background-color: var(--dark-neutral-color);
+  border-left: 1px solid var(--dark-border-color);
 }
 
 .profile h2 {
   font-size: 1.5rem;
   color: var(--primary-color);
   margin-bottom: 1rem;
+}
+
+body.dark-theme .profile h2 {
+  color: var(--dark-text-color);
 }
 
 .profile img {
@@ -251,6 +311,10 @@ body.dark-theme .theme-toggler .moon {
   font-weight: 700;
 }
 
+body.dark-theme .profile p {
+  color: var(--dark-text-color);
+}
+
 .comments-section {
   margin-top: 1rem;
   padding: 0.75rem;
@@ -258,6 +322,12 @@ body.dark-theme .theme-toggler .moon {
   border-radius: 8px;
   border: 1px solid #ddd;
   display: none;
+  transition: var(--transition);
+}
+
+body.dark-theme .comments-section {
+  background-color: var(--dark-neutral-color);
+  border: 1px solid var(--dark-border-color);
 }
 
 .comments-section h4 {
@@ -266,8 +336,16 @@ body.dark-theme .theme-toggler .moon {
   color: var(--primary-color);
 }
 
+body.dark-theme .comments-section h4 {
+  color: var(--dark-text-color);
+}
+
 .comment {
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
   color: #333;
+}
+
+body.dark-theme .comment {
+  color: var(--dark-text-color);
 }
