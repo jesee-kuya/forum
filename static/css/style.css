@@ -26,9 +26,10 @@ body {
   color: #000000;
   transition: var(--transition);
   height: 100vh;
+  padding-top: 80px;
 }
 
-.dark-theme {
+body.dark-theme {
   background-color: #000000;
   color: #ffffff;
 }
@@ -54,45 +55,44 @@ body.dark-theme .navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 5px 20px;
+  padding: 1rem 2rem;
 }
 
 .navbar .logo a {
-  font-size: 2rem;
-  font-weight: 900;
+  font-size: 1.75rem;
+  font-weight: bold;
   text-decoration: none;
   color: var(--primary-color);
 }
 
 .navbar .right-container {
-  width: 45%;
   display: flex;
-  flex-direction: column-reverse;
-  align-items: end;
-  row-gap: 20px;
-  padding: 0 0 10px 0;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .right-container .auth-container {
   display: flex;
-  column-gap: 25px;
+  gap: 1rem;
 }
 
 .right-container .auth-container a {
-  font-size: 1.25rem;
+  font-size: 1rem;
   text-decoration: none;
-  border-radius: 10px;
-  padding: 5px 30px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
   transition: var(--transition);
 }
 
 .right-container .auth-container a:first-child {
-  border: 2px solid var(--secondary-color);
+  border-color: var(--secondary-color);
   color: var(--secondary-color);
 }
 
 .right-container .auth-container a:last-child {
-  border: 2px solid var(--primary-color);
+  border-color: var(--primary-color);
   color: var(--primary-color);
 }
 
@@ -109,13 +109,13 @@ body.dark-theme .navbar {
 .theme-toggler {
   display: flex;
   align-items: center;
-  justify-content: center;
+  cursor: pointer;
 }
 
 .theme-toggler ion-icon {
+  font-size: 1.5rem;
   color: var(--primary-color);
-  font-size: 1.25rem;
-  cursor: pointer;
+  transition: var(--transition);
 }
 
 .theme-toggler .sunny {
@@ -123,7 +123,7 @@ body.dark-theme .navbar {
 }
 
 .theme-toggler.active .sunny {
-  display: flex;
+  display: block;
 }
 
 .theme-toggler.active .moon {
