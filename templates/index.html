@@ -40,6 +40,72 @@
     </aside>
 
     <main class="posts">
+      <section class="create-post hidden">
+        <h2>Create a New Post</h2>
+        <form>
+          <label for="post-title">Title</label>
+          <input
+            type="text"
+            id="post-title"
+            name="post-title"
+            placeholder="Enter your post title"
+            required
+          />
+
+          <label for="post-content">Content</label>
+          <textarea
+            id="post-content"
+            name="post-content"
+            placeholder="Write your post here..."
+            required
+          ></textarea>
+
+          <fieldset class="categories">
+            <legend>Select Category</legend>
+            <label>
+              <input type="checkbox" name="category" value="Technology" />
+              Technology
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Health" /> Health
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Education" />
+              Education
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Sports" /> Sports
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Entertainment" />
+              Entertainment
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Finance" /> Finance
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Travel" /> Travel
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Food" /> Food
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Lifestyle" />
+              Lifestyle
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Science" /> Science
+            </label>
+          </fieldset>
+
+          <button type="submit">Post</button>
+        </form>
+      </section>
+
+      <button class="floating-create-post-btn">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+
       <article class="post">
         <h3>Post without Image</h3>
         <p>
