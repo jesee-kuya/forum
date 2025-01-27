@@ -325,6 +325,23 @@ body.dark-theme .create-post form label {
   overflow-y: auto;
 }
 
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--dark-border-color);
+  font-size: 0.9rem;
+  color: #666;
+}
+
+body.dark-theme .post-header {
+  color: var(--dark-text-color);
+}
+
+.post-author, .post-time {
+  font-weight: lighter;
+}
+
 .post {
   background-color: #fff;
   padding: 1rem;
@@ -462,7 +479,7 @@ body.dark-theme .session-status {
 
 .logout-button {
   padding: 0.5rem 1rem;
-  margin: .5rem 0;
+  margin: 0.5rem 0;
   font-size: 1rem;
   font-weight: bold;
   color: #ffffff;
