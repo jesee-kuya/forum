@@ -540,6 +540,10 @@ body.dark-theme .comments-section h4 {
 }
 
 body.dark-theme .comment {
+  background-color: var(--dark-neutral-color);
+}
+
+body.dark-theme .comment p{
   color: var(--dark-text-color);
 }
 
