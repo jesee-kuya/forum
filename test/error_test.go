@@ -7,12 +7,13 @@ import (
 )
 
 func TestHandleErrors(t *testing.T) {
-	req := httptest.NewRequest("GET", "http://localhost:8080", nil)
+	str := "Not found"
+	code := 404
 	w := httptest.NewRecorder()
-	HandleErrors(w, req)
+	ErrorHandler(w, str, code)
 	resp := w.Result()
 
-	if resp.StatusCode != http.StatusOK {
-		t.Errorf("Expected the statusCode %v but got the statuscode %v", http.StatusOK, resp.StatusCode)
+	if resp.StatusCode != http.StatusNotFound {
+		t.Errorf("Expected the statusCode %v but got the statuscode %v", http.StatusNotFound, resp.StatusCode)
 	}
 }
