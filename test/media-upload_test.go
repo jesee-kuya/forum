@@ -12,7 +12,7 @@ func TestUploadMedia(t *testing.T) {
 	UploadMedia(w, req)
 	resp := w.Result()
 
-	if resp.StatusCode != http.StatusAccepted {
-		t.Errorf("Expected the statusCode %v but got the statuscode %v", http.StatusAccepted, resp.StatusCode)
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("Expected the statusCode %v but got the statuscode %v", http.StatusOK, resp.StatusCode)
 	}
 }
