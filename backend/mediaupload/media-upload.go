@@ -10,10 +10,23 @@ import (
 )
 
 /*
-UploadMedia handler function is responsible for performing server operations to enable media upload with a limit of up to 25 mbs.
+UploadMedia handler function is responsible for performing server operations to enable media upload with a file size limit of up to 25mbs.
 */
 func UploadMedia(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("frontend/templates/media-upload.html")
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		log.Println("Invalid request method:", r.Method)
+		return
+	}
+
+	// Create the img directory if it does not exist
+	if err := os.MkdirAll("img", os.ModePerm); err != nil {
+		http.Error(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+		log.Println("Failed to create img directory:", err)
+		return
+	}
+
+	tmpl, err := template.ParseFiles("frontend/templates/index.html")
 	if err != nil {
 		http.Error(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		log.Println("Failed parsing templates:", err)
@@ -48,7 +61,7 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Printf("Successfully uploaded file: %v\n", handler.Filename)
 
-		// Create a temporary file
+		// Create a temporary file in the img directory
 		tempFile, err := os.CreateTemp("img", "upload-*.jpeg")
 		if err != nil {
 			http.Error(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
