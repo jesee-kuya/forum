@@ -20,7 +20,8 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create the img directory if it does not exist
-	if err := os.MkdirAll("img", os.ModePerm); err != nil {
+	err := os.MkdirAll("img", os.ModePerm)
+	if err != nil {
 		http.Error(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		log.Println("Failed to create img directory:", err)
 		return
