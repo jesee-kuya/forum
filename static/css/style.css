@@ -329,16 +329,18 @@ body.dark-theme .create-post form label {
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.5rem;
-  border-bottom: 1px solid var(--dark-border-color);
+  border-bottom: 0.5px solid var(--dark-bg-color);
   font-size: 0.9rem;
   color: #666;
 }
 
 body.dark-theme .post-header {
   color: var(--dark-text-color);
+  border-bottom: 0.5px solid var(--dark-text-color);
 }
 
-.post-author, .post-time {
+.post-author,
+.post-time {
   font-weight: lighter;
 }
 
