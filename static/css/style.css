@@ -400,6 +400,13 @@ body.dark-theme .post p {
   margin-top: 0.75rem;
 }
 
+.post-operations {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .post-actions button {
   display: flex;
   align-items: center;
@@ -543,7 +550,7 @@ body.dark-theme .comment {
   background-color: var(--dark-neutral-color);
 }
 
-body.dark-theme .comment p{
+body.dark-theme .comment p {
   color: var(--dark-text-color);
 }
 
