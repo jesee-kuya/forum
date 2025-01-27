@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS tblUsers (
   username TEXT,
   email TEXT,
   user_password TEXT,
-  joined_on TIMESTAMP
+  joined_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS tblPosts (
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS tblPosts (
   user_id INTEGER NOT NULL,
   body TEXT,
   parent_id INTEGER,
-  created_on TIMESTAMP,
+  created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   post_type TEXT,
   FOREIGN KEY (user_id) REFERENCES tblUsers (id),
   FOREIGN KEY (parent_id) REFERENCES tblPosts (id)
