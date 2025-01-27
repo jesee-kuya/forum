@@ -409,9 +409,11 @@ body.dark-theme .post-actions button {
   padding: 1rem;
   background-color: #f9f9f9;
   border-left: 1px solid #ccc;
-  height: calc(100vh - 80px);
+  height: calc(80vh - 80px);
+  display: grid;
+  align-items: center;
+  text-align: center;
   transition: var(--transition);
-  place-items: center;
 }
 
 body.dark-theme .profile {
@@ -430,21 +432,57 @@ body.dark-theme .profile h2 {
 }
 
 .profile img {
-  width: 50px;
-  height: 50px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 1rem;
+  margin: 0 auto 1rem;
+  border: 2px solid var(--primary-color);
 }
 
 .profile p {
   color: #333;
   line-height: 1.5;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 body.dark-theme .profile p {
   color: var(--dark-text-color);
+}
+
+.session-status {
+  font-size: 1rem;
+  color: var(--utility-color);
+  font-weight: bold;
+}
+
+body.dark-theme .session-status {
+  color: var(--tertiary-color);
+}
+
+.logout-button {
+  padding: 0.5rem 1rem;
+  margin: .5rem 0;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: var(--secondary-color);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+
+.logout-button:hover {
+  background-color: var(--primary-color);
+}
+
+body.dark-theme .logout-button {
+  background-color: var(--utility-color);
+}
+
+body.dark-theme .logout-button:hover {
+  background-color: var(--tertiary-color);
 }
 
 .comments-section {
