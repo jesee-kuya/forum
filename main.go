@@ -7,5 +7,6 @@ import (
 
 func main() {
 	db := database.CreateConnection()
-	repositories.AddFile(db)
+	repositories.RemoveFile(db)
+	//repositories.AddFile(db)
 }
