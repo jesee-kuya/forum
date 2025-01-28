@@ -1,11 +1,7 @@
 package main
 
-import (
-	"forum/database"
-)
+import "github.com/jesee-kuya/forum/database"
 
 func main() {
-	//fmt.Println("Testing...")
 	database.CreateConnection()
-
 }
