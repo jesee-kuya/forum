@@ -1,7 +1,11 @@
 package main
 
-import "github.com/jesee-kuya/forum/backend/database"
+import (
+	"github.com/jesee-kuya/forum/backend/database"
+	"github.com/jesee-kuya/forum/backend/repositories"
+)
 
 func main() {
-	database.CreateConnection()
+	db := database.CreateConnection()
+	repositories.AddFile(db)
 }
