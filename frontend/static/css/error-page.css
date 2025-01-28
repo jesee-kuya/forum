@@ -1,0 +1,91 @@
+html {
+  scroll-behavior: smooth;
+  background-repeat: no-repeat;
+  height: 100%;
+}
+
+body {
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background-color: #ffffff;
+  color: #000000;
+  transition: var(--transition);
+}
+
+body.dark-theme {
+  background-color: var(--dark-bg-color);
+  color: var(--dark-text-color);
+}
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2rem;
+  text-align: center;
+  padding: 2rem;
+  transition: var(--transition);
+}
+
+.container {
+  transition: var(--transition);
+}
+
+.status-code {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--tertiary-color);
+}
+
+body.dark-theme .status-code {
+  color: var(--dark-accent-color);
+}
+
+.status-msg {
+  font-size: 1.5rem;
+  margin: 5rem 0;
+  color: var(--dark-border-color);
+}
+
+body.dark-theme .status-msg {
+  color: var(--dark-text-color);
+}
+
+button {
+  border-radius: 2rem;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  font-size: 1rem;
+  padding: 0.8rem 1.7rem;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+button:hover {
+  background-color: var(--secondary-color);
+  transform: scale(1.05);
+}
+
+button a {
+  color: #ffffff;
+  text-decoration: none;
+  display: block;
+}
+
+footer {
+  position: fixed;
+  bottom: 0.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--primary-color);
+}
+
+body.dark-theme footer {
+  color: var(--dark-text-color);
+}
