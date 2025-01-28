@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="/frontend/static/css/style.css" />
+    <script defer src="/frontend/static/js/script.js"></script>
+
+    <title>Forum</title>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar">
+        <div class="logo">
+          <a href="/">Forum</a>
+        </div>
+
+        <div class="right-container">
+          <div class="auth-container">
+            <a href="/sign-up">Sign Up</a>
+            <a href="/sign-in">Sign In</a>
+          </div>
+
+          <div class="theme-toggler">
+            <ion-icon class="moon" name="moon"></ion-icon>
+            <ion-icon class="sunny" name="sunny"></ion-icon>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <aside class="sidebar">
+      <h2>Filter By:</h2>
+      <ul>
+        <li><a href="#">Categories</a></li>
+        <li><a href="#">Created Posts</a></li>
+        <li><a href="#">Liked Posts</a></li>
+      </ul>
+    </aside>
+
+    <main class="posts">
+      <section class="create-post hidden">
+        <h2>Create a New Post</h2>
+        <form>
+          <label for="post-title">Title</label>
+          <input
+            type="text"
+            id="post-title"
+            name="post-title"
+            placeholder="Enter your post title"
+            required
+          />
+
+          <label for="post-content">Content</label>
+          <textarea
+            id="post-content"
+            name="post-content"
+            placeholder="Write your post here..."
+            required
+          ></textarea>
+
+          <fieldset class="categories">
+            <legend>Select Category</legend>
+            <label>
+              <input type="checkbox" name="category" value="Technology" />
+              Technology
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Health" /> Health
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Education" />
+              Education
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Sports" /> Sports
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Entertainment" />
+              Entertainment
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Finance" /> Finance
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Travel" /> Travel
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Food" /> Food
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Lifestyle" />
+              Lifestyle
+            </label>
+            <label>
+              <input type="checkbox" name="category" value="Science" /> Science
+            </label>
+          </fieldset>
+
+          <div class="post-operations">
+            <form enctype="multipart/form-data" action="/upload" method="post">
+              <input type="file" name="" />
+            </form>
+
+            <button type="submit">Post</button>
+          </div>
+        </form>
+      </section>
+
+      <button class="floating-create-post-btn">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+
+      <article class="post">
+        <div class="post-header">
+          <p class="post-author">John</p>
+          <p class="post-time">
+            <time datetime="2025-01-25T12:30">Jan 25, 2025, 12:30 PM</time>
+          </p>
+        </div>
+        <h3>Mazda CX-5</h3>
+        <p>
+          I think Mazda makes really good-looking cars, especially the CX-5.
+        </p>
+        <p class="post-category"><span>Travel</span></p>
+        <div class="post-actions">
+          <button class="like-button">
+            <i class="fa-regular fa-thumbs-up"></i> <span>25</span>
+          </button>
+          <button class="dislike-button">
+            <i class="fa-regular fa-thumbs-down"></i> <span>5</span>
+          </button>
+          <button class="comment-button">
+            <i class="fa-regular fa-comment"></i> <span>12</span>
+          </button>
+        </div>
+        <div class="comments-section hidden">
+          <h4>Comments</h4>
+          <div class="comment">
+            <p><strong>User1:</strong> Great post!</p>
+            <div class="comment-actions">
+              <button class="like-comment-button">
+                <i class="fa-regular fa-thumbs-up"></i> <span>10</span>
+              </button>
+              <button class="dislike-comment-button">
+                <i class="fa-regular fa-thumbs-down"></i> <span>2</span>
+              </button>
+            </div>
+          </div>
+          <div class="comment">
+            <p><strong>User2:</strong> Very insightful, thanks for sharing.</p>
+            <div class="comment-actions">
+              <button class="like-comment-button">
+                <i class="fa-regular fa-thumbs-up"></i> <span>8</span>
+              </button>
+              <button class="dislike-comment-button">
+                <i class="fa-regular fa-thumbs-down"></i> <span>1</span>
+              </button>
+            </div>
+          </div>
+          <div class="comment">
+            <p><strong>User3:</strong> I completely agree with your points.</p>
+            <div class="comment-actions">
+              <button class="like-comment-button">
+                <i class="fa-regular fa-thumbs-up"></i> <span>15</span>
+              </button>
+              <button class="dislike-comment-button">
+                <i class="fa-regular fa-thumbs-down"></i> <span>0</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="post">
+        <div class="post-header">
+          <p class="post-author">John</p>
+          <p class="post-time">
+            <time datetime="2025-01-25T12:30">Jan 25, 2025, 12:30 PM</time>
+          </p>
+        </div>
+        <h3>Mazda CX-5</h3>
+        <p>
+          I think Mazda makes really good-looking cars, especially the CX-5. I
+          have also attached a picture of it.
+        </p>
+        <img src="/frontend/static/img/post-img.jpeg" alt="Post Image of Mazda CX-5" />
+        <p class="post-category"><span>Travel</span></p>
+        <div class="post-actions">
+          <button class="like-button">
+            <i class="fa-regular fa-thumbs-up"></i> <span>25</span>
+          </button>
+          <button class="dislike-button">
+            <i class="fa-regular fa-thumbs-down"></i> <span>5</span>
+          </button>
+          <button class="comment-button">
+            <i class="fa-regular fa-comment"></i> <span>12</span>
+          </button>
+        </div>
+        <div class="comments-section hidden">
+          <h4>Comments</h4>
+          <div class="comment">
+            <p><strong>User1:</strong> Great post!</p>
+            <div class="comment-actions">
+              <button class="like-comment-button">
+                <i class="fa-regular fa-thumbs-up"></i> <span>10</span>
+              </button>
+              <button class="dislike-comment-button">
+                <i class="fa-regular fa-thumbs-down"></i> <span>2</span>
+              </button>
+            </div>
+          </div>
+          <div class="comment">
+            <p><strong>User2:</strong> Very insightful, thanks for sharing.</p>
+            <div class="comment-actions">
+              <button class="like-comment-button">
+                <i class="fa-regular fa-thumbs-up"></i> <span>8</span>
+              </button>
+              <button class="dislike-comment-button">
+                <i class="fa-regular fa-thumbs-down"></i> <span>1</span>
+              </button>
+            </div>
+          </div>
+          <div class="comment">
+            <p><strong>User3:</strong> I completely agree with your points.</p>
+            <div class="comment-actions">
+              <button class="like-comment-button">
+                <i class="fa-regular fa-thumbs-up"></i> <span>15</span>
+              </button>
+              <button class="dislike-comment-button">
+                <i class="fa-regular fa-thumbs-down"></i> <span>0</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="post">
+        <div class="post-header">
+          <p class="post-author">John</p>
+          <p class="post-time">
+            <time datetime="2025-01-25T12:30">Jan 25, 2025, 12:30 PM</time>
+          </p>
+        </div>
+        <h3>Mazda CX-5</h3>
+        <p>
+          I think Mazda makes really good-looking cars, especially the CX-5.
+        </p>
+        <p class="post-category"><span>Travel</span></p>
+        <div class="post-actions">
+          <button class="like-button">
+            <i class="fa-regular fa-thumbs-up"></i> <span>25</span>
+          </button>
+          <button class="dislike-button">
+            <i class="fa-regular fa-thumbs-down"></i> <span>5</span>
+          </button>
+          <button class="comment-button">
+            <i class="fa-regular fa-comment"></i> <span>12</span>
+          </button>
+        </div>
+        <div class="comments-section hidden">
+          <h4>Comments</h4>
+          <div class="comment">
+            <p><strong>User1:</strong> Great post!</p>
+            <div class="comment-actions">
+              <button class="like-comment-button">
+                <i class="fa-regular fa-thumbs-up"></i> <span>10</span>
+              </button>
+              <button class="dislike-comment-button">
+                <i class="fa-regular fa-thumbs-down"></i> <span>2</span>
+              </button>
+            </div>
+          </div>
+          <div class="comment">
+            <p><strong>User2:</strong> Very insightful, thanks for sharing.</p>
+            <div class="comment-actions">
+              <button class="like-comment-button">
+                <i class="fa-regular fa-thumbs-up"></i> <span>8</span>
+              </button>
+              <button class="dislike-comment-button">
+                <i class="fa-regular fa-thumbs-down"></i> <span>1</span>
+              </button>
+            </div>
+          </div>
+          <div class="comment">
+            <p><strong>User3:</strong> I completely agree with your points.</p>
+            <div class="comment-actions">
+              <button class="like-comment-button">
+                <i class="fa-regular fa-thumbs-up"></i> <span>15</span>
+              </button>
+              <button class="dislike-comment-button">
+                <i class="fa-regular fa-thumbs-down"></i> <span>0</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="post">
+        <div class="post-header">
+          <p class="post-author">John</p>
+          <p class="post-time">
+            <time datetime="2025-01-25T12:30">Jan 25, 2025, 12:30 PM</time>
+          </p>
+        </div>
+        <h3>Mazda CX-5</h3>
+        <p>
+          I think Mazda makes really good-looking cars, especially the CX-5. I
+          have also attached a picture of it.
+        </p>
+        <img src="/frontend/static/img/post-img.jpeg" alt="Post Image of Mazda CX-5" />
+        <p class="post-category"><span>Travel</span></p>
+        <div class="post-actions">
+          <button class="like-button">
+            <i class="fa-regular fa-thumbs-up"></i> <span>25</span>
+          </button>
+          <button class="dislike-button">
+            <i class="fa-regular fa-thumbs-down"></i> <span>5</span>
+          </button>
+          <button class="comment-button">
+            <i class="fa-regular fa-comment"></i> <span>12</span>
+          </button>
+        </div>
+        <div class="comments-section hidden">
+          <h4>Comments</h4>
+          <div class="comment">
+            <p><strong>User1:</strong> Great post!</p>
+            <div class="comment-actions">
+              <button class="like-comment-button">
+                <i class="fa-regular fa-thumbs-up"></i> <span>10</span>
+              </button>
+              <button class="dislike-comment-button">
+                <i class="fa-regular fa-thumbs-down"></i> <span>2</span>
+              </button>
+            </div>
+          </div>
+          <div class="comment">
+            <p><strong>User2:</strong> Very insightful, thanks for sharing.</p>
+            <div class="comment-actions">
+              <button class="like-comment-button">
+                <i class="fa-regular fa-thumbs-up"></i> <span>8</span>
+              </button>
+              <button class="dislike-comment-button">
+                <i class="fa-regular fa-thumbs-down"></i> <span>1</span>
+              </button>
+            </div>
+          </div>
+          <div class="comment">
+            <p><strong>User3:</strong> I completely agree with your points.</p>
+            <div class="comment-actions">
+              <button class="like-comment-button">
+                <i class="fa-regular fa-thumbs-up"></i> <span>15</span>
+              </button>
+              <button class="dislike-comment-button">
+                <i class="fa-regular fa-thumbs-down"></i> <span>0</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <aside class="profile">
+      <h2>Profile</h2>
+      <img src="/frontend/static/img/profile-image.jpeg" alt="Profile Picture" />
+      <p><strong>Name:</strong> John</p>
+      <p><strong>Email:</strong> john@example.com</p>
+      <p class="session-status"><strong>Status:</strong> Logged In</p>
+      <button class="logout-button">Log Out</button>
+    </aside>
+
+    <!-- Ion icons -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+    <script
+      src="https://kit.fontawesome.com/0b11e99e28.js"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
