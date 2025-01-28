@@ -10,7 +10,7 @@ import (
 )
 
 // insertPost inserts a Post into the tblPosts table
-func insertPost(db *sql.DB, file models.File) (int64, error) {
+func insertFile(db *sql.DB, file models.File) (int64, error) {
 	query := `
 		INSERT INTO tblFiles (post_id, file_name, file_type)
 		VALUES (?, ?, ?)
