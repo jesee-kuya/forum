@@ -29,7 +29,7 @@ type Post struct {
 type File struct {
 	ID       int    `json:"id"`
 	PostID   int    `json:"post_id"`
-	FilePath string `json:"file_path"`
+	FileName string `json:"file_path"`
 	FileType string `json:"file_type"`
 }
 

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS tblPosts (
 CREATE TABLE IF NOT EXISTS tblFiles (
   id INTEGER PRIMARY KEY,
   post_id INTEGER NOT NULL,
-  file_path TEXT,
+  file_name TEXT,
   file_type TEXT,
   FOREIGN KEY (post_id) REFERENCES tblPosts (id)
 );
