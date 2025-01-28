@@ -1,30 +1,34 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
-	"text/template"
 	"strconv"
+	"text/template"
 )
 
 type Message struct {
-	Code string
+	Code       string
 	ErrMessage string
 }
 
 func ErrorHandler(w http.ResponseWriter, errval string, statusCode int) {
 	tmpl, err := template.ParseFiles("templates/error.html")
 	if err != nil {
-		http.Error(w, http.StatusInternalServerError)
+		http.Error(w, errval, statusCode)
 	}
 
 	code := strconv.Itoa(statusCode)
 
-	var data = message {
-		Code: code,
+	data := Message{
+		Code:       code,
 		ErrMessage: errval,
 	}
 
 	w.WriteHeader(statusCode)
 
 	err = tmpl.Execute(w, data)
+	if err != nil {
+		log.Println("Error with the template file", err)
+	}
 }
