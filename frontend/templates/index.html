@@ -32,8 +32,51 @@
 
     <aside class="sidebar">
       <h2>Filter By:</h2>
-      <ul>
-        <li><a href="#">Categories</a></li>
+      <form class="filter-form">
+        <fieldset>
+          <legend>Categories</legend>
+          <label
+            ><input type="checkbox" name="category" value="Technology" />
+            Technology</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Health" />
+            Health</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Education" />
+            Education</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Sports" />
+            Sports</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Entertainment" />
+            Entertainment</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Finance" />
+            Finance</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Travel" />
+            Travel</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Food" /> Food</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Lifestyle" />
+            Lifestyle</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Science" />
+            Science</label
+          >
+        </fieldset>
+      </form>
+      <ul class="sidebar-links">
         <li><a href="#">Created Posts</a></li>
         <li><a href="#">Liked Posts</a></li>
       </ul>
@@ -185,7 +228,10 @@
           I think Mazda makes really good-looking cars, especially the CX-5. I
           have also attached a picture of it.
         </p>
-        <img src="/frontend/static/img/post-img.jpeg" alt="Post Image of Mazda CX-5" />
+        <img
+          src="/frontend/static/img/post-img.jpeg"
+          alt="Post Image of Mazda CX-5"
+        />
         <p class="post-category"><span>Travel</span></p>
         <div class="post-actions">
           <button class="like-button">
@@ -309,7 +355,10 @@
           I think Mazda makes really good-looking cars, especially the CX-5. I
           have also attached a picture of it.
         </p>
-        <img src="/frontend/static/img/post-img.jpeg" alt="Post Image of Mazda CX-5" />
+        <img
+          src="/frontend/static/img/post-img.jpeg"
+          alt="Post Image of Mazda CX-5"
+        />
         <p class="post-category"><span>Travel</span></p>
         <div class="post-actions">
           <button class="like-button">
@@ -363,7 +412,10 @@
 
     <aside class="profile">
       <h2>Profile</h2>
-      <img src="/frontend/static/img/profile-image.jpeg" alt="Profile Picture" />
+      <img
+        src="/frontend/static/img/profile-image.jpeg"
+        alt="Profile Picture"
+      />
       <p><strong>Name:</strong> John</p>
       <p><strong>Email:</strong> john@example.com</p>
       <p class="session-status"><strong>Status:</strong> Logged In</p>
