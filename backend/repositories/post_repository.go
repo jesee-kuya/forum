@@ -11,6 +11,7 @@ func GetPosts(db *sql.DB) ([]models.Post, error) {
 	query := `
 		SELECT id, user_id, post_title, body, created_on, post_category
 		FROM tblPosts
+		WHERE parent_id IS NULL AND post_status = 'visible';
 	`
 
 	rows, err := db.Query(query)
