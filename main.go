@@ -19,13 +19,14 @@ func main() {
 	//addComment(db)
 	//addUser(db)
 
-	posts, err := repositories.GetPosts(db)
+	//posts, err := repositories.GetPosts(db)
+	comments, err := repositories.GetComments(db, 4)
 	if err != nil {
 		fmt.Println("Failed to fetch posts", err)
 		return
 	}
 
-	fmt.Println(posts)
+	fmt.Println(comments)
 }
 
 func deletePost(db *sql.DB) {
