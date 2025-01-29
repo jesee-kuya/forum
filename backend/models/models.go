@@ -17,12 +17,14 @@ type User struct {
 
 // Post model
 type Post struct {
-	ID        int       `json:"id"`
-	UserID    int       `json:"user_id"`
-	Body      string    `json:"body"`
-	ParentID  *int      `json:"parent_id"`
-	CreatedOn time.Time `json:"created_on"`
-	PostType  string    `json:"post_type"`
+	ID           int       `json:"id"`
+	UserID       int       `json:"user_id"`
+	PostTitle    string    `json:"post_title"`
+	Body         string    `json:"body"`
+	ParentID     *int      `json:"parent_id"`
+	CreatedOn    time.Time `json:"created_on"`
+	PostCategory string    `json:"post_category"`
+	PostStatus   string    `json:"post_status"`
 }
 
 // File model

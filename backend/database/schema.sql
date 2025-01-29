@@ -9,10 +9,11 @@ CREATE TABLE IF NOT EXISTS tblUsers (
 CREATE TABLE IF NOT EXISTS tblPosts (
   id INTEGER PRIMARY KEY,
   user_id INTEGER NOT NULL,
+  post_title TEXT,
   body TEXT,
   parent_id INTEGER DEFAULT NULL,
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  post_type TEXT,
+  post_category TEXT,
   post_status TEXT DEFAULT 'visible',
   FOREIGN KEY (user_id) REFERENCES tblUsers (id),
   FOREIGN KEY (parent_id) REFERENCES tblPosts (id)
