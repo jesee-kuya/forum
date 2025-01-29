@@ -52,7 +52,7 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		file, handler, err := r.FormFile("post1")
+		file, handler, err := r.FormFile("uploaded-file")
 		if err != nil {
 			ErrorHandler(w, "File upload error", http.StatusBadRequest)
 			log.Println("Failed retrieving media file:", err)
