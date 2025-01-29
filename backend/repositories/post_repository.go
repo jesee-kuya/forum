@@ -9,9 +9,10 @@ import (
 
 func GetPosts(db *sql.DB) ([]models.Post, error) {
 	query := `
-		SELECT id, user_id, post_title, body, created_on, post_category
-		FROM tblPosts
-		WHERE parent_id IS NULL AND post_status = 'visible';
+		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on, p.post_category
+		FROM tblPosts p
+		JOIN tblUsers u ON p.user_id = u.id
+		WHERE p.parent_id IS NULL AND p.post_status = 'visible'
 	`
 
 	rows, err := db.Query(query)
@@ -25,7 +26,7 @@ func GetPosts(db *sql.DB) ([]models.Post, error) {
 	for rows.Next() {
 		post := models.Post{}
 
-		err := rows.Scan(&post.ID, &post.UserID, &post.PostTitle, &post.Body, &post.CreatedOn, &post.PostCategory)
+		err := rows.Scan(&post.ID, &post.UserID, &post.UserName, &post.PostTitle, &post.Body, &post.CreatedOn, &post.PostCategory)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}

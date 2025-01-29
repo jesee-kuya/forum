@@ -17,6 +17,7 @@ func main() {
 
 	//addPost(db)
 	//addComment(db)
+	//addUser(db)
 
 	posts, err := repositories.GetPosts(db)
 	if err != nil {
@@ -72,7 +73,20 @@ func addPost(db *sql.DB) {
 	fmt.Println(id)
 }
 
-func addUser(db sql.DB) {
+func addUser(db *sql.DB) {
+	defer db.Close()
+	user := models.User{
+		Username: "Ja Loka",
+		Email:    "jaloka@gmail.com",
+		Password: "jaloka123",
+	}
+
+	id, err := repositories.InsertRecord(db, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, user.Password)
+	if err != nil {
+		fmt.Println("failed to add Record")
+	}
+
+	fmt.Println(id)
 }
 
 func addFile(db *sql.DB) {

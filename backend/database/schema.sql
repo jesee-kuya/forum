@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS tblUsers (
   id INTEGER PRIMARY KEY,
-  username TEXT,
-  email TEXT,
-  user_password TEXT,
+  username TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  user_password TEXT NOT NULL,
   joined_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

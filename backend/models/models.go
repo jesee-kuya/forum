@@ -19,6 +19,7 @@ type User struct {
 type Post struct {
 	ID           int       `json:"id"`
 	UserID       int       `json:"user_id"`
+	UserName     string    `json:"username"`
 	PostTitle    string    `json:"post_title"`
 	Body         string    `json:"body"`
 	ParentID     int       `json:"parent_id"`
