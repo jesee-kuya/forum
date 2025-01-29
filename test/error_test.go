@@ -4,16 +4,30 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/jesee-kuya/forum/backend/handler"
 )
 
-func TestHandleErrors(t *testing.T) {
-	str := "Not found"
-	code := 404
-	w := httptest.NewRecorder()
-	ErrorHandler(w, str, code)
-	resp := w.Result()
+var TestCase1 = []struct {
+	name       string
+	errval     string
+	statusCode int
+}{
+	{"Test1", "Not found", http.StatusNotFound},
+	{"Test2", "Method not allowed", http.StatusMethodNotAllowed},
+	{"Test2", "Method not allowed", http.StatusMethodNotAllowed},
+}
 
-	if resp.StatusCode != http.StatusNotFound {
-		t.Errorf("Expected the statusCode %v but got the statuscode %v", http.StatusNotFound, resp.StatusCode)
+func TestErrorHandler(t *testing.T) {
+	for _, tc := range TestCase1 {
+		t.Run(tc.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			handler.ErrorHandler(w, tc.errval, tc.statusCode)
+			resp := w.Result()
+
+			if resp.StatusCode != tc.statusCode {
+				t.Errorf("Expected the statusCode %v but got the statuscode %v", http.StatusNotFound, resp.StatusCode)
+			}
+		})
 	}
 }
