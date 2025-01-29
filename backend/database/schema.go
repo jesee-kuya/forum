@@ -28,11 +28,10 @@ func executeSQLFile(db *sql.DB) error {
 
 func CreateConnection() *sql.DB {
 	// Open SQLite database connection
-	db, err := sql.Open("sqlite3", "/home/joe/forum/backend/database/forum.db")
+	db, err := sql.Open("sqlite3", "backend/database/forum.db")
 	if err != nil {
 		log.Fatalf("failed to open database: %v", err)
 	}
-	//defer db.Close()
 
 	// Execute the SQL file
 	err = executeSQLFile(db)

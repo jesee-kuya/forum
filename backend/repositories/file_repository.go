@@ -4,89 +4,58 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 
-	"github.com/jesee-kuya/forum/backend/models"
 	_ "github.com/mattn/go-sqlite3" // SQLite3 driver
 )
 
 // insertPost inserts a Post into the tblPosts table
-func insertFile(db *sql.DB, file models.File) (int64, error) {
-	query := `
-		INSERT INTO tblFiles (post_id, file_name, file_type)
-		VALUES (?, ?, ?)
-	`
+func InsertRecord(db *sql.DB, table string, columns []string, values ...interface{}) (int64, error) {
+	// Constructing column names and placeholders
+	columnsStr := strings.Join(columns, ", ")
+	placeholders := strings.Repeat("?, ", len(columns))
+	placeholders = strings.TrimSuffix(placeholders, ", ")
 
-	result, err := db.Exec(query, file.PostID, file.FileName, file.FileType)
+	// Constructing the SQL query dynamically
+	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", table, columnsStr, placeholders)
+
+	// Executing the query
+	result, err := db.Exec(query, values...)
 	if err != nil {
-		return 0, fmt.Errorf("failed to insert post: %w", err)
+		return 0, fmt.Errorf("failed to insert into %s: %w", table, err)
 	}
 
+	// Retrieving the last inserted ID
 	id, err := result.LastInsertId()
 	if err != nil {
-		return 0, fmt.Errorf("failed to retrieve last insert ID: %w", err)
+		return 0, fmt.Errorf("failed to retrieve last insert ID for %s: %w", table, err)
 	}
 
 	return id, nil
 }
 
 // deletePost deletes a record from tblPosts based on its ID
-func deleteFile(db *sql.DB, fileID int) error {
-	query := `
-		DELETE FROM tblFiles
-		WHERE ID = ?;
-	`
+func DeleteRecord(db *sql.DB, table, column string, id int) error {
+	// Use a parameterized query for safety
+	query := fmt.Sprintf("UPDATE %s SET %s = ? WHERE id = ?", table, column)
 
-	// Execute the DELETE statement
-	result, err := db.Exec(query, fileID)
+	// Execute the query safely with parameters
+	result, err := db.Exec(query, "Deleted", id)
 	if err != nil {
-		return fmt.Errorf("failed to delete post: %w", err)
+		return fmt.Errorf("failed to delete record from %s: %w", table, err)
 	}
 
-	// Check if a row was deleted
+	// Check if any rows were affected
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return fmt.Errorf("failed to retrieve affected rows: %w", err)
 	}
 	if rowsAffected == 0 {
-		return fmt.Errorf("no post found with ID %d", fileID)
+		return fmt.Errorf("no record found with ID %d in %s", id, table)
 	}
 
-	log.Printf("Successfully deleted post with ID: %d", fileID)
+	log.Printf("Successfully marked record with ID %d as deleted in table %s", id, table)
 	return nil
 }
 
-func RemoveFile(db *sql.DB) {
 
-	defer db.Close()
-
-	id := 1
-
-	// Delete the post
-	err := deleteFile(db, id)
-	if err != nil {
-		log.Printf("Error: %v", err)
-		return
-	}
-
-	log.Println("Post deletion complete.")
-}
-
-// func AddFile(db *sql.DB) {
-
-// 	defer db.Close()
-
-// 	// Example File data
-// 	file := models.File{
-// 		PostID:   1,
-// 		FileName: "example.jpg",
-// 		FileType: "Profile Image",
-// 	}
-
-// 	// Insert the post into the database
-// 	id, err := insertPost(db, file)
-// 	if err != nil {
-// 		log.Fatalf("failed to insert post: %v", err)
-// 	}
-
-// 	log.Printf("Post inserted successfully with ID: %d", id)
-// }
