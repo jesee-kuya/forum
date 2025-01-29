@@ -19,6 +19,7 @@ type User struct {
 type Post struct {
 	ID        int       `json:"id"`
 	UserID    int       `json:"user_id"`
+	TITLE     string    `json:"title"`
 	Body      string    `json:"body"`
 	ParentID  *int      `json:"parent_id"`
 	CreatedOn time.Time `json:"created_on"`
