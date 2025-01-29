@@ -159,7 +159,6 @@ body.dark-theme .theme-toggler .moon {
   border-right: 1px solid #ccc;
   height: calc(100vh - 80px);
   transition: var(--transition);
-  width: 250px;
 }
 
 body.dark-theme .sidebar {
