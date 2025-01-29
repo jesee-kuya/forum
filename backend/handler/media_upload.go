@@ -15,14 +15,14 @@ UploadMedia handler function is responsible for performing server operations to 
 */
 func UploadMedia(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		ErrorHandler(w, "Invalid request method", http.StatusMethodNotAllowed)
 		log.Println("Invalid request method:", r.Method)
 		return
 	}
 
 	// Create the img directory if it does not exist
 	if err := os.MkdirAll("img", os.ModePerm); err != nil {
-		http.Error(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+		ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		log.Println("Failed to create img directory:", err)
 		return
 	}
