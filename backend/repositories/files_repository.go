@@ -9,8 +9,8 @@ import (
 
 func GetMediaFiles(db *sql.DB, id int) ([]models.MediaFile, error) {
 	query := `
-		SELECT * FROM tblMediaFiles p
-		WHERE post_id = ? AND p.post_status = 'visible'
+		SELECT * FROM tblMediaFiles 
+		WHERE post_id = ? AND file_status = 'visible'
 	`
 	rows, err := db.Query(query, id)
 	if err != nil {
@@ -23,7 +23,7 @@ func GetMediaFiles(db *sql.DB, id int) ([]models.MediaFile, error) {
 	for rows.Next() {
 		file := models.MediaFile{}
 
-		err := rows.Scan(&file.ID, &file.FileName, &file.FileType, &file.PostID, &file.FileStatus)
+		err := rows.Scan(&file.ID, &file.PostID, &file.FileName, &file.FileType,  &file.FileStatus)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
