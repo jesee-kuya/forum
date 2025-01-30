@@ -5,12 +5,14 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/jesee-kuya/forum/backend/database"
 	"github.com/jesee-kuya/forum/backend/handler"
 	"github.com/jesee-kuya/forum/backend/repositories"
 )
 
 func GetAllPosts(w http.ResponseWriter, r *http.Request) {
-	posts, err := repositories.GetPosts()
+	db := database.CreateConnection()
+	posts, err := repositories.GetPosts(db)
 	if err != nil {
 		log.Printf("Failed to get posts: %v", err)
 		handler.ErrorHandler(w, "Internal Server Error", http.StatusMethodNotAllowed)

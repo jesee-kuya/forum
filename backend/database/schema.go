@@ -11,7 +11,7 @@ import (
 
 // executeSQLFile reads and executes SQL statements from a file on the given database connection
 func executeSQLFile(db *sql.DB) error {
-	content, err := os.ReadFile("database/schema.sql")
+	content, err := os.ReadFile("backend/database/schema.sql")
 	if err != nil {
 		return fmt.Errorf("failed to read SQL file: %w", err)
 	}
@@ -26,13 +26,12 @@ func executeSQLFile(db *sql.DB) error {
 	return nil
 }
 
-func CreateConnection() {
+func CreateConnection() *sql.DB {
 	// Open SQLite database connection
-	db, err := sql.Open("sqlite3", "forum.db")
+	db, err := sql.Open("sqlite3", "backend/database/forum.db")
 	if err != nil {
 		log.Fatalf("failed to open database: %v", err)
 	}
-	defer db.Close()
 
 	// Execute the SQL file
 	err = executeSQLFile(db)
@@ -41,4 +40,6 @@ func CreateConnection() {
 	}
 
 	log.Println("Database schema successfully applied!")
+
+	return db
 }
