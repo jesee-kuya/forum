@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jesee-kuya/forum/backend/database"
+	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 )
 
@@ -25,8 +26,20 @@ func main() {
 	// if err != nil {
 	// 	log.Fatalf("Error starting server: %v", err)
 	// }
-	
-	getFiles()
+
+	getReactions()
+}
+
+func getReactions() {
+	db := database.CreateConnection()
+	reactions, err := repositories.GetReactions(db, 4, "Dislike")
+
+	if err != nil {
+		fmt.Println("Could not fetch Reactions", err)
+		return
+	}
+
+	fmt.Println(reactions)
 }
 
 func getFiles() {
@@ -39,4 +52,16 @@ func getFiles() {
 	}
 
 	fmt.Println(files)
+}
+
+func addReactions() {
+	db := database.CreateConnection()
+
+	reaction := models.Reaction{
+		Reaction: "Dislike",
+		UserID:   4,
+		PostID:   4,
+	}
+
+	repositories.InsertRecord(db, "tblReactions", []string{"reaction", "user_id", "post_id"}, reaction.Reaction, reaction.UserID, reaction.PostID)
 }

@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS tblMediaFiles (
 CREATE TABLE IF NOT EXISTS tblReactions (
   id INTEGER PRIMARY KEY,
   reaction TEXT,
+  reaction_status TEXT DEFAULT 'clicked',
   user_id INTEGER NOT NULL,
   post_id INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES tblUsers (id),

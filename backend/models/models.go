@@ -39,8 +39,9 @@ type MediaFile struct {
 
 // Reaction model
 type Reaction struct {
-	ID       int    `json:"id"`
-	Reaction string `json:"reaction"`
-	UserID   int    `json:"user_id"`
-	PostID   int    `json:"post_id"`
+	ID             int    `json:"id"`
+	Reaction       string `json:"reaction"`
+	ReactionStatus string `json:"reaction_status"`
+	UserID         int    `json:"user_id"`
+	PostID         int    `json:"post_id"`
 }
