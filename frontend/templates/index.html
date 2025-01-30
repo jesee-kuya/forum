@@ -32,8 +32,51 @@
 
     <aside class="sidebar">
       <h2>Filter By:</h2>
-      <ul>
-        <li><a href="#">Categories</a></li>
+      <form class="filter-form">
+        <fieldset>
+          <legend>Categories</legend>
+          <label
+            ><input type="checkbox" name="category" value="Technology" />
+            Technology</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Health" />
+            Health</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Education" />
+            Education</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Sports" />
+            Sports</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Entertainment" />
+            Entertainment</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Finance" />
+            Finance</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Travel" />
+            Travel</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Food" /> Food</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Lifestyle" />
+            Lifestyle</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Science" />
+            Science</label
+          >
+        </fieldset>
+      </form>
+      <ul class="sidebar-links">
         <li><a href="#">Created Posts</a></li>
         <li><a href="#">Liked Posts</a></li>
       </ul>
@@ -114,259 +157,74 @@
 
       <article class="post">
         <div class="post-header">
-          <p class="post-author">John</p>
+          <p class="post-author">{{ .Author }}</p>
           <p class="post-time">
-            <time datetime="2025-01-25T12:30">Jan 25, 2025, 12:30 PM</time>
+            <time datetime="{{ .PostDate }}">{{ .FormattedPostDate }}</time>
           </p>
         </div>
-        <h3>Mazda CX-5</h3>
-        <p>
-          I think Mazda makes really good-looking cars, especially the CX-5.
-        </p>
-        <p class="post-category"><span>Travel</span></p>
-        <div class="post-actions">
-          <button class="like-button">
-            <i class="fa-regular fa-thumbs-up"></i> <span>25</span>
-          </button>
-          <button class="dislike-button">
-            <i class="fa-regular fa-thumbs-down"></i> <span>5</span>
-          </button>
-          <button class="comment-button">
-            <i class="fa-regular fa-comment"></i> <span>12</span>
-          </button>
-        </div>
-        <div class="comments-section hidden">
-          <h4>Comments</h4>
-          <div class="comment">
-            <p><strong>User1:</strong> Great post!</p>
-            <div class="comment-actions">
-              <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i> <span>10</span>
-              </button>
-              <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i> <span>2</span>
-              </button>
-            </div>
-          </div>
-          <div class="comment">
-            <p><strong>User2:</strong> Very insightful, thanks for sharing.</p>
-            <div class="comment-actions">
-              <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i> <span>8</span>
-              </button>
-              <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i> <span>1</span>
-              </button>
-            </div>
-          </div>
-          <div class="comment">
-            <p><strong>User3:</strong> I completely agree with your points.</p>
-            <div class="comment-actions">
-              <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i> <span>15</span>
-              </button>
-              <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i> <span>0</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </article>
+        <h3>{{ .Title }}</h3>
+        <p>{{ .Content }}</p>
+        {{ if .ImageURL }}
+        <img src="{{ .ImageURL }}" alt="{{ .Name }}" />
+        {{ end }}
+        <p class="post-category"><span>{{ .Category }}</span></p>
 
-      <article class="post">
-        <div class="post-header">
-          <p class="post-author">John</p>
-          <p class="post-time">
-            <time datetime="2025-01-25T12:30">Jan 25, 2025, 12:30 PM</time>
-          </p>
-        </div>
-        <h3>Mazda CX-5</h3>
-        <p>
-          I think Mazda makes really good-looking cars, especially the CX-5. I
-          have also attached a picture of it.
-        </p>
-        <img src="/frontend/static/img/post-img.jpeg" alt="Post Image of Mazda CX-5" />
-        <p class="post-category"><span>Travel</span></p>
         <div class="post-actions">
           <button class="like-button">
-            <i class="fa-regular fa-thumbs-up"></i> <span>25</span>
+            <i class="fa-regular fa-thumbs-up"></i> <span>{{ .Likes }}</span>
           </button>
           <button class="dislike-button">
-            <i class="fa-regular fa-thumbs-down"></i> <span>5</span>
+            <i class="fa-regular fa-thumbs-down"></i>
+            <span>{{ .Dislikes }}</span>
           </button>
           <button class="comment-button">
-            <i class="fa-regular fa-comment"></i> <span>12</span>
+            <i class="fa-regular fa-comment"></i>
+            <span>{{ .CommentCount }}</span>
           </button>
         </div>
-        <div class="comments-section hidden">
-          <h4>Comments</h4>
-          <div class="comment">
-            <p><strong>User1:</strong> Great post!</p>
-            <div class="comment-actions">
-              <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i> <span>10</span>
-              </button>
-              <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i> <span>2</span>
-              </button>
-            </div>
-          </div>
-          <div class="comment">
-            <p><strong>User2:</strong> Very insightful, thanks for sharing.</p>
-            <div class="comment-actions">
-              <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i> <span>8</span>
-              </button>
-              <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i> <span>1</span>
-              </button>
-            </div>
-          </div>
-          <div class="comment">
-            <p><strong>User3:</strong> I completely agree with your points.</p>
-            <div class="comment-actions">
-              <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i> <span>15</span>
-              </button>
-              <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i> <span>0</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </article>
 
-      <article class="post">
-        <div class="post-header">
-          <p class="post-author">John</p>
-          <p class="post-time">
-            <time datetime="2025-01-25T12:30">Jan 25, 2025, 12:30 PM</time>
-          </p>
-        </div>
-        <h3>Mazda CX-5</h3>
-        <p>
-          I think Mazda makes really good-looking cars, especially the CX-5.
-        </p>
-        <p class="post-category"><span>Travel</span></p>
-        <div class="post-actions">
-          <button class="like-button">
-            <i class="fa-regular fa-thumbs-up"></i> <span>25</span>
-          </button>
-          <button class="dislike-button">
-            <i class="fa-regular fa-thumbs-down"></i> <span>5</span>
-          </button>
-          <button class="comment-button">
-            <i class="fa-regular fa-comment"></i> <span>12</span>
-          </button>
-        </div>
         <div class="comments-section hidden">
           <h4>Comments</h4>
-          <div class="comment">
-            <p><strong>User1:</strong> Great post!</p>
-            <div class="comment-actions">
-              <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i> <span>10</span>
-              </button>
-              <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i> <span>2</span>
-              </button>
-            </div>
-          </div>
-          <div class="comment">
-            <p><strong>User2:</strong> Very insightful, thanks for sharing.</p>
-            <div class="comment-actions">
-              <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i> <span>8</span>
-              </button>
-              <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i> <span>1</span>
-              </button>
-            </div>
-          </div>
-          <div class="comment">
-            <p><strong>User3:</strong> I completely agree with your points.</p>
-            <div class="comment-actions">
-              <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i> <span>15</span>
-              </button>
-              <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i> <span>0</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </article>
 
-      <article class="post">
-        <div class="post-header">
-          <p class="post-author">John</p>
-          <p class="post-time">
-            <time datetime="2025-01-25T12:30">Jan 25, 2025, 12:30 PM</time>
-          </p>
-        </div>
-        <h3>Mazda CX-5</h3>
-        <p>
-          I think Mazda makes really good-looking cars, especially the CX-5. I
-          have also attached a picture of it.
-        </p>
-        <img src="/frontend/static/img/post-img.jpeg" alt="Post Image of Mazda CX-5" />
-        <p class="post-category"><span>Travel</span></p>
-        <div class="post-actions">
-          <button class="like-button">
-            <i class="fa-regular fa-thumbs-up"></i> <span>25</span>
-          </button>
-          <button class="dislike-button">
-            <i class="fa-regular fa-thumbs-down"></i> <span>5</span>
-          </button>
-          <button class="comment-button">
-            <i class="fa-regular fa-comment"></i> <span>12</span>
-          </button>
-        </div>
-        <div class="comments-section hidden">
-          <h4>Comments</h4>
+          <div class="comment-input">
+            <input
+              type="text"
+              class="comment-box"
+              placeholder="Write a comment..."
+            />
+            <button class="submit-comment">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+
+          {{ range .Comments }}
           <div class="comment">
-            <p><strong>User1:</strong> Great post!</p>
+            <p><strong>{{ .User }}</strong>: {{ .Text }}</p>
             <div class="comment-actions">
               <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i> <span>10</span>
+                <i class="fa-regular fa-thumbs-up"></i>
+                <span>{{ .Likes }}</span>
               </button>
               <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i> <span>2</span>
+                <i class="fa-regular fa-thumbs-down"></i>
+                <span>{{ .Dislikes }}</span>
               </button>
             </div>
           </div>
-          <div class="comment">
-            <p><strong>User2:</strong> Very insightful, thanks for sharing.</p>
-            <div class="comment-actions">
-              <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i> <span>8</span>
-              </button>
-              <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i> <span>1</span>
-              </button>
-            </div>
-          </div>
-          <div class="comment">
-            <p><strong>User3:</strong> I completely agree with your points.</p>
-            <div class="comment-actions">
-              <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i> <span>15</span>
-              </button>
-              <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i> <span>0</span>
-              </button>
-            </div>
-          </div>
+          {{ end }}
         </div>
       </article>
     </main>
 
     <aside class="profile">
       <h2>Profile</h2>
-      <img src="/frontend/static/img/profile-image.jpeg" alt="Profile Picture" />
-      <p><strong>Name:</strong> John</p>
-      <p><strong>Email:</strong> john@example.com</p>
-      <p class="session-status"><strong>Status:</strong> Logged In</p>
+      <img
+        src="/frontend/static/img/profile-image.jpeg"
+        alt="Profile Picture"
+      />
+      <p><strong>Name:</strong></p>
+      <p><strong>Email:</strong></p>
+      <p class="session-status"><strong>Status:</strong>Not logged</p>
       <button class="logout-button">Log Out</button>
     </aside>
 

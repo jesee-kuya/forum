@@ -26,13 +26,12 @@ func executeSQLFile(db *sql.DB) error {
 	return nil
 }
 
-func CreateConnection() {
+func CreateConnection() *sql.DB {
 	// Open SQLite database connection
-	db, err := sql.Open("sqlite3", "forum.db")
+	db, err := sql.Open("sqlite3", "backend/database/forum.db")
 	if err != nil {
 		log.Fatalf("failed to open database: %v", err)
 	}
-	defer db.Close()
 
 	// Execute the SQL file
 	err = executeSQLFile(db)
@@ -41,4 +40,6 @@ func CreateConnection() {
 	}
 
 	log.Println("Database schema successfully applied!")
+
+	return db
 }
