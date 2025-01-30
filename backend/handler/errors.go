@@ -26,8 +26,6 @@ func ErrorHandler(w http.ResponseWriter, errval string, statusCode int) {
 		ErrMessage: errval,
 	}
 
-	w.WriteHeader(statusCode)
-
 	err = tmpl.Execute(w, data)
 	if err != nil {
 		log.Println("Error with the template file", err)
