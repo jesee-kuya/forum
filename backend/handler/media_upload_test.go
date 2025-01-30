@@ -1,4 +1,4 @@
-package test
+package handler
 
 import (
 	"bytes"
@@ -7,8 +7,6 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/jesee-kuya/forum/backend/handler"
 )
 
 var TestCase2 = []struct {
@@ -41,7 +39,7 @@ func TestUploadMedia(t *testing.T) {
 			req := httptest.NewRequest(tc.method, tc.endPoint, nil)
 			w := httptest.NewRecorder()
 
-			handler.UploadMedia(w, req)
+			UploadMedia(w, req)
 
 			resp := w.Result()
 			if resp.StatusCode != tc.code {
@@ -67,7 +65,6 @@ func createTestFile(content []byte) (multipart.File, error) {
 	return &mockMultipartFile{bytes.NewReader(content)}, nil
 }
 
-
 func TestValidateMimeType(t *testing.T) {
 	for _, tc := range TestCase3 {
 		t.Run(tc.name, func(t *testing.T) {
@@ -76,7 +73,7 @@ func TestValidateMimeType(t *testing.T) {
 				t.Fatalf("Error creating test file: %v", err)
 			}
 
-			ext, err := handler.ValidateMimeType(file)
+			ext, err := ValidateMimeType(file)
 			if (err != nil) != tc.expectError {
 				t.Errorf("Expected error: %v, got: %v", tc.expectError, err)
 			}
