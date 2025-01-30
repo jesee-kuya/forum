@@ -50,16 +50,16 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 		return
 
-	}
-	if r.Method == http.MethodGet {
+	} else if r.Method == http.MethodGet {
 		tmpl, err := template.ParseFiles("frontend/templates/sign-in.html")
 		if err != nil {
 			ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 
 		tmpl.Execute(w, nil)
+	} else {
+		ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
-	ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
 
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
@@ -82,15 +82,14 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 		return
-	}
-
-	if r.Method == http.MethodGet {
+	} else if r.Method == http.MethodGet {
 		tmpl, err := template.ParseFiles("frontend/templates/sign-up.html")
 		if err != nil {
 			ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 
 		tmpl.Execute(w, nil)
+	} else {
+		ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
-	ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
