@@ -28,6 +28,13 @@ type Post struct {
 	PostStatus   string    `json:"post_status"`
 }
 
+// Category model
+type Category struct {
+	ID int `json:"id"`
+	PostID string `json:"post_id"`
+	CategoryName string `json:"category"`
+} 
+
 // File model
 type MediaFile struct {
 	ID         int    `json:"id"`
