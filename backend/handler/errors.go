@@ -13,9 +13,10 @@ type Message struct {
 }
 
 func ErrorHandler(w http.ResponseWriter, errval string, statusCode int) {
-	tmpl, err := template.ParseFiles("frontend/templates/error.html")
+	tmpl, err := template.ParseFiles("/frontend/templates/error.html")
 	if err != nil {
 		http.Error(w, errval, statusCode)
+		return
 	}
 
 	code := strconv.Itoa(statusCode)

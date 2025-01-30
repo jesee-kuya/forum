@@ -7,12 +7,12 @@ import (
 	"github.com/jesee-kuya/forum/backend/models"
 )
 
-var db *sql.DB
+var Db *sql.DB
 
 func GetPosts() ([]models.Post, error) {
 	query := "SELECT * FROM tblposts"
 
-	rows, err := db.Query(query)
+	rows, err := Db.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %v", err)
 	}
