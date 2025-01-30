@@ -92,7 +92,7 @@ async function loadUserProfile() {
     const user = await response.json();
     document.querySelector(
       '.profile img'
-    ).src = `/frontend/static/img/profile-image.jpeg`; // Use actual user profile image if available
+    ).src = `/frontend/static/img/profile-image.jpeg`;
     document.querySelector('.profile p strong').textContent = user.name;
     document.querySelector(
       '.profile p:nth-of-type(2)'
