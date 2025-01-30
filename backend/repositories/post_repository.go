@@ -36,8 +36,8 @@ func GetPosts(postType string) ([]models.Post, error) {
 }
 
 func CreatePost(post models.Post) (int64, error) {
-	query := "INSERT INTO tblPosts (user_id, body, parent_id, post_type) VALUES (?, ?, ?, ?)"
-	result, err := db.Exec(query, post.UserID, post.Body, post.ParentID, post.PostType)
+	query := "INSERT INTO tblPosts (user_id, title, body, parent_id, post_type) VALUES (?, ?, ?, ?, ?)"
+	result, err := db.Exec(query, post.UserID, post.TITLE, post.Body, post.ParentID, post.PostType)
 	if err != nil {
 		return 0, fmt.Errorf("failed to insert post: %v", err)
 	}
