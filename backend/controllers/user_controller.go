@@ -75,7 +75,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Generate a new UUID session token
 	sessionToken, err := uuid.NewV4()
 	if err != nil {
 		log.Printf("Failed to generate session token: %v", err)
@@ -83,7 +82,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Store session token in database
 	err = repositories.StoreSession(user.ID, sessionToken.String())
 	if err != nil {
 		log.Printf("Failed to store session token: %v", err)
@@ -91,7 +89,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set the session token as an HTTP cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session_token",
 		Value:    sessionToken.String(),
@@ -100,8 +97,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Secure:   false,
 	})
 
+	response := map[string]string{
+		"message": "Login successful",
+		"token":   sessionToken.String(),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "Login successful"}`))
+	json.NewEncoder(w).Encode(response)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
