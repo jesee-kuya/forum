@@ -1,7 +1,3 @@
-'use strict';
-
-const themeToggler = document.querySelector('.theme-toggler');
-
 // Apply theme based on the value in localStorage
 const applyTheme = (theme) => {
   if (theme === 'dark') {
@@ -22,8 +18,9 @@ const toggleTheme = () => {
 const savedTheme = localStorage.getItem('theme') || 'light';
 applyTheme(savedTheme);
 
-themeToggler.addEventListener('click', toggleTheme);
+document.querySelector('.theme-toggler').addEventListener('click', toggleTheme);
 
+// Toggle comment button
 document.querySelectorAll('.comment-button').forEach((button) => {
   button.addEventListener('click', () => {
     const post = button.closest('.post');
@@ -35,6 +32,7 @@ document.querySelectorAll('.comment-button').forEach((button) => {
   });
 });
 
+// Toggle post creation window
 document.addEventListener('DOMContentLoaded', () => {
   const createPostSection = document.querySelector('.create-post');
   const createPostBtn = document.querySelector('.floating-create-post-btn');
