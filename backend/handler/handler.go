@@ -32,7 +32,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl.ExecuteTemplate(w, "index,html", nil)
+	tmpl.Execute(w, nil)
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +57,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 
-		tmpl.ExecuteTemplate(w, "sign-in.html", nil)
+		tmpl.Execute(w, nil)
 	}
 	ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
@@ -90,7 +90,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 			ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 
-		tmpl.ExecuteTemplate(w, "sign-up.html", nil)
+		tmpl.Execute(w, nil)
 	}
 	ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
