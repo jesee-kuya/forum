@@ -11,7 +11,7 @@ import (
 
 // executeSQLFile reads and executes SQL statements from a file on the given database connection
 func executeSQLFile(db *sql.DB) error {
-	content, err := os.ReadFile("database/schema.sql")
+	content, err := os.ReadFile("./backend/database/schema.sql")
 	if err != nil {
 		return fmt.Errorf("failed to read SQL file: %w", err)
 	}
