@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/utils"
@@ -10,27 +11,28 @@ import (
 
 func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("session_token")
-		if err != nil {
-			if err == http.ErrNoCookie {
-				utils.ErrorHandler(w, "Unauthorized", http.StatusUnauthorized)
+		authHeader := r.Header.Get("Authorization")
+
+		if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
+			token := strings.TrimPrefix(authHeader, "Bearer ")
+			userID, err := repositories.ValidateSession(token)
+			if err == nil {
+				ctx := context.WithValue(r.Context(), "userID", userID)
+				next(w, r.WithContext(ctx))
 				return
 			}
-			utils.ErrorHandler(w, "Bad Request", http.StatusBadRequest)
-			return
 		}
 
-		sessionToken := cookie.Value
-		userID, err := repositories.ValidateSession(sessionToken)
-		if err != nil {
-			utils.ErrorHandler(w, "Invalid session or expired token", http.StatusUnauthorized)
-			return
+		cookie, err := r.Cookie("session_token")
+		if err == nil {
+			userID, err := repositories.ValidateSession(cookie.Value)
+			if err == nil {
+				ctx := context.WithValue(r.Context(), "userID", userID)
+				next(w, r.WithContext(ctx))
+				return
+			}
 		}
 
-		ctx := r.Context()
-		ctx = context.WithValue(ctx, "userID", userID)
-		r = r.WithContext(ctx)
-
-		next.ServeHTTP(w, r)
+		utils.ErrorHandler(w, "Unauthorized", http.StatusUnauthorized)
 	}
 }
