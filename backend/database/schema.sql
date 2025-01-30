@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS tblPosts (
   FOREIGN KEY (parent_id) REFERENCES tblPosts (id)
 );
 
-CREATE TABLE IF NOT EXISTS tblFiles (
+CREATE TABLE IF NOT EXISTS tblMediaFiles (
   id INTEGER PRIMARY KEY,
   post_id INTEGER NOT NULL,
   file_name TEXT,
