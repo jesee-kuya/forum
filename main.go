@@ -4,7 +4,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/jesee-kuya/forum/backend/database"
 	"github.com/jesee-kuya/forum/backend/handler"
+	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/util"
 )
 
@@ -27,3 +29,13 @@ func main() {
 		log.Fatalf("Error starting server: %v", err)
 	}
 }
+
+// func addFiles() {
+// 	db := database.CreateConnection()
+
+// 	file := models.MediaFile {
+// 		PostID: 1,
+// 		FileName: "profile.jpg",
+// 		FileType: "Profile Picture",
+// 	}
+// }

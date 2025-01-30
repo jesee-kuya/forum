@@ -29,11 +29,12 @@ type Post struct {
 }
 
 // File model
-type File struct {
-	ID       int    `json:"id"`
-	PostID   int    `json:"post_id"`
-	FileName string `json:"file_path"`
-	FileType string `json:"file_type"`
+type MediaFile struct {
+	ID         int    `json:"id"`
+	PostID     int    `json:"post_id"`
+	FileName   string `json:"file_path"`
+	FileType   string `json:"file_type"`
+	FileStatus string `json:"file_status"`
 }
 
 // Reaction model
