@@ -13,9 +13,8 @@ func GetPosts(db *sql.DB) ([]models.Post, error) {
 		FROM tblPosts p
 		JOIN tblUsers u ON p.user_id = u.id
 		WHERE p.parent_id IS NULL AND p.post_status = 'visible'
-	`
 
-	rows, err := db.Query(query)
+	rows, err := Db.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
