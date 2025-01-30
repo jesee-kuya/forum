@@ -1,7 +1,3 @@
-'use strict';
-
-const themeToggler = document.querySelector('.theme-toggler');
-
 // Apply theme based on the value in localStorage
 const applyTheme = (theme) => {
   if (theme === 'dark') {
@@ -22,8 +18,9 @@ const toggleTheme = () => {
 const savedTheme = localStorage.getItem('theme') || 'light';
 applyTheme(savedTheme);
 
-themeToggler.addEventListener('click', toggleTheme);
+document.querySelector('.theme-toggler').addEventListener('click', toggleTheme);
 
+// Toggle comment button
 document.querySelectorAll('.comment-button').forEach((button) => {
   button.addEventListener('click', () => {
     const post = button.closest('.post');
@@ -35,6 +32,7 @@ document.querySelectorAll('.comment-button').forEach((button) => {
   });
 });
 
+// Toggle post creation window
 document.addEventListener('DOMContentLoaded', () => {
   const createPostSection = document.querySelector('.create-post');
   const createPostBtn = document.querySelector('.floating-create-post-btn');
@@ -43,3 +41,65 @@ document.addEventListener('DOMContentLoaded', () => {
     createPostSection.classList.toggle('hidden');
   });
 });
+
+// Uses fetch API to make asynchronous requests to the backend when the like button is clicked.
+document.querySelectorAll('.like-button').forEach((button) => {
+  button.addEventListener('click', async function () {
+    const postId = this.dataset.postId;
+    const response = await fetch('/like', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ post_id: postId }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      this.querySelector('span').textContent = data.newLikeCount;
+    }
+  });
+});
+
+// Uses fetch API to make asynchronous requests to the backend when the comment button is clicked.
+document.querySelectorAll('.submit-comment').forEach((button) => {
+  button.addEventListener('click', async function () {
+    const postId = this.dataset.postId;
+    const commentText = this.previousElementSibling.value;
+
+    const response = await fetch('/comment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ post_id: postId, comment: commentText }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const commentSection = this.closest('.comments-section');
+      commentSection.innerHTML += `<p><strong>You:</strong> ${data.comment}</p>`;
+    }
+  });
+});
+
+// Uses fetch API to fetch user details when the page loads.
+async function loadUserProfile() {
+  try {
+    const response = await fetch('/user');
+    if (!response.ok) throw new Error('Failed to fetch user');
+
+    const user = await response.json();
+    document.querySelector(
+      '.profile img'
+    ).src = `/frontend/static/img/profile-image.jpeg`;
+    document.querySelector('.profile p strong').textContent = user.name;
+    document.querySelector(
+      '.profile p:nth-of-type(2)'
+    ).innerHTML = `<strong>Email:</strong> ${user.email}`;
+  } catch (error) {
+    console.error('Error loading user profile:', error);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', loadUserProfile);
