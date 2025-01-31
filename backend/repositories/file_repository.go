@@ -23,7 +23,7 @@ func GetMediaFiles(db *sql.DB, id int) ([]models.MediaFile, error) {
 	for rows.Next() {
 		file := models.MediaFile{}
 
-		err := rows.Scan(&file.ID, &file.PostID, &file.FileName, &file.FileType,  &file.FileStatus)
+		err := rows.Scan(&file.ID, &file.PostID, &file.FileName, &file.FileType, &file.FileStatus)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
