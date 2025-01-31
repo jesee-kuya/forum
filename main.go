@@ -11,7 +11,6 @@ import (
 func main() {
 	util.Init()
 
-	// serve static files
 	fs := http.FileServer(http.Dir("./frontend/static"))
 	http.Handle("/frontend/static/", http.StripPrefix("/frontend/static/", fs))
 
@@ -20,9 +19,13 @@ func main() {
 	http.HandleFunc("/sign-up", handler.SignupHandler)
 	http.HandleFunc("/upload", handler.UploadMedia)
 
-	port := ":8080"
+	port, err := util.ValidatePort()
+	if err != nil {
+		log.Printf("Error validating port: %v\n", err)
+		return
+	}
 	log.Printf("Server started at http://localhost%s\n", port)
-	err := http.ListenAndServe(port, nil)
+	err = http.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
