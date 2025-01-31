@@ -11,8 +11,8 @@ body {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background-color: #ffffff;
-  color: #000000;
+  background-color: var(--dark-text-color);
+  color: var(--dark-bg-color);
   transition: var(--transition);
 }
 
@@ -51,7 +51,7 @@ body.dark-theme .status-msg {
 button {
   border-radius: 2rem;
   background-color: var(--primary-color);
-  color: #ffffff;
+  color: var(--dark-text-color);
   font-size: 1rem;
   padding: 0.8rem 1.7rem;
   border: none;
@@ -65,7 +65,7 @@ button:hover {
 }
 
 button a {
-  color: #ffffff;
+  color: var(--dark-text-color);
   text-decoration: none;
   display: block;
 }

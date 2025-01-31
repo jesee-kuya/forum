@@ -6,10 +6,10 @@ body {
 }
 
 .signin-container {
-  background-color: #fff;
+  background-color: var(--dark-text-color);
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--light-box-shadow);
   max-width: 400px;
   width: 100%;
   transition: var(--transition);
@@ -17,7 +17,7 @@ body {
 
 body.dark-theme .signin-container {
   background-color: var(--dark-bg-color);
-  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+  box-shadow: var(--dark-box-shadow);
 }
 
 .signin-container h1 {
@@ -56,7 +56,7 @@ body.dark-theme .signin-container {
   padding: 0.75rem;
   border: none;
   background-color: var(--utility-color);
-  color: #fff;
+  color: var(--dark-text-color);
   font-size: 1rem;
   font-weight: bold;
   border-radius: 4px;
