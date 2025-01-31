@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"text/template"
 
+	"github.com/jesee-kuya/forum/backend/database"
 	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/util"
 )
@@ -32,6 +33,9 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
+	db := database.CreateConnection()
+	GetAllPosts(db, tmpl)
 
 	tmpl.Execute(w, nil)
 }
