@@ -3,6 +3,7 @@ package route
 import (
 	"net/http"
 
+	"github.com/jesee-kuya/forum/backend/database"
 	"github.com/jesee-kuya/forum/backend/handler"
 )
 
@@ -19,11 +20,14 @@ func InitRoutes() *http.ServeMux {
 
 	// App routes
 	r.HandleFunc("/", handler.IndexHandler)
-	r.HandleFunc("/signin", handler.LoginHandler)
-	r.HandleFunc("/signup", handler.SignupHandler)
+	r.HandleFunc("/sign-in", handler.LoginHandler)
+	r.HandleFunc("/sign-up", handler.SignupHandler)
 	r.HandleFunc("/upload", handler.UploadMedia)
 
-	// r.HandleFunc("/", handler.GetAllPosts(db, tmpl))
+	db := database.CreateConnection()
+
+	// r.HandleFunc("/posts", handler.GetAllPosts(db, tmpl))
+	r.HandleFunc("/api/posts", handler.GetAllPostsAPI(db))
 
 	return r
 }
