@@ -16,8 +16,6 @@ import (
 func main() {
 	util.Init()
 
-	fs := http.FileServer(http.Dir("./frontend/static"))
-	http.Handle("/frontend/static/", http.StripPrefix("/frontend/static/", fs))
 	port, err := util.ValidatePort()
 	router := route.InitRoutes()
 
