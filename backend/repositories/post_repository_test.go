@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"os"
+	"reflect"
 	"testing"
 	"time"
 
@@ -97,7 +98,7 @@ func TestGetPosts(t *testing.T) {
 	}
 
 	for i, post := range posts {
-		if post != expectedPosts[i] {
+		if !reflect.DeepEqual(post, expectedPosts[i]) {
 			t.Errorf("Post %d does not match expected values. Got: %+v, Expected: %+v", i+1, post, expectedPosts[i])
 		}
 	}
@@ -131,7 +132,7 @@ func TestGetComments(t *testing.T) {
 	}
 
 	for i, comment := range comments {
-		if comment != expectedComments[i] {
+		if !reflect.DeepEqual(comment, expectedComments[i]) {
 			t.Errorf("Comment %d does not match expected values. Got: %+v, Expected: %+v", i+1, comment, expectedComments[i])
 		}
 	}
@@ -186,7 +187,7 @@ func TestProcessSQLData(t *testing.T) {
 	}
 
 	for i, post := range posts {
-		if post != expectedPosts[i] {
+		if !reflect.DeepEqual(post, expectedPosts[i]) {
 			t.Errorf("Post %d does not match expected values. Got: %+v, Expected: %+v", i+1, post, expectedPosts[i])
 		}
 	}
