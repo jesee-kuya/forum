@@ -62,15 +62,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		Posts: posts,
 	}
-	// err = tmpl.Execute(w, struct {
-	// 	Posts []models.Post
-	// }{Posts: posts})
-	// if err != nil {
-	// 	log.Printf("failed to render template: %v", err)
-	// 	util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-	// 	return
-	// }
-	// GetAllPosts(db, tmpl, data.Posts)
 	tmpl.Execute(w, data)
 }
 
