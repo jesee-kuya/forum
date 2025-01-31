@@ -23,9 +23,9 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create the img directory if it does not exist
-	if err := os.MkdirAll("img", os.ModePerm); err != nil {
+	if err := os.MkdirAll("uploads", os.ModePerm); err != nil {
 		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
-		log.Println("Failed to create img directory:", err)
+		log.Println("Failed to create uploads directory:", err)
 		return
 	}
 
@@ -73,7 +73,7 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Create a temporary file with the correct extension
-		tempFile, err := os.CreateTemp("img", "upload-*"+fileExt)
+		tempFile, err := os.CreateTemp("uploads", "upload-*"+fileExt)
 		if err != nil {
 			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			log.Println("Failed creating a temporary file:", err)

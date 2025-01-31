@@ -10,8 +10,8 @@ func InitRoutes() *http.ServeMux {
 	r := http.NewServeMux()
 
 	// Serve static files (CSS, JS, images)
-	fs := http.FileServer(http.Dir("./frontend/static"))
-	r.Handle("/static/", http.StripPrefix("/static/", fs))
+	fs := http.FileServer(http.Dir("./frontend"))
+	r.Handle("/frontend/", http.StripPrefix("/frontend/", fs))
 
 	// Serve uploaded media files
 	uploadFs := http.FileServer(http.Dir("./uploads"))
