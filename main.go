@@ -18,9 +18,9 @@ func main() {
 
 	fs := http.FileServer(http.Dir("./frontend/static"))
 	http.Handle("/frontend/static/", http.StripPrefix("/frontend/static/", fs))
-  port, err := util.ValidatePort()
+	port, err := util.ValidatePort()
 	router := route.InitRoutes()
-  
+
 	server := &http.Server{
 		Addr:         port,
 		Handler:      router,
@@ -29,7 +29,7 @@ func main() {
 	}
 
 	log.Printf("Server started at http://localhost%s\n", port)
-	if err := server.ListenAndServe(); err != nil {
+	if err = server.ListenAndServe(); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
 }
