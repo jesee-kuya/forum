@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/jesee-kuya/forum/backend/models"
-	_ "github.com/mattn/go-sqlite3" 
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // setupTestDB initializes a temporary SQLite database for testing
