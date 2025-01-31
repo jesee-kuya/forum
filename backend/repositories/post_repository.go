@@ -64,3 +64,36 @@ func processSQLData(rows *sql.Rows) ([]models.Post, error) {
 
 	return posts, nil
 }
+
+// FilterPosts - Fetch posts based on category or user
+func FilterPosts(db *sql.DB, filterType, filterValue string) ([]models.Post, error) {
+	var query string
+	var rows *sql.Rows
+	var err error
+
+	switch filterType {
+	case "category":
+		query = "SELECT * FROM tblPosts WHERE post_category = ?"
+		rows, err = db.Query(query, filterValue)
+	case "user":
+		query = "SELECT * FROM tblPosts WHERE user_id = ?"
+		rows, err = db.Query(query, filterValue)
+	default:
+		return nil, fmt.Errorf("invalid filter type")
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %v", err)
+	}
+	defer rows.Close()
+
+	var posts []models.Post
+	for rows.Next() {
+		var post models.Post
+		if err := rows.Scan(&post.ID, &post.UserID, &post.Body, &post.ParentID, &post.CreatedOn, &post.PostCategory); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %v", err)
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
