@@ -33,18 +33,27 @@ type Post struct {
 	Comments     []Post
 }
 
+// Category model
+type Category struct {
+	ID int `json:"id"`
+	PostID string `json:"post_id"`
+	CategoryName string `json:"category"`
+} 
+
 // File model
-type File struct {
-	ID       int    `json:"id"`
-	PostID   int    `json:"post_id"`
-	FileName string `json:"file_path"`
-	FileType string `json:"file_type"`
+type MediaFile struct {
+	ID         int    `json:"id"`
+	PostID     int    `json:"post_id"`
+	FileName   string `json:"file_path"`
+	FileType   string `json:"file_type"`
+	FileStatus string `json:"file_status"`
 }
 
 // Reaction model
 type Reaction struct {
-	ID       int    `json:"id"`
-	Reaction string `json:"reaction"`
-	UserID   int    `json:"user_id"`
-	PostID   int    `json:"post_id"`
+	ID             int    `json:"id"`
+	Reaction       string `json:"reaction"`
+	ReactionStatus string `json:"reaction_status"`
+	UserID         int    `json:"user_id"`
+	PostID         int    `json:"post_id"`
 }

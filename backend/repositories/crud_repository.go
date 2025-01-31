@@ -57,5 +57,3 @@ func DeleteRecord(db *sql.DB, table, column string, id int) error {
 	log.Printf("Successfully marked record with ID %d as deleted in table %s", id, table)
 	return nil
 }
-
-

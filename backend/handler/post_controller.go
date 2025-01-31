@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/jesee-kuya/forum/backend/repositories"
+	"github.com/jesee-kuya/forum/backend/util"
 )
 
 func GetAllPosts(db *sql.DB) http.HandlerFunc {
@@ -14,7 +15,7 @@ func GetAllPosts(db *sql.DB) http.HandlerFunc {
 		posts, err := repositories.GetPosts(db)
 		if err != nil {
 			log.Printf("Failed to get posts: %v", err)
-			ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		// fetch comments for each post
@@ -22,7 +23,7 @@ func GetAllPosts(db *sql.DB) http.HandlerFunc {
 			comments, err := repositories.GetComments(db, post.ID)
 			if err != nil {
 				log.Printf("Failed to get posts: %v", err)
-				ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+				util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 
@@ -35,7 +36,7 @@ func GetAllPosts(db *sql.DB) http.HandlerFunc {
 
 		if err = json.NewEncoder(w).Encode(posts); err != nil {
 			log.Printf("Failed to encode posts to JSON: %v", err)
-			ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 	}
