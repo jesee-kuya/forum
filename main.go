@@ -16,6 +16,8 @@ import (
 func main() {
 	util.Init()
 
+	addPost()
+
 	port, err := util.ValidatePort()
 	router := route.InitRoutes()
 
@@ -64,4 +66,17 @@ func addReactions() {
 	}
 
 	repositories.InsertRecord(db, "tblReactions", []string{"reaction", "user_id", "post_id"}, reaction.Reaction, reaction.UserID, reaction.PostID)
+}
+
+func addPost() {
+	db := database.CreateConnection()
+
+	post := models.Post {
+		PostTitle: "Litu",
+		Body: "We are from Litu session and the participants had an interesting debate about relationships",
+		PostCategory: "Technology",
+		UserID: 1,
+	}
+
+	repositories.InsertRecord(db, "tblPosts", []string{"post_title", "body", "post_category", "user_id"}, post.PostTitle, post.Body, post.PostCategory, post.UserID)
 }
