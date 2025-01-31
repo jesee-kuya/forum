@@ -26,6 +26,10 @@ type Post struct {
 	CreatedOn    time.Time `json:"created_on"`
 	PostCategory string    `json:"post_category"`
 	PostStatus   string    `json:"post_status"`
+	Likes        int       `json:"likes"`
+	Dislikes     int       `json:"dislikes"`
+	CommentCount int       `json:"comment_count"`
+	ImageURL     string    `json:"imageurl"`
 }
 
 // File model
