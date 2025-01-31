@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"text/template"
+
+	"github.com/jesee-kuya/forum/backend/util"
 )
 
 /*
@@ -15,28 +17,28 @@ UploadMedia handler function is responsible for performing server operations to 
 */
 func UploadMedia(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		ErrorHandler(w, "Invalid request method", http.StatusMethodNotAllowed)
+		util.ErrorHandler(w, "Invalid request method", http.StatusMethodNotAllowed)
 		log.Println("Invalid request method:", r.Method)
 		return
 	}
 
 	// Create the img directory if it does not exist
 	if err := os.MkdirAll("img", os.ModePerm); err != nil {
-		ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		log.Println("Failed to create img directory:", err)
 		return
 	}
 
 	tmpl, err := template.ParseFiles("frontend/templates/index.html")
 	if err != nil {
-		ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		log.Println("Failed parsing templates:", err)
 		return
 	}
 
 	err = tmpl.Execute(w, nil)
 	if err != nil {
-		ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		log.Println("Failed executing template:", err)
 		return
 	}
@@ -47,14 +49,14 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 		// Parse the multipart form with a 25MB limit
 		err := r.ParseMultipartForm(25 << 20)
 		if err != nil {
-			ErrorHandler(w, "Failed parsing form data", http.StatusBadRequest)
+			util.ErrorHandler(w, "Failed parsing form data", http.StatusBadRequest)
 			log.Println("Failed parsing multipart form:", err)
 			return
 		}
 
 		file, handler, err := r.FormFile("uploaded-file")
 		if err != nil {
-			ErrorHandler(w, "File upload error", http.StatusBadRequest)
+			util.ErrorHandler(w, "File upload error", http.StatusBadRequest)
 			log.Println("Failed retrieving media file:", err)
 			return
 		}
@@ -65,7 +67,7 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 		// Validate MIME type and get the file extension
 		fileExt, err := ValidateMimeType(file)
 		if err != nil {
-			ErrorHandler(w, err.Error(), http.StatusBadRequest)
+			util.ErrorHandler(w, err.Error(), http.StatusBadRequest)
 			log.Println("Invalid extension associated with file:", err)
 			return
 		}
@@ -73,7 +75,7 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 		// Create a temporary file with the correct extension
 		tempFile, err := os.CreateTemp("img", "upload-*"+fileExt)
 		if err != nil {
-			ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			log.Println("Failed creating a temporary file:", err)
 			return
 		}
@@ -82,7 +84,7 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 		// Copy file contents to the temporary file
 		_, err = io.Copy(tempFile, file)
 		if err != nil {
-			ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			log.Println("Failed saving file to temporary location:", err)
 			return
 		}
