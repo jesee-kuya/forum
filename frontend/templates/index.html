@@ -154,20 +154,20 @@
       <button class="floating-create-post-btn">
         <i class="fa-solid fa-plus"></i>
       </button>
-
+      {{ range .Posts}}
       <article class="post">
         <div class="post-header">
-          <p class="post-author">{{ .Author }}</p>
+          <p class="post-author">{{ .UserName }}</p>
           <p class="post-time">
-            <time datetime="{{ .PostDate }}">{{ .FormattedPostDate }}</time>
+            <time datetime="{{ .CreatedOn }}">{{ .CreatedOn }}</time>
           </p>
         </div>
-        <h3>{{ .Title }}</h3>
-        <p>{{ .Content }}</p>
+        <h3>{{ .PostTitle }}</h3>
+        <p>{{ .Body }}</p>
         {{ if .ImageURL }}
-        <img src="{{ .ImageURL }}" alt="{{ .Name }}" />
+        <img src="{{ .ImageURL }}" alt="{{ .FileName }}" />
         {{ end }}
-        <p class="post-category"><span>{{ .Category }}</span></p>
+        <p class="post-category"><span>{{ .PostCategory }}</span></p>
 
         <div class="post-actions">
           <button class="like-button">
@@ -199,7 +199,7 @@
 
           {{ range .Comments }}
           <div class="comment">
-            <p><strong>{{ .User }}</strong>: {{ .Text }}</p>
+            <p><strong>{{ .UserName }}</strong>: {{ .Body }}</p>
             <div class="comment-actions">
               <button class="like-comment-button">
                 <i class="fa-regular fa-thumbs-up"></i>
