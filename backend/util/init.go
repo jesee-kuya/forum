@@ -1,7 +1,13 @@
 package util
 
-import "github.com/jesee-kuya/forum/backend/database"
+import (
+	"database/sql"
+
+	"github.com/jesee-kuya/forum/backend/database"
+)
+
+var DB *sql.DB
 
 func Init() {
-	database.CreateConnection()
+	DB = database.CreateConnection()
 }

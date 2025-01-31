@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jesee-kuya/forum/backend/database"
 	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/route"
@@ -15,10 +14,13 @@ import (
 
 func main() {
 	util.Init()
-
-	addPost()
-
+	defer util.DB.Close()
+	
 	port, err := util.ValidatePort()
+	if err != nil {
+		log.Fatalf("Error validating port: %v", err)
+		return
+	}
 	router := route.InitRoutes()
 
 	server := &http.Server{
@@ -35,8 +37,7 @@ func main() {
 }
 
 func getReactions() {
-	db := database.CreateConnection()
-	reactions, err := repositories.GetReactions(db, 4, "Dislike")
+	reactions, err := repositories.GetReactions(util.DB, 4, "Dislike")
 	if err != nil {
 		fmt.Println("Could not fetch Reactions", err)
 		return
@@ -46,8 +47,7 @@ func getReactions() {
 }
 
 func getFiles() {
-	db := database.CreateConnection()
-	files, err := repositories.GetMediaFiles(db, 4)
+	files, err := repositories.GetMediaFiles(util.DB, 4)
 	if err != nil {
 		fmt.Println("Could not fetch files", err)
 		return
@@ -57,26 +57,22 @@ func getFiles() {
 }
 
 func addReactions() {
-	db := database.CreateConnection()
-
 	reaction := models.Reaction{
 		Reaction: "Dislike",
 		UserID:   4,
 		PostID:   4,
 	}
 
-	repositories.InsertRecord(db, "tblReactions", []string{"reaction", "user_id", "post_id"}, reaction.Reaction, reaction.UserID, reaction.PostID)
+	repositories.InsertRecord(util.DB, "tblReactions", []string{"reaction", "user_id", "post_id"}, reaction.Reaction, reaction.UserID, reaction.PostID)
 }
 
 func addPost() {
-	db := database.CreateConnection()
-
-	post := models.Post {
-		PostTitle: "Litu",
-		Body: "We are from Litu session and the participants had an interesting debate about relationships",
-		PostCategory: "Technology",
-		UserID: 1,
+	post := models.Post{
+		PostTitle:    "Monthly Goals",
+		Body:         "The bocal team has brought a requirement of submitting monthly goals for every apprentice enrolled in the boot camp",
+		PostCategory: "Slavery",
+		UserID:       1,
 	}
 
-	repositories.InsertRecord(db, "tblPosts", []string{"post_title", "body", "post_category", "user_id"}, post.PostTitle, post.Body, post.PostCategory, post.UserID)
+	repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "post_category", "user_id"}, post.PostTitle, post.Body, post.PostCategory, post.UserID)
 }

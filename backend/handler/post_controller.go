@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"text/template"
 
-	"github.com/jesee-kuya/forum/backend/database"
 	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
 )
+
 func GetAllPosts(db *sql.DB, tmpl *template.Template, posts []models.Post) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// fetch comments for each post
@@ -73,11 +73,10 @@ func GetAllPostsAPI(db *sql.DB) http.HandlerFunc {
 
 // FilterPosts - Handles filtering posts by category or user
 func FilterPosts(w http.ResponseWriter, r *http.Request) {
-	db := database.CreateConnection()
 	filterType := r.URL.Query().Get("type")
 	filterValue := r.URL.Query().Get("value")
 
-	posts, err := repositories.FilterPosts(db, filterType, filterValue)
+	posts, err := repositories.FilterPosts(util.DB, filterType, filterValue)
 	if err != nil {
 		log.Printf("Failed to filter posts: %v", err)
 		util.ErrorHandler(w, "Could not filter posts", http.StatusInternalServerError)
