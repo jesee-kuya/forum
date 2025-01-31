@@ -30,10 +30,10 @@ type Post struct {
 
 // Category model
 type Category struct {
-	ID int `json:"id"`
-	PostID string `json:"post_id"`
+	ID           int    `json:"id"`
+	PostID       string `json:"post_id"`
 	CategoryName string `json:"category"`
-} 
+}
 
 // File model
 type MediaFile struct {
