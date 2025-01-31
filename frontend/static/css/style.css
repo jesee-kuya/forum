@@ -52,7 +52,7 @@ header,
   z-index: 10;
   position: fixed;
   top: 0;
-  background-color: var(--dark-text-color);
+  background-color: #f9f9f9;
   box-shadow: var(--light-box-shadow);
   transition: var(--transition);
 }
@@ -392,7 +392,6 @@ body.dark-theme .floating-create-post-btn {
 }
 
 .posts {
-  padding: 1rem;
   overflow-y: auto;
 }
 
