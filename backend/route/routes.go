@@ -9,10 +9,20 @@ import (
 func InitRoutes() *http.ServeMux {
 	r := http.NewServeMux()
 
+	// Serve static files (CSS, JS, images)
+	fs := http.FileServer(http.Dir("./frontend/static"))
+	r.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	// Serve uploaded media files
+	uploadFs := http.FileServer(http.Dir("./uploads"))
+	r.Handle("/uploads/", http.StripPrefix("/uploads/", uploadFs))
+
+	// App routes
 	r.HandleFunc("/", handler.IndexHandler)
 	r.HandleFunc("/signin", handler.LoginHandler)
 	r.HandleFunc("/signup", handler.SignupHandler)
 	r.HandleFunc("/upload", handler.UploadMedia)
 	r.HandleFunc("/posts", handler.GetAllPosts)
+
 	return r
 }
