@@ -2,14 +2,15 @@ package handler
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"text/template"
 
+	"github.com/jesee-kuya/forum/backend/database"
 	"github.com/jesee-kuya/forum/backend/models"
+	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
 )
-
-var user models.User
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// URL path
@@ -29,11 +30,39 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// template rendering
 	tmpl, err := template.ParseFiles("frontend/templates/index.html")
 	if err != nil {
+		log.Printf("Failed to load index template: %v", err)
 		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	tmpl.Execute(w, nil)
+	db := database.CreateConnection()
+	defer db.Close()
+
+	posts, err := repositories.GetPosts(db)
+	if err != nil {
+		log.Printf("Failed to get posts: %v", err)
+		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// fetch comments for each post
+	for i, post := range posts {
+		comments, err := repositories.GetComments(db, post.ID)
+		if err != nil {
+			log.Printf("Failed to get posts: %v", err)
+			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		posts[i].Comments = comments
+	}
+
+	data := struct {
+		Posts []models.Post
+	}{
+		Posts: posts,
+	}
+	tmpl.Execute(w, data)
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +70,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		util.ErrorHandler(w, "Page not found", http.StatusNotFound)
 		return
 	}
+
+	var user models.User
 
 	if r.Method == http.MethodPost {
 		if user.Username == "" || user.Email == "" || user.Password == "" {
@@ -68,6 +99,8 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		util.ErrorHandler(w, "Page Not Found", http.StatusNotFound)
 		return
 	}
+
+	var user models.User
 
 	if r.Method == http.MethodPost {
 		fmt.Println("OK: ", http.StatusOK)
