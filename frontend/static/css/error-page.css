@@ -32,18 +32,10 @@ body.dark-theme {
   transition: var(--transition);
 }
 
-.container {
-  transition: var(--transition);
-}
-
 .status-code {
-  font-size: 3rem;
+  font-size: 5rem;
   font-weight: bold;
   color: var(--tertiary-color);
-}
-
-body.dark-theme .status-code {
-  color: var(--dark-accent-color);
 }
 
 .status-msg {
