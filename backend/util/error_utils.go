@@ -1,4 +1,4 @@
-package handler
+package util
 
 import (
 	"log"
@@ -15,6 +15,7 @@ type Message struct {
 func ErrorHandler(w http.ResponseWriter, errval string, statusCode int) {
 	tmpl, err := template.ParseFiles("frontend/templates/error.html")
 	if err != nil {
+		log.Printf("Failed to load error template: %v", err)
 		http.Error(w, errval, statusCode)
 		return
 	}
@@ -26,8 +27,11 @@ func ErrorHandler(w http.ResponseWriter, errval string, statusCode int) {
 		ErrMessage: errval,
 	}
 
+	w.WriteHeader(statusCode)
+
 	err = tmpl.Execute(w, data)
 	if err != nil {
-		log.Println("Error with the template file", err)
+		log.Printf("Error executing the template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }

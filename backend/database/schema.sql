@@ -19,7 +19,14 @@ CREATE TABLE IF NOT EXISTS tblPosts (
   FOREIGN KEY (parent_id) REFERENCES tblPosts (id)
 );
 
-CREATE TABLE IF NOT EXISTS tblFiles (
+CREATE TABLE IF NOT EXISTS tblPostCategories (
+  id INTEGER PRIMARY KEY,
+  post_id INTEGER NOT NULL,
+  category TEXT,
+  FOREIGN KEY (post_id) REFERENCES tblPosts (id)
+);
+
+CREATE TABLE IF NOT EXISTS tblMediaFiles (
   id INTEGER PRIMARY KEY,
   post_id INTEGER NOT NULL,
   file_name TEXT,
@@ -31,6 +38,7 @@ CREATE TABLE IF NOT EXISTS tblFiles (
 CREATE TABLE IF NOT EXISTS tblReactions (
   id INTEGER PRIMARY KEY,
   reaction TEXT,
+  reaction_status TEXT DEFAULT 'clicked',
   user_id INTEGER NOT NULL,
   post_id INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES tblUsers (id),
