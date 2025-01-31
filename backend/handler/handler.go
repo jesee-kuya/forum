@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"text/template"
 
-	"github.com/jesee-kuya/forum/backend/database"
 	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
@@ -35,10 +34,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db := database.CreateConnection()
-	defer db.Close()
-
-	posts, err := repositories.GetPosts(db)
+	posts, err := repositories.GetPosts(util.DB)
 	if err != nil {
 		log.Printf("Failed to get posts: %v", err)
 		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
@@ -47,7 +43,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 	// fetch comments for each post
 	for i, post := range posts {
-		comments, err := repositories.GetComments(db, post.ID)
+		comments, err := repositories.GetComments(util.DB, post.ID)
 		if err != nil {
 			log.Printf("Failed to get posts: %v", err)
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
