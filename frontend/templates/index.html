@@ -170,14 +170,14 @@
         <p class="post-category"><span>{{ .PostCategory }}</span></p>
 
         <div class="post-actions">
-          <button class="like-button">
+          <button class="like-button" data-post-id="{{ .ID }}">
             <i class="fa-regular fa-thumbs-up"></i> <span>{{ .Likes }}</span>
           </button>
-          <button class="dislike-button">
+          <button class="dislike-button" data-post-id="{{ .ID }}">
             <i class="fa-regular fa-thumbs-down"></i>
             <span>{{ .Dislikes }}</span>
           </button>
-          <button class="comment-button">
+          <button class="comment-button" data-post-id="{{ .ID }}">
             <i class="fa-regular fa-comment"></i>
             <span>{{ .CommentCount }}</span>
           </button>
@@ -201,11 +201,11 @@
           <div class="comment">
             <p><strong>{{ .UserName }}</strong>: {{ .Body }}</p>
             <div class="comment-actions">
-              <button class="like-comment-button">
+              <button class="like-comment-button" data-post-id="{{ .ID }}">
                 <i class="fa-regular fa-thumbs-up"></i>
                 <span>{{ .Likes }}</span>
               </button>
-              <button class="dislike-comment-button">
+              <button class="dislike-comment-button" data-post-id="{{ .ID }}">
                 <i class="fa-regular fa-thumbs-down"></i>
                 <span>{{ .Dislikes }}</span>
               </button>
