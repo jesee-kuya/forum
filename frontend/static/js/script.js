@@ -45,18 +45,25 @@ document.addEventListener('DOMContentLoaded', () => {
 // Uses fetch API to make asynchronous requests to the backend when the like button is clicked.
 document.querySelectorAll('.like-button').forEach((button) => {
   button.addEventListener('click', async function () {
-    const postId = this.dataset.postId;
+    console.log('Like button clicked');
+
+    const postId = this.getAttribute('data-post-id');
+    if (!postId) return;
+
     const response = await fetch('/like', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ post_id: postId }),
+      body: JSON.stringify({ post_id: parseInt(postId) }),
     });
 
     if (response.ok) {
       const data = await response.json();
+      // Update the like count dynamically
       this.querySelector('span').textContent = data.newLikeCount;
+    } else {
+      console.error('Failed to update like count');
     }
   });
 });
@@ -82,24 +89,3 @@ document.querySelectorAll('.submit-comment').forEach((button) => {
     }
   });
 });
-
-// Uses fetch API to fetch user details when the page loads.
-async function loadUserProfile() {
-  try {
-    const response = await fetch('/user');
-    if (!response.ok) throw new Error('Failed to fetch user');
-
-    const user = await response.json();
-    document.querySelector(
-      '.profile img'
-    ).src = `/frontend/static/img/profile-image.jpeg`;
-    document.querySelector('.profile p strong').textContent = user.name;
-    document.querySelector(
-      '.profile p:nth-of-type(2)'
-    ).innerHTML = `<strong>Email:</strong> ${user.email}`;
-  } catch (error) {
-    console.error('Error loading user profile:', error);
-  }
-}
-
-window.addEventListener('DOMContentLoaded', loadUserProfile);
