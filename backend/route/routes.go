@@ -26,6 +26,6 @@ func InitRoutes() *http.ServeMux {
 
 	// r.HandleFunc("/posts", handler.GetAllPosts(db, tmpl))
 	r.HandleFunc("/api/posts", handler.GetAllPostsAPI(util.DB))
-
+	r.HandleFunc("/like", handler.LikePostHandler)
 	return r
 }
