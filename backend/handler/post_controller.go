@@ -90,3 +90,35 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func LikePostHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		util.ErrorHandler(w, "Invalid request method", http.StatusMethodNotAllowed)
+		log.Println("Invalid request method")
+		return
+	}
+
+	var req struct {
+		PostID int `json:"post_id"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		util.ErrorHandler(w, "Bad request", http.StatusBadRequest)
+		log.Printf("Failed to decode response body: %v\n", err)
+		return
+	}
+
+	log.Printf("Received post_id: %d\n", req.PostID)
+
+	newLikeCount, err := repositories.UpdateLikeCount(util.DB, req.PostID, 3)
+	if err != nil {
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+		log.Printf("Failed updating likes count: %v\n", err)
+		return
+	}
+
+	resp := map[string]int{"newLikeCount": newLikeCount}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
+}
