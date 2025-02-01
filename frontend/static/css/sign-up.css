@@ -6,7 +6,7 @@ body {
 }
 
 .signup-container {
-  background-color: var(--dark-text-color);
+  background-color: #f9f9f9;
   padding: 2rem;
   border-radius: 8px;
   box-shadow: var(--light-box-shadow);
