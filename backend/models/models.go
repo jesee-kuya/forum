@@ -36,7 +36,7 @@ type Post struct {
 // Category model
 type Category struct {
 	ID           int    `json:"id"`
-	PostID       string `json:"post_id"`
+	PostID       int `json:"post_id"`
 	CategoryName string `json:"category"`
 }
 

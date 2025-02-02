@@ -15,6 +15,8 @@ import (
 func main() {
 	util.Init()
 	defer util.DB.Close()
+
+	addCategories()
 	
 	port, err := util.ValidatePort()
 	if err != nil {
@@ -66,12 +68,28 @@ func addReactions() {
 	repositories.InsertRecord(util.DB, "tblReactions", []string{"reaction", "user_id", "post_id"}, reaction.Reaction, reaction.UserID, reaction.PostID)
 }
 
+func addCategories() {
+	cat := models.Category{
+		PostID: 7,
+		CategoryName: "Technology",
+	}
+
+	repositories.InsertRecord(util.DB, "tblPostCategories", []string{"post_id", "category"}, cat.PostID, cat.CategoryName)
+}
+
 func addPost() {
 	post := models.Post{
-		PostTitle:    "Monthly Goals",
-		Body:         "The bocal team has brought a requirement of submitting monthly goals for every apprentice enrolled in the boot camp",
+		PostTitle:    "Sunday Rost",
+		Body:         "The earth will be exactly six thousand years in 2027",
 		UserID:       1,
 	}
 
-	repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "post_category", "user_id"}, post.PostTitle, post.Body, post.UserID)
+	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "user_id"}, post.PostTitle, post.Body, post.UserID)
+
+	if err != nil {
+		fmt.Println("failed to AD post", err)
+		return
+	}
+
+	fmt.Println("added post", id)
 }

@@ -164,6 +164,11 @@
         </div>
         <h3>{{ .PostTitle }}</h3>
         <p>{{ .Body }}</p>
+
+          {{ range .Categories }}
+            <p class="post-category"><span>{{ .CategoryName }}</span></p>
+          {{ end }}
+
         <div class="post-actions">
           <button class="like-button">
             <i class="fa-regular fa-thumbs-up"></i> <span>{{ .Likes }}</span>
