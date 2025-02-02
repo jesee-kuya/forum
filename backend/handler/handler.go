@@ -44,6 +44,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// fetch comments for each post
 	for i, post := range posts {
 		comments, err := repositories.GetComments(util.DB, post.ID)
+
 		if err != nil {
 			log.Printf("Failed to get posts: %v", err)
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
@@ -58,6 +59,13 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		Posts: posts,
 	}
+
+	// fmt.Println(data)
+
+	for i := 0; i < len(data.Posts); i++ {
+		fmt.Println(data.Posts[i])
+	}
+
 	tmpl.Execute(w, data)
 }
 
