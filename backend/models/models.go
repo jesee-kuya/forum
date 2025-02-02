@@ -17,19 +17,20 @@ type User struct {
 
 // Post model
 type Post struct {
-	ID           int       `json:"id"`
-	UserID       int       `json:"user_id"`
-	UserName     string    `json:"username"`
-	PostTitle    string    `json:"post_title"`
-	Body         string    `json:"body"`
-	ParentID     *int       `json:"parent_id"`
-	CreatedOn    time.Time `json:"created_on"`
-	PostStatus   string    `json:"post_status"`
-	Likes        int       `json:"likes"`
-	Dislikes     int       `json:"dislikes"`
-	CommentCount int       `json:"comment_count"`
-	ImageURL     string    `json:"imageurl"`
-	Comments     []Post
+	ID           int         `json:"id"`
+	UserID       int         `json:"user_id"`
+	UserName     string      `json:"username"`
+	PostTitle    string      `json:"post_title"`
+	Body         string      `json:"body"`
+	ParentID     *int        `json:"parent_id"`
+	CreatedOn    time.Time   `json:"created_on"`
+	PostStatus   string      `json:"post_status"`
+	Likes        int         `json:"likes"`
+	Dislikes     int         `json:"dislikes"`
+	CommentCount int         `json:"comment_count"`
+	Categories   []Category  `json:"categorie"`
+	ImageURL     []MediaFile `json:"imageurl"`
+	Comments     []Post      `json:"comments"`
 }
 
 // Category model
