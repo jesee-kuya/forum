@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	"github.com/jesee-kuya/forum/backend/controllers"
+	handler "github.com/jesee-kuya/forum/backend/handler"
 	"github.com/jesee-kuya/forum/backend/middleware"
 )
 
@@ -11,17 +11,17 @@ func RegisterRoutes() *http.ServeMux {
 	r := http.NewServeMux()
 
 	// Public routes
-	r.HandleFunc("/api/register", controllers.RegisterUser)
-	r.HandleFunc("/api/login", controllers.Login)
-	r.HandleFunc("/api/posts", controllers.GetAllPosts)
+	r.HandleFunc("/api/register", handler.RegisterUser)
+	r.HandleFunc("/api/login", handler.Login)
+	r.HandleFunc("/api/posts", handler.GetAllPosts)
 
 	// Protected routes (authentication required)
 	protectedRoutes := map[string]http.HandlerFunc{
-		"/api/posts/create":  controllers.CreatePost,
-		"/api/posts/like":    controllers.LikePost,
-		"/api/posts/comment": controllers.CreateComment,
-		"/api/posts/filter":  controllers.FilterPosts,
-		// "/api/upload":        controllers.UploadMedia,
+		"/api/posts/create":  handler.CreatePost,
+		"/api/posts/like":    handler.LikePost,
+		"/api/posts/comment": handler.CreateComment,
+		"/api/posts/filter":  handler.FilterPosts,
+		// "/api/upload":        handler.UploadMedia,
 	}
 
 	for route, handler := range protectedRoutes {
