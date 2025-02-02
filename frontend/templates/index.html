@@ -164,10 +164,6 @@
         </div>
         <h3>{{ .PostTitle }}</h3>
         <p>{{ .Body }}</p>
-        {{ if .ImageURL }}
-        <img src="{{ .ImageURL }}" alt="{{ .FileName }}" />
-        {{ end }}
-        
         <div class="post-actions">
           <button class="like-button">
             <i class="fa-regular fa-thumbs-up"></i> <span>{{ .Likes }}</span>
