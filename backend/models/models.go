@@ -24,7 +24,6 @@ type Post struct {
 	Body         string    `json:"body"`
 	ParentID     *int       `json:"parent_id"`
 	CreatedOn    time.Time `json:"created_on"`
-	PostCategory string    `json:"post_category"`
 	PostStatus   string    `json:"post_status"`
 	Likes        int       `json:"likes"`
 	Dislikes     int       `json:"dislikes"`
