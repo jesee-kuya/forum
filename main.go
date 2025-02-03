@@ -16,8 +16,6 @@ func main() {
 	util.Init()
 	defer util.DB.Close()
 
-	// addCategories()
-
 	port, err := util.ValidatePort()
 	if err != nil {
 		log.Fatalf("Error validating port: %v", err)
