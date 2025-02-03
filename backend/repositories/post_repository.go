@@ -11,7 +11,7 @@ var PostQuery string
 
 func GetPosts(db *sql.DB) ([]models.Post, error) {
 	query := `
-		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on
+		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on, p.media_url
 		FROM tblPosts p
 		JOIN tblUsers u ON p.user_id = u.id
 		WHERE p.parent_id IS NULL AND p.post_status = 'visible'
@@ -33,7 +33,7 @@ func GetPosts(db *sql.DB) ([]models.Post, error) {
 
 func GetComments(db *sql.DB, id int) ([]models.Post, error) {
 	query := `
-		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on
+		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on, p.media_url
 		FROM tblPosts p
 		JOIN tblUsers u ON p.user_id = u.id
 		WHERE p.parent_id = ? AND p.post_status = 'visible'
@@ -61,7 +61,7 @@ func FilterPosts(db *sql.DB, filterType, filterValue string) ([]models.Post, err
 	switch filterType {
 	case "category":
 		query = `
-			SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on
+			SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on, p.media_url
 			FROM tblPosts p
 			JOIN tblUsers u ON p.user_id = u.id
 			LEFT JOIN tblPostCategories c ON p.id = c.post_id 
@@ -69,14 +69,14 @@ func FilterPosts(db *sql.DB, filterType, filterValue string) ([]models.Post, err
 			`
 	case "user":
 		query = `
-		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on
+		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on, p.media_url
 		FROM tblPosts p
 		JOIN tblUsers u ON p.user_id = u.id
 		WHERE p.parent_id IS NULL AND p.post_status = 'visible' AND u.id = ?
 		`
 	case "likes":
 		query = `
-		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on
+		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on, p.media_url
 		FROM tblPosts p
 		JOIN tblUsers u ON p.user_id = u.id
 		LEFT JOIN tblReactions r ON p.id = r.post_id 
@@ -106,7 +106,7 @@ func processSQLData(rows *sql.Rows) ([]models.Post, error) {
 	for rows.Next() {
 		post := models.Post{}
 
-		err := rows.Scan(&post.ID, &post.UserID, &post.UserName, &post.PostTitle, &post.Body, &post.CreatedOn)
+		err := rows.Scan(&post.ID, &post.UserID, &post.UserName, &post.PostTitle, &post.Body, &post.CreatedOn, &post.MediaURL)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
