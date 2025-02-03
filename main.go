@@ -68,7 +68,7 @@ func addReactions() {
 
 func addCategories() {
 	cat := models.Category{
-		PostID:       7,
+		PostID: 7,
 		CategoryName: "Technology",
 	}
 
@@ -77,12 +77,13 @@ func addCategories() {
 
 func addPost() {
 	post := models.Post{
-		PostTitle: "Sunday Rost",
-		Body:      "The earth will be exactly six thousand years in 2027",
-		UserID:    1,
+		PostTitle:    "Sunday Rost",
+		Body:         "The earth will be exactly six thousand years in 2027",
+		UserID:       1,
 	}
 
 	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "user_id"}, post.PostTitle, post.Body, post.UserID)
+
 	if err != nil {
 		fmt.Println("failed to AD post", err)
 		return

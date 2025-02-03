@@ -332,6 +332,13 @@ body.dark-theme .create-post form label {
   padding: 0.5rem;
 }
 
+.category-div {
+  display: flex;
+  align-items: center;
+  column-gap: 5px;
+  flex-wrap: wrap;
+}
+
 .create-post form .categories label {
   display: flex;
   align-items: center;
