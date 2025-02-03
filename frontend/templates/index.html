@@ -103,43 +103,50 @@
             required
           ></textarea>
 
-          <fieldset class="categories">
+          <fieldset class="categories" name="categories">
             <legend>Select Category</legend>
             <label>
-              <input type="checkbox" name="category" value="Technology" />
+              <input type="checkbox" name="category[]" value="Technology" />
               Technology
             </label>
             <label>
-              <input type="checkbox" name="category" value="Health" /> Health
+              <input type="checkbox" name="category[]" value="Health" />
+              Health
             </label>
             <label>
-              <input type="checkbox" name="category" value="Education" />
+              <input type="checkbox" name="category[]" value="Education" />
               Education
             </label>
             <label>
-              <input type="checkbox" name="category" value="Sports" /> Sports
+              <input type="checkbox" name="category[]" value="Sports" />
+              Sports
             </label>
             <label>
-              <input type="checkbox" name="category" value="Entertainment" />
+              <input type="checkbox" name="category[]" value="Entertainment" />
               Entertainment
             </label>
             <label>
-              <input type="checkbox" name="category" value="Finance" /> Finance
+              <input type="checkbox" name="category[]" value="Finance" />
+              Finance
             </label>
             <label>
-              <input type="checkbox" name="category" value="Travel" /> Travel
+              <input type="checkbox" name="category[]" value="Travel" />
+              Travel
             </label>
             <label>
-              <input type="checkbox" name="category" value="Food" /> Food
+              <input type="checkbox" name="category[]" value="Food" />
+              Food
             </label>
             <label>
-              <input type="checkbox" name="category" value="Lifestyle" />
+              <input type="checkbox" name="category[]" value="Lifestyle" />
               Lifestyle
             </label>
             <label>
-              <input type="checkbox" name="category" value="Science" /> Science
+              <input type="checkbox" name="category[]" value="Science" />
+              Science
             </label>
           </fieldset>
+          
 
           <div class="post-operations">
             <input type="file" name="uploaded-file" />
@@ -163,9 +170,12 @@
         <h3>{{ .PostTitle }}</h3>
         <p>{{ .Body }}</p>
 
-        {{ range .Categories }}
-        <p class="post-category"><span>{{ .CategoryName }}</span></p>
-        {{ end }}
+        <div class="category-div">
+          {{ range .Categories }}
+          <p class="post-category"><span>{{ .CategoryName }}</span></p>
+          {{ end }}
+        </div>
+        
 
         <div class="post-actions">
           <button class="like-button">
