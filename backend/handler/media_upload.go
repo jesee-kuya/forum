@@ -7,7 +7,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"text/template"
 
 	"github.com/jesee-kuya/forum/backend/util"
 )
@@ -29,67 +28,52 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles("frontend/templates/index.html")
+	// Parse the multipart form with a 25MB limit
+	err := r.ParseMultipartForm(25 << 20)
 	if err != nil {
-		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
-		log.Println("Failed parsing templates:", err)
+		util.ErrorHandler(w, "Failed parsing form data", http.StatusBadRequest)
+		log.Println("Failed parsing multipart form:", err)
 		return
 	}
 
-	err = tmpl.Execute(w, nil)
+	file, handler, err := r.FormFile("uploaded-file")
 	if err != nil {
-		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
-		log.Println("Failed executing template:", err)
+		util.ErrorHandler(w, "File upload error", http.StatusBadRequest)
+		log.Println("Failed retrieving media file:", err)
+		return
+	}
+	defer file.Close()
+
+	fmt.Printf("Content Type: %v\n", handler.Header)
+
+	fmt.Printf("Successfully uploaded file: %v\n", handler.Filename)
+
+	// Validate MIME type and get the file extension
+	fileExt, err := ValidateMimeType(file)
+	if err != nil {
+		util.ErrorHandler(w, err.Error(), http.StatusBadRequest)
+		log.Println("Invalid extension associated with file:", err)
 		return
 	}
 
-	if r.FormValue("upload") != "" {
-		fmt.Fprintf(w, "Uploading file...\n")
-
-		// Parse the multipart form with a 25MB limit
-		err := r.ParseMultipartForm(25 << 20)
-		if err != nil {
-			util.ErrorHandler(w, "Failed parsing form data", http.StatusBadRequest)
-			log.Println("Failed parsing multipart form:", err)
-			return
-		}
-
-		file, handler, err := r.FormFile("uploaded-file")
-		if err != nil {
-			util.ErrorHandler(w, "File upload error", http.StatusBadRequest)
-			log.Println("Failed retrieving media file:", err)
-			return
-		}
-		defer file.Close()
-
-		fmt.Printf("Successfully uploaded file: %v\n", handler.Filename)
-
-		// Validate MIME type and get the file extension
-		fileExt, err := ValidateMimeType(file)
-		if err != nil {
-			util.ErrorHandler(w, err.Error(), http.StatusBadRequest)
-			log.Println("Invalid extension associated with file:", err)
-			return
-		}
-
-		// Create a temporary file with the correct extension
-		tempFile, err := os.CreateTemp("uploads", "upload-*"+fileExt)
-		if err != nil {
-			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
-			log.Println("Failed creating a temporary file:", err)
-			return
-		}
-		defer tempFile.Close()
-
-		// Copy file contents to the temporary file
-		_, err = io.Copy(tempFile, file)
-		if err != nil {
-			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
-			log.Println("Failed saving file to temporary location:", err)
-			return
-		}
-		fmt.Fprintf(w, "Successfully uploaded file.\n")
+	// Create a temporary file with the correct extension
+	tempFile, err := os.CreateTemp("uploads", "upload-*"+fileExt)
+	if err != nil {
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+		log.Println("Failed creating a temporary file:", err)
+		return
 	}
+	defer tempFile.Close()
+
+	// Copy file contents to the temporary file
+	_, err = io.Copy(tempFile, file)
+	if err != nil {
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+		log.Println("Failed saving file to temporary location:", err)
+		return
+	}
+	fmt.Fprintf(w, "Successfully uploaded file.\n")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 /*

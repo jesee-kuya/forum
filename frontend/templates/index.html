@@ -85,7 +85,7 @@
     <main class="posts">
       <section class="create-post hidden">
         <h2>Create a New Post</h2>
-        <form>
+        <form name="upload" enctype="multipart/form-data" action="/upload" method="POST">
           <label for="post-title">Title</label>
           <input
             type="text"
@@ -142,9 +142,7 @@
           </fieldset>
 
           <div class="post-operations">
-            <form enctype="multipart/form-data" action="/upload" method="post">
-              <input type="file" name="uploaded-file" />
-            </form>
+            <input type="file" name="uploaded-file" />
 
             <button type="submit">Post</button>
           </div>
@@ -165,9 +163,9 @@
         <h3>{{ .PostTitle }}</h3>
         <p>{{ .Body }}</p>
 
-          {{ range .Categories }}
-            <p class="post-category"><span>{{ .CategoryName }}</span></p>
-          {{ end }}
+        {{ range .Categories }}
+        <p class="post-category"><span>{{ .CategoryName }}</span></p>
+        {{ end }}
 
         <div class="post-actions">
           <button class="like-button">
