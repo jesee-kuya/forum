@@ -17,36 +17,27 @@ type User struct {
 
 // Post model
 type Post struct {
-	ID           int         `json:"id"`
-	UserID       int         `json:"user_id"`
-	UserName     string      `json:"username"`
-	PostTitle    string      `json:"post_title"`
-	Body         string      `json:"body"`
-	ParentID     *int        `json:"parent_id"`
-	CreatedOn    time.Time   `json:"created_on"`
-	PostStatus   string      `json:"post_status"`
-	Likes        int         `json:"likes"`
-	Dislikes     int         `json:"dislikes"`
-	CommentCount int         `json:"comment_count"`
-	Categories   []Category  `json:"categorie"`
-	ImageURL     []MediaFile `json:"imageurl"`
-	Comments     []Post      `json:"comments"`
+	ID           int        `json:"id"`
+	UserID       int        `json:"user_id"`
+	UserName     string     `json:"username"`
+	PostTitle    string     `json:"post_title"`
+	Body         string     `json:"body"`
+	ParentID     *int       `json:"parent_id"`
+	CreatedOn    time.Time  `json:"created_on"`
+	PostStatus   string     `json:"post_status"`
+	Likes        int        `json:"likes"`
+	Dislikes     int        `json:"dislikes"`
+	CommentCount int        `json:"comment_count"`
+	Categories   []Category `json:"categorie"`
+	MediaURL     string     `json:"imageurl"`
+	Comments     []Post     `json:"comments"`
 }
 
 // Category model
 type Category struct {
 	ID           int    `json:"id"`
-	PostID       int `json:"post_id"`
+	PostID       int    `json:"post_id"`
 	CategoryName string `json:"category"`
-}
-
-// File model
-type MediaFile struct {
-	ID         int    `json:"id"`
-	PostID     int    `json:"post_id"`
-	FileName   string `json:"file_path"`
-	FileType   string `json:"file_type"`
-	FileStatus string `json:"file_status"`
 }
 
 // Reaction model
