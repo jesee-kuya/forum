@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS tblPosts (
   parent_id INTEGER DEFAULT NULL,
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   post_status TEXT DEFAULT 'visible',
+  media_url TEXT DEFAULT '',
   FOREIGN KEY (user_id) REFERENCES tblUsers (id),
   FOREIGN KEY (parent_id) REFERENCES tblPosts (id)
 );
@@ -22,15 +23,6 @@ CREATE TABLE IF NOT EXISTS tblPostCategories (
   id INTEGER PRIMARY KEY,
   post_id INTEGER NOT NULL,
   category TEXT,
-  FOREIGN KEY (post_id) REFERENCES tblPosts (id)
-);
-
-CREATE TABLE IF NOT EXISTS tblMediaFiles (
-  id INTEGER PRIMARY KEY,
-  post_id INTEGER NOT NULL,
-  file_name TEXT,
-  file_type TEXT,
-  file_status TEXT DEFAULT 'visible',
   FOREIGN KEY (post_id) REFERENCES tblPosts (id)
 );
 
