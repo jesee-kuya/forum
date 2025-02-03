@@ -90,3 +90,7 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func AddPostHandler(w http.ResponseWriter, r *http.Request) {
+	repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "post_category", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), r.FormValue("category"), 1)
+}

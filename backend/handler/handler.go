@@ -128,7 +128,4 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func AddPostHandler(w http.ResponseWriter, r *http.Request) {
-	title := r.FormValue("post-title")
-	repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "post_category", "user_id"}, title, r.FormValue("post-content"), r.FormValue("category"), 1)
-}
+
