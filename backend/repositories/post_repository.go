@@ -7,12 +7,15 @@ import (
 	"github.com/jesee-kuya/forum/backend/models"
 )
 
+var PostQuery string
+
 func GetPosts(db *sql.DB) ([]models.Post, error) {
 	query := `
 		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on
 		FROM tblPosts p
 		JOIN tblUsers u ON p.user_id = u.id
-		WHERE p.parent_id IS NULL AND p.post_status = 'visible'`
+		WHERE p.parent_id IS NULL AND p.post_status = 'visible'
+		`
 
 	rows, err := db.Query(query)
 	if err != nil {
@@ -73,15 +76,33 @@ func FilterPosts(db *sql.DB, filterType, filterValue string) ([]models.Post, err
 
 	switch filterType {
 	case "category":
-		query = "SELECT * FROM tblPosts WHERE post_category = ?"
-		rows, err = db.Query(query, filterValue)
+		query = `
+			SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on
+			FROM tblPosts p
+			JOIN tblUsers u ON p.user_id = u.id
+			LEFT JOIN tblPostCategories c ON p.id = c.post_id 
+			WHERE p.parent_id IS NULL AND p.post_status = 'visible' AND c.category = ? 
+			`
 	case "user":
-		query = "SELECT * FROM tblPosts WHERE user_id = ?"
-		rows, err = db.Query(query, filterValue)
+		query = `
+		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on
+		FROM tblPosts p
+		JOIN tblUsers u ON p.user_id = u.id
+		WHERE p.parent_id IS NULL AND p.post_status = 'visible' AND u.id = ?
+		`
+	case "likes" :
+		query = `
+		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on
+		FROM tblPosts p
+		JOIN tblUsers u ON p.user_id = u.id
+		LEFT JOIN tblReactions r ON p.id = r.post_id 
+		WHERE p.parent_id IS NULL AND p.post_status = 'visible' AND r.reaction_status = 'clicked' AND r.reaction = 'Like' AND r.user_id = ?
+		`
 	default:
 		return nil, fmt.Errorf("invalid filter type")
 	}
 
+	rows, err = db.Query(query, filterValue)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %v", err)
 	}
