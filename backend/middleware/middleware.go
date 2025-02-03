@@ -1,38 +1,33 @@
 package middleware
 
 import (
-	"context"
+	"log"
 	"net/http"
-	"strings"
+	"strconv"
 
 	"github.com/jesee-kuya/forum/backend/repositories"
-	"github.com/jesee-kuya/forum/backend/util"
 )
 
+// Authenticate middleware to check session token
 func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		authHeader := r.Header.Get("Authorization")
-
-		if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
-			token := strings.TrimPrefix(authHeader, "Bearer ")
-			userID, err := repositories.ValidateSession(token)
-			if err == nil {
-				ctx := context.WithValue(r.Context(), "userID", userID)
-				next(w, r.WithContext(ctx))
-				return
-			}
-		}
-
 		cookie, err := r.Cookie("session_token")
-		if err == nil {
-			userID, err := repositories.ValidateSession(cookie.Value)
-			if err == nil {
-				ctx := context.WithValue(r.Context(), "userID", userID)
-				next(w, r.WithContext(ctx))
-				return
-			}
+		if err != nil {
+			http.Error(w, "Unauthorized: No session token", http.StatusUnauthorized)
+			return
 		}
 
-		util.ErrorHandler(w, "Unauthorized", http.StatusUnauthorized)
+		userID, err := repositories.ValidateSession(cookie.Value)
+		if err != nil {
+			log.Printf("Invalid session token: %v", err)
+			http.Error(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+			return
+		}
+
+		x := strconv.Itoa(userID)
+
+		r.Header.Set("X-User-ID", x)
+
+		next(w, r)
 	}
 }
