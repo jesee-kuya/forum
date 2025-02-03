@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
 )
 
@@ -38,42 +39,93 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	file, handler, err := r.FormFile("uploaded-file")
 	if err != nil {
-		util.ErrorHandler(w, "File upload error", http.StatusBadRequest)
-		log.Println("Failed retrieving media file:", err)
-		return
+		if err.Error() == "http: no such file" {
+			log.Println("No file uploaded, continuing process.")
+		} else {
+			util.ErrorHandler(w, "File upload error", http.StatusBadRequest)
+			log.Println("Failed retrieving media file:", err)
+			return
+		}
 	}
-	defer file.Close()
 
-	fmt.Printf("Content Type: %v\n", handler.Header)
+	if file != nil {
+		defer file.Close()
 
-	fmt.Printf("Successfully uploaded file: %v\n", handler.Filename)
+		log.Printf("Success in uploading %q, content type %v.\n", handler.Filename, handler.Header)
 
-	// Validate MIME type and get the file extension
-	fileExt, err := ValidateMimeType(file)
+		// Validate MIME type and get the file extension
+		fileExt, err := ValidateMimeType(file)
+		if err != nil {
+			util.ErrorHandler(w, err.Error(), http.StatusBadRequest)
+			log.Println("Invalid extension associated with file:", err)
+			return
+		}
+
+		// Create a temporary file with the correct extension
+		tempFile, err := os.CreateTemp("uploads", "upload-*"+fileExt)
+		if err != nil {
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+			log.Println("Failed creating a temporary file:", err)
+			return
+		}
+		defer tempFile.Close()
+
+		// Copy file contents to the temporary file
+		_, err = io.Copy(tempFile, file)
+		if err != nil {
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+			log.Println("Failed saving file to temporary location:", err)
+			return
+		}
+	}
+
+	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), 1)
 	if err != nil {
-		util.ErrorHandler(w, err.Error(), http.StatusBadRequest)
-		log.Println("Invalid extension associated with file:", err)
+		fmt.Println("failed to AD post", err)
 		return
 	}
 
-	// Create a temporary file with the correct extension
-	tempFile, err := os.CreateTemp("uploads", "upload-*"+fileExt)
+	err = r.ParseForm()
 	if err != nil {
-		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
-		log.Println("Failed creating a temporary file:", err)
+		http.Error(w, "Failed to parse form", http.StatusBadRequest)
 		return
 	}
-	defer tempFile.Close()
 
-	// Copy file contents to the temporary file
-	_, err = io.Copy(tempFile, file)
-	if err != nil {
-		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
-		log.Println("Failed saving file to temporary location:", err)
-		return
+	/*
+		err = r.ParseForm()
+		if err != nil {
+			http.Error(w, "Failed to parse form", http.StatusBadRequest)
+			return
+		}
+
+		categories := r.Form["category"]
+		fmt.Println(categories)
+
+		data := struct {
+			Categories []string
+		}{
+			Categories: categories,
+		}
+
+		tmpl, err := template.ParseFiles("frontend/templates/index.html")
+		if err != nil {
+			util.ErrorHandler(w, "Failed parsing template", http.StatusNotFound)
+			return
+		}
+		tmpl.Execute(w, data)
+	*/
+
+	categories := r.Form["category[]"]
+
+	fmt.Println("Categories:", categories)
+
+	for _, category := range categories {
+		repositories.InsertRecord(util.DB, "tblPostCategories", []string{"post_id", "category"}, id, category)
 	}
-	fmt.Fprintf(w, "Successfully uploaded file.\n")
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+	r.Method = http.MethodGet
+	IndexHandler(w, r)
 }
 
 /*
