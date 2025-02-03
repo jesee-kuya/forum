@@ -12,6 +12,10 @@ import (
 )
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
+	title := r.FormValue("post-title")
+	if title != "" {
+		AddPostHandler(w, r)
+	}
 	// URL path
 	if r.URL.Path != "/" {
 		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
@@ -122,4 +126,9 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func AddPostHandler(w http.ResponseWriter, r *http.Request) {
+	title := r.FormValue("post-title")
+	repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "post_category", "user_id"}, title, r.FormValue("post-content"), r.FormValue("category"), 1)
 }
