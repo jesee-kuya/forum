@@ -33,7 +33,6 @@ func setupTestDBP(t *testing.T) *sql.DB {
 			post_title TEXT,
 			body TEXT,
 			created_on DATETIME,
-			post_category TEXT,
 			parent_id INTEGER,
 			post_status TEXT DEFAULT 'visible',
 			FOREIGN KEY (user_id) REFERENCES tblUsers(id)
@@ -41,12 +40,12 @@ func setupTestDBP(t *testing.T) *sql.DB {
 
 		INSERT INTO tblUsers (username) VALUES ('user1'), ('user2');
 
-		INSERT INTO tblPosts (user_id, post_title, body, created_on, post_category, parent_id, post_status)
+		INSERT INTO tblPosts (user_id, post_title, body, created_on, parent_id, post_status)
 		VALUES
-			(1, 'Post 1', 'Content 1', '2023-10-01 10:00:00', 'General', NULL, 'visible'),
-			(2, 'Post 2', 'Content 2', '2023-10-02 11:00:00', 'Tech', NULL, 'visible'),
-			(1, 'Comment 1', 'Comment Content 1', '2023-10-01 10:30:00', 'General', 1, 'visible'),
-			(2, 'Comment 2', 'Comment Content 2', '2023-10-02 11:30:00', 'Tech', 2, 'visible');
+			(1, 'Post 1', 'Content 1', '2023-10-01 10:00:00', NULL, 'visible'),
+			(2, 'Post 2', 'Content 2', '2023-10-02 11:00:00', NULL, 'visible'),
+			(1, 'Comment 1', 'Comment Content 1', '2023-10-01 10:30:00', 1, 'visible'),
+			(2, 'Comment 2', 'Comment Content 2', '2023-10-02 11:30:00', 2, 'visible');
 	`)
 	if err != nil {
 		t.Fatalf("Failed to set up test data: %v", err)
@@ -80,7 +79,6 @@ func TestGetPosts(t *testing.T) {
 			PostTitle:    "Post 1",
 			Body:         "Content 1",
 			CreatedOn:    time.Date(2023, 10, 1, 10, 0, 0, 0, time.UTC),
-			PostCategory: "General",
 		},
 		{
 			ID:           2,
@@ -89,7 +87,6 @@ func TestGetPosts(t *testing.T) {
 			PostTitle:    "Post 2",
 			Body:         "Content 2",
 			CreatedOn:    time.Date(2023, 10, 2, 11, 0, 0, 0, time.UTC),
-			PostCategory: "Tech",
 		},
 	}
 
@@ -123,7 +120,6 @@ func TestGetComments(t *testing.T) {
 			PostTitle:    "Comment 1",
 			Body:         "Comment Content 1",
 			CreatedOn:    time.Date(2023, 10, 1, 10, 30, 0, 0, time.UTC),
-			PostCategory: "General",
 		},
 	}
 
@@ -144,7 +140,7 @@ func TestProcessSQLData(t *testing.T) {
 
 	// Query rows from the database
 	rows, err := db.Query(`
-		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on, p.post_category
+		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on
 		FROM tblPosts p
 		JOIN tblUsers u ON p.user_id = u.id
 		WHERE p.parent_id IS NULL AND p.post_status = 'visible'
@@ -169,7 +165,6 @@ func TestProcessSQLData(t *testing.T) {
 			PostTitle:    "Post 1",
 			Body:         "Content 1",
 			CreatedOn:    time.Date(2023, 10, 1, 10, 0, 0, 0, time.UTC),
-			PostCategory: "General",
 		},
 		{
 			ID:           2,
@@ -178,7 +173,6 @@ func TestProcessSQLData(t *testing.T) {
 			PostTitle:    "Post 2",
 			Body:         "Content 2",
 			CreatedOn:    time.Date(2023, 10, 2, 11, 0, 0, 0, time.UTC),
-			PostCategory: "Tech",
 		},
 	}
 

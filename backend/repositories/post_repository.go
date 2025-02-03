@@ -9,7 +9,7 @@ import (
 
 func GetPosts(db *sql.DB) ([]models.Post, error) {
 	query := `
-		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on, p.post_category
+		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on
 		FROM tblPosts p
 		JOIN tblUsers u ON p.user_id = u.id
 		WHERE p.parent_id IS NULL AND p.post_status = 'visible'`
@@ -27,7 +27,7 @@ func GetPosts(db *sql.DB) ([]models.Post, error) {
 
 func GetComments(db *sql.DB, id int) ([]models.Post, error) {
 	query := `
-		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on, p.post_category
+		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on
 		FROM tblPosts p
 		JOIN tblUsers u ON p.user_id = u.id
 		WHERE p.parent_id = ? AND p.post_status = 'visible'
@@ -49,7 +49,7 @@ func processSQLData(rows *sql.Rows) ([]models.Post, error) {
 	for rows.Next() {
 		post := models.Post{}
 
-		err := rows.Scan(&post.ID, &post.UserID, &post.UserName, &post.PostTitle, &post.Body, &post.CreatedOn, &post.PostCategory)
+		err := rows.Scan(&post.ID, &post.UserID, &post.UserName, &post.PostTitle, &post.Body, &post.CreatedOn)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
@@ -90,7 +90,7 @@ func FilterPosts(db *sql.DB, filterType, filterValue string) ([]models.Post, err
 	var posts []models.Post
 	for rows.Next() {
 		var post models.Post
-		if err := rows.Scan(&post.ID, &post.UserID, &post.Body, &post.ParentID, &post.CreatedOn, &post.PostCategory); err != nil {
+		if err := rows.Scan(&post.ID, &post.UserID, &post.Body, &post.ParentID, &post.CreatedOn); err != nil {
 			return nil, fmt.Errorf("failed to scan row: %v", err)
 		}
 		posts = append(posts, post)
