@@ -12,7 +12,7 @@ import (
 // Authenticate middleware to check session token
 func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("session_token")
+		cookie, err := r.Cookie(repositories.Session.Token)
 		if err != nil {
 			util.ErrorHandler(w, "Unauthorized: No session token", http.StatusUnauthorized)
 			return
