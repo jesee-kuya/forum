@@ -46,16 +46,6 @@ func getReactions() {
 	fmt.Println(reactions)
 }
 
-func getFiles() {
-	files, err := repositories.GetMediaFiles(util.DB, 4)
-	if err != nil {
-		fmt.Println("Could not fetch files", err)
-		return
-	}
-
-	fmt.Println(files)
-}
-
 func addReactions() {
 	reaction := models.Reaction{
 		Reaction: "Dislike",
@@ -66,11 +56,4 @@ func addReactions() {
 	repositories.InsertRecord(util.DB, "tblReactions", []string{"reaction", "user_id", "post_id"}, reaction.Reaction, reaction.UserID, reaction.PostID)
 }
 
-func addUser() {
-	user := models.User{
-		Username: "john doe",
-		Email:    "johndoer@gmail.com",
-		Password: "123",
-	}
-	repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, user.Password)
-}
+
