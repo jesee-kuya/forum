@@ -16,13 +16,11 @@ import (
 var User models.User
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	// URL path
 	if r.URL.Path != "/" {
 		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
 
-	// Method used
 	if r.Method == http.MethodGet {
 		fmt.Println("OK: ", http.StatusOK)
 	} else {
@@ -30,7 +28,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// template rendering
 	tmpl, err := template.ParseFiles("frontend/templates/index.html")
 	if err != nil {
 		log.Printf("Failed to load index template: %v", err)
