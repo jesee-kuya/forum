@@ -46,11 +46,10 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// fetch comments for each post
 	for i, post := range posts {
 		comments, err1 := repositories.GetComments(util.DB, post.ID)
-		mediFiles, err2 := repositories.GetMediaFiles(util.DB, post.ID)
 		categories, err3 := repositories.GetCategories(util.DB, post.ID)
 		likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
 		dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
-		if err != nil || err1 != nil || err2 != nil || err3 != nil || err4 != nil {
+		if err != nil || err1 != nil || err3 != nil || err4 != nil {
 			log.Printf("Failed to get posts details: %v", err)
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			return
@@ -58,7 +57,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 		posts[i].Comments = comments
 		posts[i].CommentCount = len(comments)
-		posts[i].ImageURL = mediFiles
 		posts[i].Categories = categories
 		posts[i].Likes = len(likes)
 		posts[i].Dislikes = len(dislikes)
