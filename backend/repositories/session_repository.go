@@ -8,6 +8,13 @@ import (
 	"github.com/jesee-kuya/forum/backend/util"
 )
 
+type SessionManager struct {
+	Token  string
+	UserId int
+}
+
+var Session SessionManager
+
 // StoreSession creates a new session for a user with expiration time
 func StoreSession(userID int, sessionToken string) error {
 	expiration := time.Now().Add(24 * time.Hour) // Session expires in 24 hours
@@ -17,6 +24,9 @@ func StoreSession(userID int, sessionToken string) error {
 	if err != nil {
 		return fmt.Errorf("failed to store session: %v", err)
 	}
+
+	Session.Token = sessionToken
+	Session.UserId = userID
 
 	return nil
 }
