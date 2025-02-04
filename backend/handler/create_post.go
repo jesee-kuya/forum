@@ -16,6 +16,7 @@ import (
 UploadMedia handler function is responsible for performing server operations to enable media upload with a file size limit of up to 25 mbs.
 */
 func CreatePost(w http.ResponseWriter, r *http.Request) {
+	var url string
 	if r.Method != http.MethodPost {
 		util.ErrorHandler(w, "Invalid request method", http.StatusMethodNotAllowed)
 		log.Println("Invalid request method:", r.Method)
@@ -61,25 +62,41 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		_, err = file.Seek(0, 0)
+		if err != nil {
+			util.ErrorHandler(w, "Failed to reset file pointer", http.StatusInternalServerError)
+			log.Println("Failed to reset file pointer:", err)
+			return
+		}
+
 		// Create a temporary file with the correct extension
 		tempFile, err := os.CreateTemp("uploads", "upload-*"+fileExt)
 		if err != nil {
-			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
-			log.Println("Failed creating a temporary file:", err)
+			util.ErrorHandler(w, "Failed to create file", http.StatusInternalServerError)
+			log.Println("Failed to read file:", err)
 			return
 		}
 		defer tempFile.Close()
 
-		// Copy file contents to the temporary file
-		_, err = io.Copy(tempFile, file)
+		fileBytes, err := io.ReadAll(file)
 		if err != nil {
-			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
-			log.Println("Failed saving file to temporary location:", err)
+			util.ErrorHandler(w, "Failed to read file", http.StatusInternalServerError)
+			log.Println("Failed to read file:", err)
 			return
 		}
+
+		// Write the uploaded file content to the temp file
+		_, err = tempFile.Write(fileBytes)
+		if err != nil {
+			util.ErrorHandler(w, "Failed to write file", http.StatusInternalServerError)
+			log.Println("Failed to write file:", err)
+			return
+		}
+		tempFilePath := tempFile.Name()
+		url = fmt.Sprintf("%v", tempFilePath)
 	}
 
-	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), Session.UserId)
+	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "media_url", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), url, Session.UserId)
 	if err != nil {
 		fmt.Println("failed to add post", err)
 		return
