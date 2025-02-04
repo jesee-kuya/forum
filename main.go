@@ -46,16 +46,6 @@ func getReactions() {
 	fmt.Println(reactions)
 }
 
-func getFiles() {
-	files, err := repositories.GetMediaFiles(util.DB, 4)
-	if err != nil {
-		fmt.Println("Could not fetch files", err)
-		return
-	}
-
-	fmt.Println(files)
-}
-
 func addReactions() {
 	reaction := models.Reaction{
 		Reaction: "Dislike",
@@ -66,46 +56,4 @@ func addReactions() {
 	repositories.InsertRecord(util.DB, "tblReactions", []string{"reaction", "user_id", "post_id"}, reaction.Reaction, reaction.UserID, reaction.PostID)
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
->>>>>>> 485e4ed712283f45b5f4b940aadcbaa32848bb64
-func addCategories() {
-	cat := models.Category{
-		PostID: 7,
-		CategoryName: "Technology",
-	}
-
-	repositories.InsertRecord(util.DB, "tblPostCategories", []string{"post_id", "category"}, cat.PostID, cat.CategoryName)
-}
-
-func addPost() {
-	post := models.Post{
-		PostTitle:    "Sunday Rost",
-		Body:         "The earth will be exactly six thousand years in 2027",
-		UserID:       1,
-	}
-
-	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "user_id"}, post.PostTitle, post.Body, post.UserID)
-
-	if err != nil {
-		fmt.Println("failed to AD post", err)
-		return
-	}
-
-	fmt.Println("added post", id)
-<<<<<<< HEAD
-=======
-func addUser() {
-	user := models.User{
-		Username: "john doe",
-		Email:    "johndoer@gmail.com",
-		Password: "123",
-	}
-	repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, user.Password)
->>>>>>> main
-}
-=======
-}
->>>>>>> 485e4ed712283f45b5f4b940aadcbaa32848bb64
