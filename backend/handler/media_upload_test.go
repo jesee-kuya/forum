@@ -39,7 +39,7 @@ func TestUploadMedia(t *testing.T) {
 			req := httptest.NewRequest(tc.method, tc.endPoint, nil)
 			w := httptest.NewRecorder()
 
-			UploadMedia(w, req)
+			CreatePost(w, req)
 
 			resp := w.Result()
 			if resp.StatusCode != tc.code {

@@ -15,7 +15,7 @@ import (
 /*
 UploadMedia handler function is responsible for performing server operations to enable media upload with a file size limit of up to 25 mbs.
 */
-func UploadMedia(w http.ResponseWriter, r *http.Request) {
+func CreatePost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		util.ErrorHandler(w, "Invalid request method", http.StatusMethodNotAllowed)
 		log.Println("Invalid request method:", r.Method)
@@ -90,30 +90,6 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to parse form", http.StatusBadRequest)
 		return
 	}
-
-	/*
-		err = r.ParseForm()
-		if err != nil {
-			http.Error(w, "Failed to parse form", http.StatusBadRequest)
-			return
-		}
-
-		categories := r.Form["category"]
-		fmt.Println(categories)
-
-		data := struct {
-			Categories []string
-		}{
-			Categories: categories,
-		}
-
-		tmpl, err := template.ParseFiles("frontend/templates/index.html")
-		if err != nil {
-			util.ErrorHandler(w, "Failed parsing template", http.StatusNotFound)
-			return
-		}
-		tmpl.Execute(w, data)
-	*/
 
 	categories := r.Form["category[]"]
 

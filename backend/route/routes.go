@@ -23,7 +23,7 @@ func InitRoutes() *http.ServeMux {
 	r.HandleFunc("/", handler.IndexHandler)
 	r.HandleFunc("/sign-in", handler.LoginHandler)
 	r.HandleFunc("/sign-up", handler.SignupHandler)
-	r.HandleFunc("/upload", middleware.Authenticate(handler.UploadMedia))
+	r.HandleFunc("/upload", middleware.Authenticate(handler.CreatePost))
 
 	// r.HandleFunc("/posts", handler.GetAllPosts(db, tmpl))
 	r.HandleFunc("/api/posts", handler.GetAllPostsAPI(util.DB))
