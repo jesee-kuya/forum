@@ -89,7 +89,15 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("Error fetching user", err)
 			return
 		}
-		fmt.Printf("user: %v", user.Email)
+
+		// decrypt password & authorize user
+		storedPassword := user.Password
+
+		err = util.CompareHashAndPassword([]byte(storedPassword), []byte(r.FormValue("password")))
+		if err != nil {
+			util.ErrorHandler(w, "Invalid Email or Password. Try Again", http.StatusUnauthorized)
+			return
+		}
 
 		sessionToken, err := uuid.NewV4()
 		if err != nil {
