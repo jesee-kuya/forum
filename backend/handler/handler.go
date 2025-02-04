@@ -15,8 +15,8 @@ import (
 )
 
 type StoreSession struct {
-	Token  string
-	UserId int
+	Token, Email string
+	UserId       int
 }
 
 var Session StoreSession
@@ -27,20 +27,35 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method == http.MethodGet {
-		fmt.Println("OK: ", http.StatusOK)
-	} else {
+	if r.Method != http.MethodGet {
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	tmpl, err := template.ParseFiles("frontend/templates/index.html")
+	// Retrieve the session token cookie
+	cookie, err := r.Cookie("session_token")
 	if err != nil {
-		log.Printf("Failed to load index template: %v", err)
-		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		log.Printf("Cookie not found: %v", err)
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
 		return
 	}
 
+	// Validate the cookie value against the session token
+	if cookie.Value != Session.Token {
+		log.Printf("Invalid session token: %v", err)
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		return
+	}
+
+	// Fetch user information
+	user, err := repositories.GetUserByEmail(Session.Email)
+	if err != nil {
+		log.Printf("Invalid session token: %v", err)
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		return
+	}
+
+	// Load posts
 	posts, err := repositories.GetPosts(util.DB)
 	if err != nil {
 		log.Printf("Failed to get posts: %v", err)
@@ -48,7 +63,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// fetch comments for each post
+	// Fetch comments, categories, likes, and dislikes for each post
 	for i, post := range posts {
 		comments, err1 := repositories.GetComments(util.DB, post.ID)
 		categories, err3 := repositories.GetCategories(util.DB, post.ID)
@@ -65,13 +80,25 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		posts[i].Categories = categories
 		posts[i].Likes = len(likes)
 		posts[i].Dislikes = len(dislikes)
-
 	}
 
 	data := struct {
-		Posts []models.Post
+		IsLoggedIn  bool
+		Name, Email string
+		Posts       []models.Post
 	}{
-		Posts: posts,
+		IsLoggedIn: true,
+		Name:       user.Username,
+		Email:      user.Email,
+		Posts:      posts,
+	}
+
+	// Parse and execute the template
+	tmpl, err := template.ParseFiles("frontend/templates/index.html")
+	if err != nil {
+		log.Printf("Failed to load index template: %v", err)
+		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 
 	tmpl.Execute(w, data)
@@ -112,6 +139,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		err = repositories.StoreSession(user.ID, sessionToken.String())
 		Session.Token = sessionToken.String()
 		Session.UserId = user.ID
+		Session.Email = user.Email
 
 		if err != nil {
 			log.Printf("Failed to store session token: %v", err)
