@@ -140,7 +140,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		User.Email = r.PostFormValue("email")
 		User.Password = r.PostFormValue("password")
 
-		if User.Username == "" || User.Email == "" || User.Password == "" {
+		if User.Email == "" || User.Password == "" {
 			util.ErrorHandler(w, "Fields cannot be empty", http.StatusBadRequest)
 			return
 		}
