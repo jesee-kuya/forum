@@ -6,6 +6,8 @@ import (
 	"log"
 	"strings"
 
+	"github.com/jesee-kuya/forum/backend/models"
+	"github.com/jesee-kuya/forum/backend/util"
 	_ "github.com/mattn/go-sqlite3" // SQLite3 driver
 )
 
@@ -56,4 +58,19 @@ func DeleteRecord(db *sql.DB, table, column string, id int) error {
 
 	log.Printf("Successfully marked record with ID %d as deleted in table %s", id, table)
 	return nil
+}
+
+func GetUserByEmail(email string) (models.User, error) {
+	query := "SELECT id, username, email, user_password FROM tblUsers WHERE email = ?"
+	row := util.DB.QueryRow(query, email)
+
+	var user models.User
+	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return user, fmt.Errorf("user not found")
+		}
+		return user, fmt.Errorf("failed to retrieve user: %v", err)
+	}
+	return user, nil
 }
