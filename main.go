@@ -67,6 +67,10 @@ func addReactions() {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> 485e4ed712283f45b5f4b940aadcbaa32848bb64
 func addCategories() {
 	cat := models.Category{
 		PostID: 7,
@@ -91,6 +95,7 @@ func addPost() {
 	}
 
 	fmt.Println("added post", id)
+<<<<<<< HEAD
 =======
 func addUser() {
 	user := models.User{
@@ -101,3 +106,6 @@ func addUser() {
 	repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, user.Password)
 >>>>>>> main
 }
+=======
+}
+>>>>>>> 485e4ed712283f45b5f4b940aadcbaa32848bb64
