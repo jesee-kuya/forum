@@ -79,7 +79,7 @@ func UploadMedia(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), 1)
+	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"))
 	if err != nil {
 		fmt.Println("failed to AD post", err)
 		return

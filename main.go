@@ -15,7 +15,7 @@ import (
 func main() {
 	util.Init()
 	defer util.DB.Close()
-
+	
 	port, err := util.ValidatePort()
 	if err != nil {
 		log.Fatalf("Error validating port: %v", err)
@@ -65,6 +65,7 @@ func addReactions() {
 
 	repositories.InsertRecord(util.DB, "tblReactions", []string{"reaction", "user_id", "post_id"}, reaction.Reaction, reaction.UserID, reaction.PostID)
 }
+
 
 func addCategories() {
 	cat := models.Category{
