@@ -11,6 +11,7 @@ import (
 	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var User models.User
@@ -89,9 +90,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		// decrypt password & authorize user
 		storedPassword := User.Password
 
-		err = util.CompareHashAndPassword([]byte(storedPassword), []byte(r.FormValue("password")))
+		err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(r.FormValue("password")))
 		if err != nil {
-			util.ErrorHandler(w, "Invalid Email or Password. Try Again", http.StatusUnauthorized)
+			log.Printf("Failed to hash: %v", err)
+			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
@@ -152,7 +154,13 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 			util.ErrorHandler(w, "Fields cannot be empty", http.StatusBadRequest)
 			return
 		}
-		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, User.Username, User.Email, User.Password)
+		
+		hashed, err := util.PasswordEncrypt([]byte(User.Password), 10)
+		if err != nil {
+			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+
+		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, User.Username, User.Email, string(hashed))
 		if err != nil {
 			util.ErrorHandler(w, "User Can not be added", http.StatusForbidden)
 			log.Println("Error adding User:", err)
@@ -168,11 +176,13 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		tmpl, err := template.ParseFiles("frontend/templates/sign-up.html")
 		if err != nil {
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			return
 		}
 
 		tmpl.Execute(w, nil)
 	} else {
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
 	}
 }
 
