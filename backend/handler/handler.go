@@ -134,14 +134,14 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		fmt.Println("OK: ", http.StatusOK)
 		r.ParseForm()
-		User.Username = r.PostFormValue("Username")
+		User.Username = r.PostFormValue("username")
 		User.Email = r.PostFormValue("email")
 		User.Password = r.PostFormValue("password")
 
-		if User.Email == "" || User.Password == "" {
+		if User.Email == "" || User.Password == "" || User.Username == "" {
 			util.ErrorHandler(w, "Fields cannot be empty", http.StatusBadRequest)
+			log.Println("Empty field")
 			return
 		}
 		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"Username", "email", "User_password"}, User.Username, User.Email, User.Password)
