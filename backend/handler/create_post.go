@@ -79,9 +79,9 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"))
+	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), Session.UserId)
 	if err != nil {
-		fmt.Println("failed to AD post", err)
+		fmt.Println("failed to add post", err)
 		return
 	}
 
@@ -92,8 +92,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	categories := r.Form["category[]"]
-
-	fmt.Println("Categories:", categories)
 
 	for _, category := range categories {
 		repositories.InsertRecord(util.DB, "tblPostCategories", []string{"post_id", "category"}, id, category)

@@ -14,7 +14,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var User models.User
+type StoreSession struct {
+	Token  string
+	UserId int
+}
+
+var Session StoreSession
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
@@ -80,15 +85,15 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 		email := r.FormValue("email")
-		User, err := repositories.GetUserByEmail(email)
+		user, err := repositories.GetUserByEmail(email)
 		if err != nil {
-			util.ErrorHandler(w, "Error fetching User", http.StatusForbidden)
-			log.Println("Error fetching User", err)
+			util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
+			log.Println("Error fetching user", err)
 			return
 		}
 
 		// decrypt password & authorize user
-		storedPassword := User.Password
+		storedPassword := user.Password
 
 		err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(r.FormValue("password")))
 		if err != nil {
@@ -104,7 +109,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = repositories.StoreSession(User.ID, sessionToken.String())
+		err = repositories.StoreSession(user.ID, sessionToken.String())
+		Session.Token = sessionToken.String()
+		Session.UserId = user.ID
+
 		if err != nil {
 			log.Printf("Failed to store session token: %v", err)
 			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
@@ -138,6 +146,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
+	var user models.User
 	if r.URL.Path != "/sign-up" {
 		util.ErrorHandler(w, "Page Not Found", http.StatusNotFound)
 		return
@@ -146,24 +155,24 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		fmt.Println("OK: ", http.StatusOK)
 		r.ParseForm()
-		User.Username = r.PostFormValue("username")
-		User.Email = r.PostFormValue("email")
-		User.Password = r.PostFormValue("password")
+		user.Username = r.PostFormValue("username")
+		user.Email = r.PostFormValue("email")
+		user.Password = r.PostFormValue("password")
 
-		if User.Email == "" || User.Password == "" || User.Username == "" {
+		if user.Email == "" || user.Password == "" || user.Username == "" {
 			util.ErrorHandler(w, "Fields cannot be empty", http.StatusBadRequest)
 			return
 		}
-		
-		hashed, err := util.PasswordEncrypt([]byte(User.Password), 10)
+
+		hashed, err := util.PasswordEncrypt([]byte(user.Password), 10)
 		if err != nil {
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 
-		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, User.Username, User.Email, string(hashed))
+		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, string(hashed))
 		if err != nil {
-			util.ErrorHandler(w, "User Can not be added", http.StatusForbidden)
-			log.Println("Error adding User:", err)
+			util.ErrorHandler(w, "user Can not be added", http.StatusForbidden)
+			log.Println("Error adding user:", err)
 			return
 		}
 		fmt.Println(id)
