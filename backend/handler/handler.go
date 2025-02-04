@@ -13,6 +13,8 @@ import (
 	"github.com/jesee-kuya/forum/backend/util"
 )
 
+var User models.User
+
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// URL path
 	if r.URL.Path != "/" {
@@ -80,13 +82,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 		email := r.FormValue("email")
-		user, err := repositories.GetUserByEmail(email)
+		User, err := repositories.GetUserByEmail(email)
 		if err != nil {
-			util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
-			log.Println("Error fetching user", err)
+			util.ErrorHandler(w, "Error fetching User", http.StatusForbidden)
+			log.Println("Error fetching User", err)
 			return
 		}
-		fmt.Printf("user: %v", user.Email)
+		fmt.Printf("User: %v", User.Email)
 
 		sessionToken, err := uuid.NewV4()
 		if err != nil {
@@ -95,7 +97,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = repositories.StoreSession(user.ID, sessionToken.String())
+		err = repositories.StoreSession(User.ID, sessionToken.String())
 		if err != nil {
 			log.Printf("Failed to store session token: %v", err)
 			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
@@ -134,23 +136,21 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var user models.User
-
 	if r.Method == http.MethodPost {
 		fmt.Println("OK: ", http.StatusOK)
 		r.ParseForm()
-		user.Username = r.PostFormValue("username")
-		user.Email = r.PostFormValue("email")
-		user.Password = r.PostFormValue("password")
+		User.Username = r.PostFormValue("Username")
+		User.Email = r.PostFormValue("email")
+		User.Password = r.PostFormValue("password")
 
-		if user.Username == "" || user.Email == "" || user.Password == "" {
+		if User.Username == "" || User.Email == "" || User.Password == "" {
 			util.ErrorHandler(w, "Fields cannot be empty", http.StatusBadRequest)
 			return
 		}
-		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, user.Password)
+		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"Username", "email", "User_password"}, User.Username, User.Email, User.Password)
 		if err != nil {
 			util.ErrorHandler(w, "User Can not be added", http.StatusForbidden)
-			log.Println("Error adding user:", err)
+			log.Println("Error adding User:", err)
 			return
 		}
 		fmt.Println(id)
