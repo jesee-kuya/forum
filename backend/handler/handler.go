@@ -11,6 +11,7 @@ import (
 	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -149,6 +150,17 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 			util.ErrorHandler(w, "Fields cannot be empty", http.StatusBadRequest)
 			return
 		}
+
+		// encrypt password
+		password, err := util.PasswordEncrypt([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Println("Password encryption failed:", err)
+			return
+		}
+
+		user.Password = string(password)
+
 		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, user.Password)
 		if err != nil {
 			util.ErrorHandler(w, "User Can not be added", http.StatusForbidden)
