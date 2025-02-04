@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"text/template"
+	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
@@ -76,15 +78,41 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var user models.User
-
 	if r.Method == http.MethodPost {
-		if user.Username == "" || user.Email == "" || user.Password == "" {
-			util.ErrorHandler(w, "Username/Email and Password are required", http.StatusBadRequest)
+		email := r.FormValue("email")
+		user, err := repositories.GetUserByEmail(email)
+		if err != nil {
+			util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
+			log.Println("Error fetching user", err)
+			return
+		}
+		fmt.Printf("user: %v", user.Email)
+
+		sessionToken, err := uuid.NewV4()
+		if err != nil {
+			log.Printf("Failed to generate session token: %v", err)
+			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
-		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
+		err = repositories.StoreSession(user.ID, sessionToken.String())
+		if err != nil {
+			log.Printf("Failed to store session token: %v", err)
+			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     "session_token",
+			Value:    sessionToken.String(),
+			Path:     "/",
+			HttpOnly: true,
+			Secure:   false,
+		})
+
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		r.Method = http.MethodGet
+		IndexHandler(w, r)
 		return
 
 	} else if r.Method == http.MethodGet {
@@ -94,6 +122,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		tmpl.Execute(w, nil)
+
 	} else {
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
@@ -118,8 +147,17 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 			util.ErrorHandler(w, "Fields cannot be empty", http.StatusBadRequest)
 			return
 		}
+		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, user.Password)
+		if err != nil {
+			util.ErrorHandler(w, "User Can not be added", http.StatusForbidden)
+			log.Println("Error adding user:", err)
+			return
+		}
+		fmt.Println(id)
 
 		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
+		r.Method = http.MethodGet
+		SignupHandler(w, r)
 		return
 	} else if r.Method == http.MethodGet {
 		tmpl, err := template.ParseFiles("frontend/templates/sign-up.html")
@@ -131,4 +169,29 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil || cookie.Value == "" {
+		util.ErrorHandler(w, "No active session", http.StatusUnauthorized)
+		return
+	}
+
+	err = repositories.DeleteSession(cookie.Value)
+	if err != nil {
+		util.ErrorHandler(w, "Failed to log out", http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    "",
+		Path:     "/",
+		Expires:  time.Now().Add(-time.Hour),
+		HttpOnly: true,
+	})
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message": "Logged out successfully"}`))
 }

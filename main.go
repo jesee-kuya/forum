@@ -15,7 +15,7 @@ import (
 func main() {
 	util.Init()
 	defer util.DB.Close()
-
+	
 	port, err := util.ValidatePort()
 	if err != nil {
 		log.Fatalf("Error validating port: %v", err)
@@ -66,6 +66,7 @@ func addReactions() {
 	repositories.InsertRecord(util.DB, "tblReactions", []string{"reaction", "user_id", "post_id"}, reaction.Reaction, reaction.UserID, reaction.PostID)
 }
 
+<<<<<<< HEAD
 func addCategories() {
 	cat := models.Category{
 		PostID: 7,
@@ -90,4 +91,13 @@ func addPost() {
 	}
 
 	fmt.Println("added post", id)
+=======
+func addUser() {
+	user := models.User{
+		Username: "john doe",
+		Email:    "johndoer@gmail.com",
+		Password: "123",
+	}
+	repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, user.Password)
+>>>>>>> main
 }
