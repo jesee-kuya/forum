@@ -11,7 +11,6 @@ import (
 	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var User models.User
@@ -88,7 +87,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// decrypt password & authorize user
-		storedPassword := user.Password
+		storedPassword := User.Password
 
 		err = util.CompareHashAndPassword([]byte(storedPassword), []byte(r.FormValue("password")))
 		if err != nil {
@@ -145,15 +144,15 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		fmt.Println("OK: ", http.StatusOK)
 		r.ParseForm()
-		User.Username = r.PostFormValue("Username")
+		User.Username = r.PostFormValue("username")
 		User.Email = r.PostFormValue("email")
 		User.Password = r.PostFormValue("password")
 
-		if User.Email == "" || User.Password == "" {
+		if User.Email == "" || User.Password == "" || User.Username == "" {
 			util.ErrorHandler(w, "Fields cannot be empty", http.StatusBadRequest)
 			return
 		}
-		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, user.Password)
+		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, User.Username, User.Email, User.Password)
 		if err != nil {
 			util.ErrorHandler(w, "User Can not be added", http.StatusForbidden)
 			log.Println("Error adding User:", err)
