@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS tblUsers (
   user_password TEXT NOT NULL,
   joined_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 CREATE TABLE IF NOT EXISTS tblPosts (
   id INTEGER PRIMARY KEY,
   user_id INTEGER NOT NULL,
@@ -17,6 +18,7 @@ CREATE TABLE IF NOT EXISTS tblPosts (
   FOREIGN KEY (user_id) REFERENCES tblUsers (id),
   FOREIGN KEY (parent_id) REFERENCES tblPosts (id)
 );
+
 CREATE TABLE IF NOT EXISTS tblPostCategories (
   id INTEGER PRIMARY KEY,
   post_id INTEGER NOT NULL,
@@ -33,6 +35,7 @@ CREATE TABLE IF NOT EXISTS tblReactions (
   FOREIGN KEY (user_id) REFERENCES tblUsers (id),
   FOREIGN KEY (post_id) REFERENCES tblPosts (id)
 );
+
 CREATE TABLE IF NOT EXISTS tblSessions (
   id INTEGER PRIMARY KEY,
   user_id INTEGER NOT NULL,
