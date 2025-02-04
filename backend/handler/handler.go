@@ -11,9 +11,15 @@ import (
 	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
+	"golang.org/x/crypto/bcrypt"
 )
 
-var User models.User
+type StoreSession struct {
+	Token, Email string
+	UserId       int
+}
+
+var Session StoreSession
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
@@ -21,20 +27,35 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method == http.MethodGet {
-		fmt.Println("OK: ", http.StatusOK)
-	} else {
+	if r.Method != http.MethodGet {
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	tmpl, err := template.ParseFiles("frontend/templates/index.html")
+	// Retrieve the session token cookie
+	cookie, err := r.Cookie("session_token")
 	if err != nil {
-		log.Printf("Failed to load index template: %v", err)
-		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		log.Printf("Cookie not found: %v", err)
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
 		return
 	}
 
+	// Validate the cookie value against the session token
+	if cookie.Value != Session.Token {
+		log.Printf("Invalid session token: %v", err)
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		return
+	}
+
+	// Fetch user information
+	user, err := repositories.GetUserByEmail(Session.Email)
+	if err != nil {
+		log.Printf("Invalid session token: %v", err)
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		return
+	}
+
+	// Load posts
 	posts, err := repositories.GetPosts(util.DB)
 	if err != nil {
 		log.Printf("Failed to get posts: %v", err)
@@ -42,7 +63,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// fetch comments for each post
+	// Fetch comments, categories, likes, and dislikes for each post
 	for i, post := range posts {
 		comments, err1 := repositories.GetComments(util.DB, post.ID)
 		categories, err3 := repositories.GetCategories(util.DB, post.ID)
@@ -59,13 +80,25 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		posts[i].Categories = categories
 		posts[i].Likes = len(likes)
 		posts[i].Dislikes = len(dislikes)
-
 	}
 
 	data := struct {
-		Posts []models.Post
+		IsLoggedIn  bool
+		Name, Email string
+		Posts       []models.Post
 	}{
-		Posts: posts,
+		IsLoggedIn: true,
+		Name:       user.Username,
+		Email:      user.Email,
+		Posts:      posts,
+	}
+
+	// Parse and execute the template
+	tmpl, err := template.ParseFiles("frontend/templates/index.html")
+	if err != nil {
+		log.Printf("Failed to load index template: %v", err)
+		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 
 	tmpl.Execute(w, data)
@@ -79,13 +112,22 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 		email := r.FormValue("email")
-		User, err := repositories.GetUserByEmail(email)
+		user, err := repositories.GetUserByEmail(email)
 		if err != nil {
-			util.ErrorHandler(w, "Error fetching User", http.StatusForbidden)
-			log.Println("Error fetching User", err)
+			util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
+			log.Println("Error fetching user", err)
 			return
 		}
-		fmt.Printf("User: %v", User.Email)
+
+		// decrypt password & authorize user
+		storedPassword := user.Password
+
+		err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(r.FormValue("password")))
+		if err != nil {
+			log.Printf("Failed to hash: %v", err)
+			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
 
 		sessionToken, err := uuid.NewV4()
 		if err != nil {
@@ -94,7 +136,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = repositories.StoreSession(User.ID, sessionToken.String())
+		err = repositories.StoreSession(user.ID, sessionToken.String())
+		Session.Token = sessionToken.String()
+		Session.UserId = user.ID
+		Session.Email = user.Email
+
 		if err != nil {
 			log.Printf("Failed to store session token: %v", err)
 			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
@@ -128,6 +174,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
+	var user models.User
 	if r.URL.Path != "/sign-up" {
 		util.ErrorHandler(w, "Page Not Found", http.StatusNotFound)
 		return
@@ -136,18 +183,24 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		fmt.Println("OK: ", http.StatusOK)
 		r.ParseForm()
-		User.Username = r.PostFormValue("Username")
-		User.Email = r.PostFormValue("email")
-		User.Password = r.PostFormValue("password")
+		user.Username = r.PostFormValue("username")
+		user.Email = r.PostFormValue("email")
+		user.Password = r.PostFormValue("password")
 
-		if User.Email == "" || User.Password == "" {
+		if user.Email == "" || user.Password == "" || user.Username == "" {
 			util.ErrorHandler(w, "Fields cannot be empty", http.StatusBadRequest)
 			return
 		}
-		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"Username", "email", "User_password"}, User.Username, User.Email, User.Password)
+
+		hashed, err := util.PasswordEncrypt([]byte(user.Password), 10)
 		if err != nil {
-			util.ErrorHandler(w, "User Can not be added", http.StatusForbidden)
-			log.Println("Error adding User:", err)
+			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+
+		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, string(hashed))
+		if err != nil {
+			util.ErrorHandler(w, "user Can not be added", http.StatusForbidden)
+			log.Println("Error adding user:", err)
 			return
 		}
 		fmt.Println(id)
@@ -160,11 +213,13 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		tmpl, err := template.ParseFiles("frontend/templates/sign-up.html")
 		if err != nil {
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			return
 		}
 
 		tmpl.Execute(w, nil)
 	} else {
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
 	}
 }
 

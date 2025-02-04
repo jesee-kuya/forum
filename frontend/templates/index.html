@@ -85,7 +85,12 @@
     <main class="posts">
       <section class="create-post hidden">
         <h2>Create a New Post</h2>
-        <form name="upload" enctype="multipart/form-data" action="/upload" method="POST">
+        <form
+          name="upload"
+          enctype="multipart/form-data"
+          action="/upload"
+          method="POST"
+        >
           <label for="post-title">Title</label>
           <input
             type="text"
@@ -146,7 +151,6 @@
               Science
             </label>
           </fieldset>
-          
 
           <div class="post-operations">
             <input type="file" name="uploaded-file" />
@@ -170,12 +174,15 @@
         <h3>{{ .PostTitle }}</h3>
         <p>{{ .Body }}</p>
 
+        {{ if .MediaURL }}
+        <img src="{{ .MediaURL }}" alt="{{ .PostTitle }}" />
+        {{ end }}
+
         <div class="category-div">
           {{ range .Categories }}
           <p class="post-category"><span>{{ .CategoryName }}</span></p>
           {{ end }}
         </div>
-        
 
         <div class="post-actions">
           <button class="like-button">
@@ -231,10 +238,11 @@
         src="/frontend/static/img/profile-image.jpeg"
         alt="Profile Picture"
       />
-      <p><strong>Name:</strong></p>
-      <p><strong>Email:</strong></p>
-      <p class="session-status"><strong>Status:</strong>Not logged</p>
-      <button class="logout-button">Log Out</button>
+
+      {{if .IsLoggedIn }} {{template "status" .}} {{else}}
+      <p class="session-status"><strong>Status:</strong> Not logged in</p>
+
+      {{end}}
     </aside>
 
     <!-- Ion icons -->
@@ -252,3 +260,13 @@
     ></script>
   </body>
 </html>
+
+{{ define "status"}}
+<p><strong>Name:</strong> {{.Name}}</p>
+<p><strong>Email:</strong> {{.Email}}</p>
+<p class="session-status"><strong>Status:</strong> Logged in</p>
+
+<form action="/logout" method="POST">
+  <button class="logout-button">Log Out</button>
+</form>
+{{ end }}
