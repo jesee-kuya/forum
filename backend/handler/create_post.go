@@ -24,13 +24,15 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var url string
+
 	for _, v := range Sessions {
 		if v.Token == cookie.Value {
 			session = v
 			break
 		}
 	}
-	var url string
+
 	if r.Method != http.MethodPost {
 		util.ErrorHandler(w, "Invalid request method", http.StatusMethodNotAllowed)
 		log.Println("Invalid request method:", r.Method)
@@ -128,7 +130,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		repositories.InsertRecord(util.DB, "tblPostCategories", []string{"post_id", "category"}, id, category)
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 	r.Method = http.MethodGet
 	IndexHandler(w, r)
 }
