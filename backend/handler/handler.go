@@ -48,9 +48,16 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	// Fetch comments, categories, likes, and dislikes for each post
 	for i, post := range posts {
 		comments, err1 := repositories.GetComments(util.DB, post.ID)
+		if err1 != nil {
+			log.Println("Failed to get comments:", err1)
+			util.ErrorHandler(w, "An unexpected error occured", http.StatusInternalServerError)
+			return
+		}
 		categories, err3 := repositories.GetCategories(util.DB, post.ID)
-		if err1 != nil || err3 != nil {
-			log.Println("Error encountered getting posts", err1, err3)
+		if err3 != nil {
+			log.Println("Failed to get categories", err3)
+			util.ErrorHandler(w, "An unexpected error occured", http.StatusInternalServerError)
+			return
 		}
 		// likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
 		// dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
@@ -161,7 +168,12 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("Failed to get comments:", err1)
 			return
 		}
-		// categories, err3 := repositories.GetCategories(util.DB, post.ID)
+		categories, err3 := repositories.GetCategories(util.DB, post.ID)
+		if err3 != nil {
+			log.Println("Failed to get categories", err3)
+			util.ErrorHandler(w, "An unexpected error occured", http.StatusInternalServerError)
+			return
+		}
 		// likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
 		// dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
 		// if err != nil || err3 != nil || err4 != nil {
@@ -172,7 +184,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 		posts[i].Comments = comments
 		posts[i].CommentCount = len(comments)
-		// posts[i].Categories = categories
+		posts[i].Categories = categories
 		// posts[i].Likes = len(likes)
 		// posts[i].Dislikes = len(dislikes)
 	}
