@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"text/template"
 	"time"
 
@@ -109,15 +110,15 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// Fetch session from DB
 	dbSessionToken, err := repositories.GetSessionByUserEmail(session.UserId)
 	if err != nil || dbSessionToken != cookie.Value {
-		log.Printf("Invalid session token")
-		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		log.Printf("Invalid session token: %v\n", err)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
 	// Validate the cookie value against the session token
 	if cookie.Value != session.Token {
 		log.Printf("Invalid session token: %v", err)
-		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	} else {
 		r.Method = http.MethodGet
@@ -138,7 +139,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := repositories.GetUserByEmail(session.Email)
 	if err != nil {
 		log.Printf("Invalid session token: %v", err)
-		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
@@ -176,7 +177,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		Path:     "/upload",
 	})
-	
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session_token",
 		Value:    session.Token,
@@ -262,7 +263,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			HttpOnly: true,
 			Path:     "/home",
 		})
-		fmt.Println("Cookie token", sessionToken)
 
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 
@@ -295,23 +295,24 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		user.Email = r.PostFormValue("email")
 		user.Password = r.PostFormValue("password")
 
-		if user.Email == "" || user.Password == "" || user.Username == "" {
-			util.ErrorHandler(w, "Fields cannot be empty", http.StatusBadRequest)
+		if strings.TrimSpace(user.Email) == "" || strings.TrimSpace(user.Password) == "" || strings.TrimSpace(user.Username) == "" {
+			log.Println("Invalid form values from user")
+			// util.ErrorHandler(w, "Fields cannot be empty", http.StatusBadRequest)
 			return
 		}
 
 		hashed, err := util.PasswordEncrypt([]byte(user.Password), 10)
 		if err != nil {
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			return
 		}
 
-		id, err := repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, string(hashed))
+		_, err = repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, string(hashed))
 		if err != nil {
 			util.ErrorHandler(w, "user Can not be added", http.StatusForbidden)
 			log.Println("Error adding user:", err)
 			return
 		}
-		fmt.Println(id)
 
 		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 		r.Method = http.MethodGet
@@ -331,7 +332,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Logout(w http.ResponseWriter, r *http.Request) {
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		util.ErrorHandler(w, "No active session", http.StatusUnauthorized)
 		return
