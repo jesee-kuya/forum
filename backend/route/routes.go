@@ -22,7 +22,7 @@ func InitRoutes() *http.ServeMux {
 	r.HandleFunc("/sign-in", handler.LoginHandler)
 	r.HandleFunc("/sign-up", handler.SignupHandler)
 	r.HandleFunc("/upload", handler.CreatePost)
-	r.HandleFunc("/logout", handler.Logout)
+	r.HandleFunc("/logout", handler.LogoutHandler)
 
 	r.HandleFunc("/api/posts", handler.GetAllPostsAPI(util.DB))
 	return r
