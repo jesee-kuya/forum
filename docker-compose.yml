@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  asciiartwebdockerize:
+    image: forum
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 9000:9001
