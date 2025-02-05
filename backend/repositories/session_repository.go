@@ -11,12 +11,11 @@ import (
 
 // StoreSession creates a new session for a user with expiration time
 func StoreSession(userID int, sessionToken string, expiryTime time.Time) error {
-	id, err := InsertRecord(util.DB, "tblSessions", []string{"user_id", "session_token", "expires_at"}, userID, sessionToken, expiryTime)
+	_, err := InsertRecord(util.DB, "tblSessions", []string{"user_id", "session_token", "expires_at"}, userID, sessionToken, expiryTime)
 	if err != nil {
 		log.Println("Error inserting session:", err)
+		return err
 	}
-	fmt.Println(id)
-
 	return nil
 }
 
@@ -47,6 +46,15 @@ func ValidateSession(sessionToken string) (string, error) {
 func DeleteSession(sessionToken string) error {
 	query := "DELETE FROM tblSessions WHERE session_token = ?"
 	_, err := util.DB.Exec(query, sessionToken)
+	if err != nil {
+		return fmt.Errorf("failed to delete session: %v", err)
+	}
+	return nil
+}
+
+func DeleteSessionByUser(userId int) error {
+	query := "DELETE FROM tblSessions WHERE user_id = ?"
+	_, err := util.DB.Exec(query, userId)
 	if err != nil {
 		return fmt.Errorf("failed to delete session: %v", err)
 	}
