@@ -25,10 +25,69 @@ var (
 	Sessions []StoreSession
 )
 
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
+		return
+	}
+
+	if r.Method != http.MethodGet {
+		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Load posts
+	posts, err := repositories.GetPosts(util.DB)
+	if err != nil {
+		log.Printf("Failed to get posts: %v", err)
+		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Fetch comments, categories, likes, and dislikes for each post
+	for i, post := range posts {
+		comments, err1 := repositories.GetComments(util.DB, post.ID)
+		categories, err3 := repositories.GetCategories(util.DB, post.ID)
+		likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
+		dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
+		if err != nil || err1 != nil || err3 != nil || err4 != nil {
+			log.Printf("Failed to get posts details: %v", err)
+			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		posts[i].Comments = comments
+		posts[i].CommentCount = len(comments)
+		posts[i].Categories = categories
+		posts[i].Likes = len(likes)
+		posts[i].Dislikes = len(dislikes)
+	}
+
+	data := struct {
+		IsLoggedIn  bool
+		Name, Email string
+		Posts       []models.Post
+	}{
+		IsLoggedIn: false,
+		Name:       "",
+		Email:      "",
+		Posts:      posts,
+	}
+
+	// Parse and execute the template
+	tmpl, err := template.ParseFiles("frontend/templates/index.html")
+	if err != nil {
+		log.Printf("Failed to load index template: %v", err)
+		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	tmpl.Execute(w, data)
+}
+
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	var session StoreSession
 
-	if r.URL.Path != "/" {
+	if r.URL.Path != "/home" {
 		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
@@ -110,6 +169,22 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		posts[i].Dislikes = len(dislikes)
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    session.Token,
+		Expires:  session.ExpiryTime,
+		HttpOnly: true,
+		Path:     "/upload",
+	})
+	
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    session.Token,
+		Expires:  session.ExpiryTime,
+		HttpOnly: true,
+		Path:     "/logout",
+	})
+
 	data := struct {
 		IsLoggedIn  bool
 		Name, Email string
@@ -159,6 +234,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		sessionToken := uuid.New().String()
 		expiryTime := time.Now().Add(1440 * time.Minute)
 
+		err = repositories.DeleteSessionByUser(user.ID)
+		if err != nil {
+			log.Printf("Failed to delete session token: %v", err)
+			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
 		err = repositories.StoreSession(user.ID, sessionToken, expiryTime)
 		if err != nil {
 			log.Printf("Failed to store session token: %v", err)
@@ -178,10 +260,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			Value:    sessionToken,
 			Expires:  expiryTime,
 			HttpOnly: true,
-			Path:     "/",
+			Path:     "/home",
 		})
+		fmt.Println("Cookie token", sessionToken)
 
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
 
 		return
 
