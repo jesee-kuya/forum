@@ -20,9 +20,14 @@ type StoreSession struct {
 	ExpiryTime   time.Time
 }
 
-var Session StoreSession
+var (
+	Session  StoreSession
+	Sessions []StoreSession
+)
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
+	var session StoreSession
+
 	if r.URL.Path != "/" {
 		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
@@ -35,8 +40,15 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	for _, v := range Sessions {
+		if v.Token == cookie.Value {
+			session = v
+			break
+		}
+	}
+
 	// Fetch session from DB
-	dbSessionToken, err := repositories.GetSessionByUserEmail(Session.UserId)
+	dbSessionToken, err := repositories.GetSessionByUserEmail(session.UserId)
 	if err != nil || dbSessionToken != cookie.Value {
 		log.Printf("Invalid session token")
 		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
@@ -44,7 +56,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate the cookie value against the session token
-	if cookie.Value != Session.Token {
+	if cookie.Value != session.Token {
 		log.Printf("Invalid session token: %v", err)
 		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
 		return
@@ -52,7 +64,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		r.Method = http.MethodGet
 	}
 
-	if time.Now().After(Session.ExpiryTime) {
+	if time.Now().After(session.ExpiryTime) {
 		log.Println("User session has expired. Please log in again")
 		util.ErrorHandler(w, "User session has expired. Please log in again", http.StatusUnauthorized)
 		return
@@ -64,7 +76,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch user information
-	user, err := repositories.GetUserByEmail(Session.Email)
+	user, err := repositories.GetUserByEmail(session.Email)
 	if err != nil {
 		log.Printf("Invalid session token: %v", err)
 		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
@@ -145,7 +157,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		sessionToken := uuid.New().String()
-		expiryTime := time.Now().Add(40 * time.Minute)
+		expiryTime := time.Now().Add(1440 * time.Minute)
 
 		err = repositories.StoreSession(user.ID, sessionToken, expiryTime)
 		if err != nil {
@@ -158,6 +170,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Session.UserId = user.ID
 		Session.Email = user.Email
 		Session.ExpiryTime = expiryTime
+		Sessions = append(Sessions, Session)
+		Session = StoreSession{}
 
 		http.SetCookie(w, &http.Cookie{
 			Name:     "session_token",
@@ -250,6 +264,13 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		util.ErrorHandler(w, "Failed to log out", http.StatusInternalServerError)
 		return
+	}
+
+	for i, session := range Sessions {
+		if session.Token == cookie.Value {
+			Sessions[i] = StoreSession{}
+			break
+		}
 	}
 
 	http.SetCookie(w, &http.Cookie{
