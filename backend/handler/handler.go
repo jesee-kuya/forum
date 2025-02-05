@@ -235,6 +235,11 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		util.ErrorHandler(w, "No active session", http.StatusUnauthorized)
+		return
+	}
+
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
 		util.ErrorHandler(w, "No active session", http.StatusUnauthorized)
@@ -254,7 +259,5 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(-time.Hour),
 		HttpOnly: true,
 	})
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "Logged out successfully"}`))
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
