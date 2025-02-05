@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
-	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/google/uuid v1.6.0
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/crypto v0.32.0
