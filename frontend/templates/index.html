@@ -18,8 +18,10 @@
 
         <div class="right-container">
           <div class="auth-container">
+            {{if .IsLoggedIn}}{{ else}}
             <a href="/sign-up">Sign Up</a>
             <a href="/sign-in">Sign In</a>
+            {{ end }}
           </div>
 
           <div class="theme-toggler">

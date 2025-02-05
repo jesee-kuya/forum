@@ -16,7 +16,23 @@ import (
 UploadMedia handler function is responsible for performing server operations to enable media upload with a file size limit of up to 25 mbs.
 */
 func CreatePost(w http.ResponseWriter, r *http.Request) {
+	var session StoreSession
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		log.Printf("Cookie not found: %v", err)
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		return
+	}
+
 	var url string
+
+	for _, v := range Sessions {
+		if v.Token == cookie.Value {
+			session = v
+			break
+		}
+	}
+
 	if r.Method != http.MethodPost {
 		util.ErrorHandler(w, "Invalid request method", http.StatusMethodNotAllowed)
 		log.Println("Invalid request method:", r.Method)
@@ -31,7 +47,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Parse the multipart form with a 25MB limit
-	err := r.ParseMultipartForm(25 << 20)
+	err = r.ParseMultipartForm(25 << 20)
 	if err != nil {
 		util.ErrorHandler(w, "Failed parsing form data", http.StatusBadRequest)
 		log.Println("Failed parsing multipart form:", err)
@@ -96,7 +112,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		url = fmt.Sprintf("%v", tempFilePath)
 	}
 
-	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "media_url", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), url, Session.UserId)
+	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "media_url", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), url, session.UserId)
 	if err != nil {
 		fmt.Println("failed to add post", err)
 		return
@@ -114,7 +130,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		repositories.InsertRecord(util.DB, "tblPostCategories", []string{"post_id", "category"}, id, category)
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 	r.Method = http.MethodGet
 	IndexHandler(w, r)
 }

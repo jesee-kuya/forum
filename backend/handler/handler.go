@@ -7,7 +7,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
@@ -17,11 +17,15 @@ import (
 type StoreSession struct {
 	Token, Email string
 	UserId       int
+	ExpiryTime   time.Time
 }
 
-var Session StoreSession
+var (
+	Session  StoreSession
+	Sessions []StoreSession
+)
 
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
@@ -29,29 +33,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodGet {
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Retrieve the session token cookie
-	cookie, err := r.Cookie("session_token")
-	if err != nil {
-		log.Printf("Cookie not found: %v", err)
-		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
-		return
-	}
-
-	// Validate the cookie value against the session token
-	if cookie.Value != Session.Token {
-		log.Printf("Invalid session token: %v", err)
-		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
-		return
-	}
-
-	// Fetch user information
-	user, err := repositories.GetUserByEmail(Session.Email)
-	if err != nil {
-		log.Printf("Invalid session token: %v", err)
-		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
 		return
 	}
 
@@ -87,6 +68,128 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		Name, Email string
 		Posts       []models.Post
 	}{
+		IsLoggedIn: false,
+		Name:       "",
+		Email:      "",
+		Posts:      posts,
+	}
+
+	// Parse and execute the template
+	tmpl, err := template.ParseFiles("frontend/templates/index.html")
+	if err != nil {
+		log.Printf("Failed to load index template: %v", err)
+		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	tmpl.Execute(w, data)
+}
+
+func IndexHandler(w http.ResponseWriter, r *http.Request) {
+	var session StoreSession
+
+	if r.URL.Path != "/home" {
+		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
+		return
+	}
+
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		log.Printf("Cookie not found: %v", err)
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		return
+	}
+
+	for _, v := range Sessions {
+		if v.Token == cookie.Value {
+			session = v
+			break
+		}
+	}
+
+	// Fetch session from DB
+	dbSessionToken, err := repositories.GetSessionByUserEmail(session.UserId)
+	if err != nil || dbSessionToken != cookie.Value {
+		log.Printf("Invalid session token")
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		return
+	}
+
+	// Validate the cookie value against the session token
+	if cookie.Value != session.Token {
+		log.Printf("Invalid session token: %v", err)
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		return
+	} else {
+		r.Method = http.MethodGet
+	}
+
+	if time.Now().After(session.ExpiryTime) {
+		log.Println("User session has expired. Please log in again")
+		util.ErrorHandler(w, "User session has expired. Please log in again", http.StatusUnauthorized)
+		return
+	}
+
+	if r.Method != http.MethodGet {
+		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Fetch user information
+	user, err := repositories.GetUserByEmail(session.Email)
+	if err != nil {
+		log.Printf("Invalid session token: %v", err)
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		return
+	}
+
+	// Load posts
+	posts, err := repositories.GetPosts(util.DB)
+	if err != nil {
+		log.Printf("Failed to get posts: %v", err)
+		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Fetch comments, categories, likes, and dislikes for each post
+	for i, post := range posts {
+		comments, err1 := repositories.GetComments(util.DB, post.ID)
+		categories, err3 := repositories.GetCategories(util.DB, post.ID)
+		likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
+		dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
+		if err != nil || err1 != nil || err3 != nil || err4 != nil {
+			log.Printf("Failed to get posts details: %v", err)
+			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		posts[i].Comments = comments
+		posts[i].CommentCount = len(comments)
+		posts[i].Categories = categories
+		posts[i].Likes = len(likes)
+		posts[i].Dislikes = len(dislikes)
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    session.Token,
+		Expires:  session.ExpiryTime,
+		HttpOnly: true,
+		Path:     "/upload",
+	})
+	
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    session.Token,
+		Expires:  session.ExpiryTime,
+		HttpOnly: true,
+		Path:     "/logout",
+	})
+
+	data := struct {
+		IsLoggedIn  bool
+		Name, Email string
+		Posts       []models.Post
+	}{
 		IsLoggedIn: true,
 		Name:       user.Username,
 		Email:      user.Email,
@@ -100,7 +203,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-
 	tmpl.Execute(w, data)
 }
 
@@ -129,35 +231,41 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		sessionToken, err := uuid.NewV4()
+		sessionToken := uuid.New().String()
+		expiryTime := time.Now().Add(1440 * time.Minute)
+
+		err = repositories.DeleteSessionByUser(user.ID)
 		if err != nil {
-			log.Printf("Failed to generate session token: %v", err)
+			log.Printf("Failed to delete session token: %v", err)
 			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
-		err = repositories.StoreSession(user.ID, sessionToken.String())
-		Session.Token = sessionToken.String()
-		Session.UserId = user.ID
-		Session.Email = user.Email
-
+		err = repositories.StoreSession(user.ID, sessionToken, expiryTime)
 		if err != nil {
 			log.Printf("Failed to store session token: %v", err)
 			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
+		Session.Token = sessionToken
+		Session.UserId = user.ID
+		Session.Email = user.Email
+		Session.ExpiryTime = expiryTime
+		Sessions = append(Sessions, Session)
+		Session = StoreSession{}
+
 		http.SetCookie(w, &http.Cookie{
 			Name:     "session_token",
-			Value:    sessionToken.String(),
-			Path:     "/",
+			Value:    sessionToken,
+			Expires:  expiryTime,
 			HttpOnly: true,
-			Secure:   false,
+			Path:     "/home",
 		})
+		fmt.Println("Cookie token", sessionToken)
 
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		r.Method = http.MethodGet
-		IndexHandler(w, r)
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+
 		return
 
 	} else if r.Method == http.MethodGet {
@@ -224,8 +332,13 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		util.ErrorHandler(w, "No active session", http.StatusUnauthorized)
+		return
+	}
+
 	cookie, err := r.Cookie("session_token")
-	if err != nil || cookie.Value == "" {
+	if err != nil {
 		util.ErrorHandler(w, "No active session", http.StatusUnauthorized)
 		return
 	}
@@ -236,6 +349,13 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	for i, session := range Sessions {
+		if session.Token == cookie.Value {
+			Sessions[i] = StoreSession{}
+			break
+		}
+	}
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session_token",
 		Value:    "",
@@ -243,7 +363,5 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(-time.Hour),
 		HttpOnly: true,
 	})
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "Logged out successfully"}`))
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

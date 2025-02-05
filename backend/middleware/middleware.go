@@ -3,7 +3,6 @@ package middleware
 import (
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
@@ -25,9 +24,7 @@ func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		x := strconv.Itoa(userID)
-
-		r.Header.Set("X-User-ID", x)
+		r.Header.Set("X-User-ID", userID)
 
 		next(w, r)
 	}
