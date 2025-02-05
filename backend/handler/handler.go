@@ -49,19 +49,22 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	for i, post := range posts {
 		comments, err1 := repositories.GetComments(util.DB, post.ID)
 		categories, err3 := repositories.GetCategories(util.DB, post.ID)
-		likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
-		dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
-		if err != nil || err1 != nil || err3 != nil || err4 != nil {
-			log.Printf("Failed to get posts details: %v", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
+		if err1 != nil || err3 != nil {
+			log.Println("Error encountered getting posts", err1, err3)
 		}
+		// likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
+		// dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
+		// if err != nil || err1 != nil || err3 != nil || err4 != nil {
+		// 	log.Printf("Failed to get posts details: %v", err)
+		// 	util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		// 	return
+		// }
 
 		posts[i].Comments = comments
 		posts[i].CommentCount = len(comments)
 		posts[i].Categories = categories
-		posts[i].Likes = len(likes)
-		posts[i].Dislikes = len(dislikes)
+		// posts[i].Likes = len(likes)
+		// posts[i].Dislikes = len(dislikes)
 	}
 
 	data := struct {
@@ -154,20 +157,24 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// Fetch comments, categories, likes, and dislikes for each post
 	for i, post := range posts {
 		comments, err1 := repositories.GetComments(util.DB, post.ID)
-		categories, err3 := repositories.GetCategories(util.DB, post.ID)
-		likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
-		dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
-		if err != nil || err1 != nil || err3 != nil || err4 != nil {
-			log.Printf("Failed to get posts details: %v", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		if err1 != nil {
+			log.Println("Failed to get comments:", err1)
 			return
 		}
+		// categories, err3 := repositories.GetCategories(util.DB, post.ID)
+		// likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
+		// dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
+		// if err != nil || err3 != nil || err4 != nil {
+		// 	log.Printf("Failed to get posts details: %v", err)
+		// 	util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		// 	return
+		// }
 
 		posts[i].Comments = comments
 		posts[i].CommentCount = len(comments)
-		posts[i].Categories = categories
-		posts[i].Likes = len(likes)
-		posts[i].Dislikes = len(dislikes)
+		// posts[i].Categories = categories
+		// posts[i].Likes = len(likes)
+		// posts[i].Dislikes = len(dislikes)
 	}
 
 	http.SetCookie(w, &http.Cookie{
@@ -184,6 +191,14 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		Expires:  session.ExpiryTime,
 		HttpOnly: true,
 		Path:     "/logout",
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    session.Token,
+		Expires:  session.ExpiryTime,
+		HttpOnly: true,
+		Path:     "/comments",
 	})
 
 	data := struct {
@@ -365,4 +380,33 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	})
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func CommentHandler(w http.ResponseWriter, r *http.Request) {
+	var session StoreSession
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		log.Printf("Cookie not found: %v", err)
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		return
+	}
+
+	for _, v := range Sessions {
+		if v.Token == cookie.Value {
+			session = v
+			break
+		}
+	}
+
+	if r.Method != http.MethodPost {
+		log.Println("Method not allowed in comment handler", r.Method)
+		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	id := r.FormValue("id")
+	userId := session.UserId
+	comment := r.FormValue("comment")
+
+	repositories.InsertRecord(util.DB, "tblPosts", []string{"user_id", "body", "parent_id", "post_title"}, userId, comment, id, "comment")
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
