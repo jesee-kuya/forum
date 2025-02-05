@@ -7,7 +7,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
@@ -17,6 +17,7 @@ import (
 type StoreSession struct {
 	Token, Email string
 	UserId       int
+	ExpiryTime   time.Time
 }
 
 var Session StoreSession
@@ -27,15 +28,17 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method != http.MethodGet {
-		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Retrieve the session token cookie
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
 		log.Printf("Cookie not found: %v", err)
+		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		return
+	}
+
+	// Fetch session from DB
+	dbSessionToken, err := repositories.GetSessionByUserEmail(Session.UserId)
+	if err != nil || dbSessionToken != cookie.Value {
+		log.Printf("Invalid session token")
 		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
 		return
 	}
@@ -44,6 +47,19 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if cookie.Value != Session.Token {
 		log.Printf("Invalid session token: %v", err)
 		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		return
+	} else {
+		r.Method = http.MethodGet
+	}
+
+	if time.Now().After(Session.ExpiryTime) {
+		log.Println("User session has expired. Please log in again")
+		util.ErrorHandler(w, "User session has expired. Please log in again", http.StatusUnauthorized)
+		return
+	}
+
+	if r.Method != http.MethodGet {
+		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -100,7 +116,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-
 	tmpl.Execute(w, data)
 }
 
@@ -129,35 +144,31 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		sessionToken, err := uuid.NewV4()
-		if err != nil {
-			log.Printf("Failed to generate session token: %v", err)
-			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
+		sessionToken := uuid.New().String()
+		expiryTime := time.Now().Add(40 * time.Minute)
 
-		err = repositories.StoreSession(user.ID, sessionToken.String())
-		Session.Token = sessionToken.String()
-		Session.UserId = user.ID
-		Session.Email = user.Email
-
+		err = repositories.StoreSession(user.ID, sessionToken, expiryTime)
 		if err != nil {
 			log.Printf("Failed to store session token: %v", err)
 			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
+		Session.Token = sessionToken
+		Session.UserId = user.ID
+		Session.Email = user.Email
+		Session.ExpiryTime = expiryTime
+
 		http.SetCookie(w, &http.Cookie{
 			Name:     "session_token",
-			Value:    sessionToken.String(),
-			Path:     "/",
+			Value:    sessionToken,
+			Expires:  expiryTime,
 			HttpOnly: true,
-			Secure:   false,
+			Path:     "/",
 		})
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-		r.Method = http.MethodGet
-		IndexHandler(w, r)
+
 		return
 
 	} else if r.Method == http.MethodGet {
@@ -225,7 +236,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 
 func Logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_token")
-	if err != nil || cookie.Value == "" {
+	if err != nil {
 		util.ErrorHandler(w, "No active session", http.StatusUnauthorized)
 		return
 	}
