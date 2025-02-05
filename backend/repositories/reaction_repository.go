@@ -68,20 +68,21 @@ func CheckReactions(db *sql.DB, userId, postId int) (bool, string) {
 	return true, reaction.Reaction
 }
 
-func UpdateReaction(db *sql.DB, reaction string, userId, postId int) {
+func UpdateReaction(db *sql.DB, reaction string, userId, postId int) error {
 	query := `
 	UPDATE tblReactions
 	SET reaction = ?
 	 WHERE post_id = ? AND user_id = ?
 	`
-	_, err := db.Query(query, reaction, postId, userId)
+	_, err := db.Exec(query, reaction, postId, userId)
 	if err != nil {
 		log.Println("error executing query:", err)
-		return
+		return err
 	}
+	return nil
 }
 
-func UpdateReactionStatus(db *sql.DB, userId, postId int) {
+func UpdateReactionStatus(db *sql.DB, userId, postId int) error {
 	query := `
     UPDATE tblReactions
     SET reaction_status = 
@@ -92,9 +93,10 @@ func UpdateReactionStatus(db *sql.DB, userId, postId int) {
     WHERE post_id = ? AND user_id = ?
 `
 
-	_, err := db.Exec(query, postId, userId) // Use Exec instead of Query for UPDATE
+	_, err := db.Exec(query, postId, userId)
 	if err != nil {
 		log.Println("Error executing query:", err)
-		return
+		return err
 	}
+	return nil
 }
