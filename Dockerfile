@@ -14,7 +14,7 @@ RUN CGO_ENABLED=0 GOOG=LINUX go build -o /forum
 
 EXPOSE 9000
 
-CMD ["/forum"]
+CMD ["./forum"]
 
 
 # Docker permission setup (optional)
