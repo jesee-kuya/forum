@@ -26,6 +26,24 @@ body.dark-theme .signin-container {
   text-align: center;
 }
 
+.error-message {
+  position: absolute;
+  right: 10px;
+  top: 80px;
+  padding: 1rem 2rem;
+  background-color: var(--utility-color);
+  transition: var(--transition);
+  z-index: 10;
+  border-radius: 0.5rem;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.error-message.show {
+  visibility: visible;
+  opacity: 1;
+}
+
 .form-group {
   margin-bottom: 1rem;
 }
