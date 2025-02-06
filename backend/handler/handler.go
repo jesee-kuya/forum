@@ -661,3 +661,13 @@ func loadPosts() ([]models.Post, error) {
 	}
 	return posts, nil
 }
+
+func renderTemplate(w http.ResponseWriter, templateFile string, data interface{}) {
+	tmpl, err := template.ParseFiles(templateFile)
+	if err != nil {
+		log.Printf("Failed to load template %s: %v", templateFile, err)
+		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	tmpl.Execute(w, data)
+}
