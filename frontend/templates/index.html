@@ -189,7 +189,8 @@
 
         <div class="post-actions" data-post-id="{{ .ID }}">
           <!-- Like Button -->
-          <button  data-posted-id="{{ .ID }}"
+          <button
+            data-posted-id="{{ .ID }}"
             class="like-button"
             data-reaction="Like"
             aria-label="Like this post"
@@ -199,7 +200,8 @@
           </button>
 
           <!-- Dislike Button -->
-          <button data-posted-id="{{ .ID }}"
+          <button
+            data-posted-id="{{ .ID }}"
             class="dislike-button"
             data-reaction="Dislike"
             aria-label="Dislike this post"
@@ -259,10 +261,6 @@
 
     <aside class="profile">
       <h2>Profile</h2>
-      <img
-        src="/frontend/static/img/profile-image.jpeg"
-        alt="Profile Picture"
-      />
 
       {{if .IsLoggedIn }} {{template "status" .}} {{else}}
       <p class="session-status"><strong>Status:</strong> Not logged in</p>
@@ -284,60 +282,56 @@
       crossorigin="anonymous"
     ></script>
     <script>
-      document
-        .querySelectorAll(".like-button")
-        .forEach((button) => {
-          button.addEventListener("click", function (event) {
-            console.log("clicked", button);
-            
-            event.preventDefault(); // prevent default button behavior if inside a form
-            const postActions = this.closest(".post-actions");
-            const postId = button.getAttribute("data-posted-id");
-            console.log(postId);
-            
-            const reaction = this.getAttribute("data-reaction");
+      document.querySelectorAll('.like-button').forEach((button) => {
+        button.addEventListener('click', function (event) {
+          console.log('clicked', button);
 
-            // Log the data for debugging
-            console.log("Sending reaction:", { postId, reaction });
+          event.preventDefault(); // prevent default button behavior if inside a form
+          const postActions = this.closest('.post-actions');
+          const postId = button.getAttribute('data-posted-id');
+          console.log(postId);
 
-            // Send AJAX request
-            fetch("/reaction", {
-              method: "POST",
-              headers: { "Content-Type": "application/x-www-form-urlencoded" },
-              body: `post_id=${postId}&reaction=${reaction}`,
-            })
-              .then((response) => response.text())
-              .then((data) => console.log("Server response:", data))
-              .catch((err) => console.error(err));
-          });
+          const reaction = this.getAttribute('data-reaction');
+
+          // Log the data for debugging
+          console.log('Sending reaction:', { postId, reaction });
+
+          // Send AJAX request
+          fetch('/reaction', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `post_id=${postId}&reaction=${reaction}`,
+          })
+            .then((response) => response.text())
+            .then((data) => console.log('Server response:', data))
+            .catch((err) => console.error(err));
         });
-        document
-        .querySelectorAll(".dislike-button")
-        .forEach((button) => {
-          button.addEventListener("click", function (event) {
-            console.log("clicked", button);
-            
-            event.preventDefault(); // prevent default button behavior if inside a form
-            const postActions = this.closest(".post-actions");
-            const postId = button.getAttribute("data-posted-id");
-            console.log(postId);
-            
-            const reaction = this.getAttribute("data-reaction");
+      });
+      document.querySelectorAll('.dislike-button').forEach((button) => {
+        button.addEventListener('click', function (event) {
+          console.log('clicked', button);
 
-            // Log the data for debugging
-            // console.log("Sending reaction:", { postId, reaction });
+          event.preventDefault(); // prevent default button behavior if inside a form
+          const postActions = this.closest('.post-actions');
+          const postId = button.getAttribute('data-posted-id');
+          console.log(postId);
 
-            // Send AJAX request
-            fetch("/reaction", {
-              method: "POST",
-              headers: { "Content-Type": "application/x-www-form-urlencoded" },
-              body: `post_id=${postId}&reaction=${reaction}`,
-            })
-              .then((response) => response.text())
-              .then((data) => console.log("Server response:", data))
-              .catch((err) => console.error(err));
-          });
+          const reaction = this.getAttribute('data-reaction');
+
+          // Log the data for debugging
+          // console.log("Sending reaction:", { postId, reaction });
+
+          // Send AJAX request
+          fetch('/reaction', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `post_id=${postId}&reaction=${reaction}`,
+          })
+            .then((response) => response.text())
+            .then((data) => console.log('Server response:', data))
+            .catch((err) => console.error(err));
         });
+      });
     </script>
   </body>
 </html>
