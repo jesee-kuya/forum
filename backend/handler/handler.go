@@ -208,80 +208,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, data)
 }
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/sign-in" {
-		util.ErrorHandler(w, "Page not found", http.StatusNotFound)
-		return
-	}
-
-	if r.Method == http.MethodPost {
-		email := r.FormValue("email")
-		user, err := repositories.GetUserByEmail(email)
-		if err != nil {
-			util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
-			log.Println("Error fetching user", err)
-			return
-		}
-
-		// decrypt password & authorize user
-		storedPassword := user.Password
-
-		err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(r.FormValue("password")))
-		if err != nil {
-			log.Printf("Failed to hash: %v", err)
-			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-
-		sessionToken := uuid.New().String()
-		expiryTime := time.Now().Add(1440 * time.Minute)
-
-		err = repositories.DeleteSessionByUser(user.ID)
-		if err != nil {
-			log.Printf("Failed to delete session token: %v", err)
-			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-
-		err = repositories.StoreSession(user.ID, sessionToken, expiryTime)
-		if err != nil {
-			log.Printf("Failed to store session token: %v", err)
-			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-
-		Session.Token = sessionToken
-		Session.UserId = user.ID
-		Session.Email = user.Email
-		Session.ExpiryTime = expiryTime
-		Sessions = append(Sessions, Session)
-		Session = StoreSession{}
-
-		http.SetCookie(w, &http.Cookie{
-			Name:     "session_token",
-			Value:    sessionToken,
-			Expires:  expiryTime,
-			HttpOnly: true,
-			Path:     "/home",
-		})
-
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-
-		return
-
-	} else if r.Method == http.MethodGet {
-		tmpl, err := template.ParseFiles("frontend/templates/sign-in.html")
-		if err != nil {
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-		}
-
-		tmpl.Execute(w, nil)
-
-	} else {
-		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-	}
-}
-
 type Response struct {
 	Success bool `json:"success"`
 }
@@ -341,6 +267,83 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
+	}
+}
+
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/sign-in" {
+		util.ErrorHandler(w, "Page not found", http.StatusNotFound)
+		return
+	}
+
+	if r.Method == http.MethodPost {
+		email := r.FormValue("email")
+		user, err := repositories.GetUserByEmail(email)
+		if err != nil {
+			util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
+			log.Println("Error fetching user", err)
+			return
+		}
+
+		// decrypt password & authorize user
+		storedPassword := user.Password
+
+		err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(r.FormValue("password")))
+		if err != nil {
+			log.Printf("Failed to hash: %v", err)
+			// util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "application/json")
+			response := Response{Success: false}
+			json.NewEncoder(w).Encode(response)
+			return
+		}
+
+		sessionToken := uuid.New().String()
+		expiryTime := time.Now().Add(1440 * time.Minute)
+
+		err = repositories.DeleteSessionByUser(user.ID)
+		if err != nil {
+			log.Printf("Failed to delete session token: %v", err)
+			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		err = repositories.StoreSession(user.ID, sessionToken, expiryTime)
+		if err != nil {
+			log.Printf("Failed to store session token: %v", err)
+			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		Session.Token = sessionToken
+		Session.UserId = user.ID
+		Session.Email = user.Email
+		Session.ExpiryTime = expiryTime
+		Sessions = append(Sessions, Session)
+		Session = StoreSession{}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     "session_token",
+			Value:    sessionToken,
+			Expires:  expiryTime,
+			HttpOnly: true,
+			Path:     "/home",
+		})
+
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+
+		return
+
+	} else if r.Method == http.MethodGet {
+		tmpl, err := template.ParseFiles("frontend/templates/sign-in.html")
+		if err != nil {
+			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+
+		tmpl.Execute(w, nil)
+
+	} else {
+		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
 }
 
