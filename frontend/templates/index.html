@@ -79,9 +79,11 @@
             Science</label
           >
         </fieldset>
+
         <button class="apply">Apply</button>
       </form>
 
+      {{ if .IsLoggedIn }}
       <form class="filter-form" action="/filter" method="get">
         <ul class="sidebar-links">
           <li>
@@ -92,6 +94,7 @@
           </li>
         </ul>
       </form>
+      {{ end }}
     </aside>
 
     <main class="posts">
