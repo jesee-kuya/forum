@@ -687,3 +687,29 @@ body.dark-theme .comment-box {
 .comment-actions button:hover {
   color: var(--utility-color);
 }
+
+.apply, .filter-form button {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--dark-text-color);
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.filter-form .sidebar-links {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 1rem;
+}
+
+.filter-form .sidebar-links button {
+  background-color: var(--secondary-color);
+}
