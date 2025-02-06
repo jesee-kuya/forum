@@ -100,3 +100,19 @@ func UpdateReactionStatus(db *sql.DB, userId, postId int) error {
 	}
 	return nil
 }
+
+// AddReaction adds a reaction to the database
+
+func InsertReaction(db *sql.DB, reaction models.Reaction) error {
+	query := `
+	INSERT INTO tblReactions (reaction, reaction_status, user_id, post_id)
+	VALUES (?, 'clicked', ?, ?)
+`
+
+	_, err := db.Exec(query, reaction.Reaction, reaction.UserID, reaction.PostID)
+	if err != nil {
+		log.Println("Error executing query:", err)
+		return err
+	}
+	return nil
+}

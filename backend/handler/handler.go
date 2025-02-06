@@ -218,6 +218,14 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		Value:    session.Token,
 		Expires:  session.ExpiryTime,
 		HttpOnly: true,
+		Path:     "/reaction",
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    session.Token,
+		Expires:  session.ExpiryTime,
+		HttpOnly: true,
 		Path:     "/logout",
 	})
 
@@ -472,14 +480,8 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
-func LikeHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/like" {
-		log.Println("url not found", r.URL.Path)
-		util.ErrorHandler(w, "Not Found", http.StatusNotFound)
-		return
-	}
-
-	var session StoreSession
+func ReactionHandler(w http.ResponseWriter, r *http.Request) {
+	session := StoreSession{}
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
 		log.Printf("Cookie not found: %v", err)
@@ -493,36 +495,24 @@ func LikeHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-
 	if r.Method != http.MethodPost {
-		log.Println("Method not allowed in reactions", r.Method)
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var reqData RequestData
-	err = json.NewDecoder(r.Body).Decode(&reqData)
+	err = r.ParseForm()
 	if err != nil {
-		log.Println("Failed to decode json:", err)
-		util.ErrorHandler(w, "Invalid JSON", http.StatusBadRequest)
+		util.ErrorHandler(w, "Failed to parse form", http.StatusBadRequest)
 		return
 	}
 
-	postID, err := strconv.Atoi(reqData.ID)
-	if err != nil {
-		log.Println("Failed to change to int:", postID)
-		util.ErrorHandler(w, "An unexpected error occurred", http.StatusInternalServerError)
-		return
-	}
-
-	status := "like"
+	reactionType := r.FormValue("reaction")
+	postID, _ := strconv.Atoi(r.FormValue("post_id"))
 
 	check, reaction := repositories.CheckReactions(util.DB, session.UserId, postID)
-	log.Printf("CheckReactions: check=%v, reaction=%s", check, reaction) // Debugging
 
 	if !check {
-		log.Println("Inserting new reaction record") // Debugging
-		_, err := repositories.InsertRecord(util.DB, "tblReactions", []string{"user_id", "post_id", "reaction"}, session.UserId, postID, status)
+		_, err := repositories.InsertRecord(util.DB, "tblReactions", []string{"user_id", "post_id", "reaction"}, session.UserId, postID, reactionType)
 		if err != nil {
 			log.Println("Failed to insert record:", err)
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
@@ -532,8 +522,7 @@ func LikeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if status == reaction {
-		log.Println("Updating reaction status") // Debugging
+	if reactionType == reaction {
 		err := repositories.UpdateReactionStatus(util.DB, session.UserId, postID)
 		if err != nil {
 			log.Println("Failed to update reaction status:", err)
@@ -543,97 +532,13 @@ func LikeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	} else {
-		log.Println("Updating reaction") // Debugging
-		err := repositories.UpdateReaction(util.DB, status, session.UserId, postID)
+		err := repositories.UpdateReaction(util.DB, reactionType, session.UserId, postID)
 		if err != nil {
 			log.Println("Failed to update reaction:", err)
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-		return
 	}
-}
-
-func DislikeHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/dislike" {
-		log.Println("url not found", r.URL.Path)
-		util.ErrorHandler(w, "Not Found", http.StatusNotFound)
-		return
-	}
-
-	var session StoreSession
-	cookie, err := r.Cookie("session_token")
-	if err != nil {
-		log.Printf("Cookie not found: %v", err)
-		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
-		return
-	}
-
-	for _, v := range Sessions {
-		if v.Token == cookie.Value {
-			session = v
-			break
-		}
-	}
-
-	if r.Method != http.MethodPost {
-		log.Println("Method not allowed in reactions", r.Method)
-		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var reqData RequestData
-	err = json.NewDecoder(r.Body).Decode(&reqData)
-	if err != nil {
-		log.Println("Failed to decode json:", err)
-		util.ErrorHandler(w, "Invalid JSON", http.StatusBadRequest)
-		return
-	}
-
-	postID, err := strconv.Atoi(reqData.ID)
-	if err != nil {
-		log.Println("Failed to change to int:", postID)
-		util.ErrorHandler(w, "An unexpected error occurred", http.StatusInternalServerError)
-		return
-	}
-
-	status := "dislike"
-
-	check, reaction := repositories.CheckReactions(util.DB, session.UserId, postID)
-	log.Printf("CheckReactions: check=%v, reaction=%s", check, reaction) // Debugging
-
-	if !check {
-		log.Println("Inserting new reaction record") // Debugging
-		_, err := repositories.InsertRecord(util.DB, "tblReactions", []string{"user_id", "post_id", "reaction"}, session.UserId, postID, status)
-		if err != nil {
-			log.Println("Failed to insert record:", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-		return
-	}
-
-	if status == reaction {
-		log.Println("Updating reaction status")
-		err := repositories.UpdateReactionStatus(util.DB, session.UserId, postID)
-		if err != nil {
-			log.Println("Failed to update reaction status:", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-		return
-	} else {
-		log.Println("Updating reaction")
-		err := repositories.UpdateReaction(util.DB, status, session.UserId, postID)
-		if err != nil {
-			log.Println("Failed to update reaction:", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-		return
-	}
+	r.Method = http.MethodGet
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }

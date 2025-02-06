@@ -6,7 +6,6 @@
 
     <link rel="stylesheet" href="/frontend/static/css/style.css" />
     <script defer src="/frontend/static/js/script.js"></script>
-    <script defer src="/frontend/static/js/likes_event.js"></script>
 
     <title>Home</title>
   </head>
@@ -167,7 +166,6 @@
       <button class="floating-create-post-btn">
         <i class="fa-solid fa-plus"></i>
       </button>
-
       {{ range .Posts}}
       <article class="post">
         <div class="post-header">
@@ -189,17 +187,35 @@
           {{ end }}
         </div>
 
-        <div class="post-actions">
-          <button class="like-button" data-id="{{ .ID }}">
-            <i class="fa-regular fa-thumbs-up"></i> <span>{{ .Likes }}</span>
+        <div class="post-actions" data-post-id="{{ .ID }}">
+          <!-- Like Button -->
+          <button  data-posted-id="{{ .ID }}"
+            class="like-button"
+            data-reaction="Like"
+            aria-label="Like this post"
+          >
+            <i class="fa-regular fa-thumbs-up"></i>
+            <span> Like <span class="like-count">{{ .Likes }}</span> </span>
           </button>
-          <button class="dislike-button" data-id="{{ .ID }}">
+
+          <!-- Dislike Button -->
+          <button data-posted-id="{{ .ID }}"
+            class="dislike-button"
+            data-reaction="Dislike"
+            aria-label="Dislike this post"
+          >
             <i class="fa-regular fa-thumbs-down"></i>
-            <span>{{ .Dislikes }}</span>
+            <span>
+              Dislike <span class="dislike-count">{{ .Dislikes }}</span>
+            </span>
           </button>
-          <button class="comment-button">
+
+          <!-- Comment Button -->
+          <button class="comment-button" aria-label="View or add comments">
             <i class="fa-regular fa-comment"></i>
-            <span>{{ .CommentCount }}</span>
+            <span>
+              Comment <span class="comment-count">{{ .CommentCount }}</span>
+            </span>
           </button>
         </div>
 
@@ -225,11 +241,11 @@
           <div class="comment">
             <p><strong>{{ .UserName }}</strong>: {{ .Body }}</p>
             <div class="comment-actions">
-              <button class="like-comment-button" data-id="{{ .ID }}">
+              <button class="like-comment-button">
                 <i class="fa-regular fa-thumbs-up"></i>
                 <span>{{ .Likes }}</span>
               </button>
-              <button class="dislike-comment-button" data-id="{{ .ID }}">
+              <button class="dislike-comment-button">
                 <i class="fa-regular fa-thumbs-down"></i>
                 <span>{{ .Dislikes }}</span>
               </button>
@@ -243,10 +259,14 @@
 
     <aside class="profile">
       <h2>Profile</h2>
+      <img
+        src="/frontend/static/img/profile-image.jpeg"
+        alt="Profile Picture"
+      />
 
       {{if .IsLoggedIn }} {{template "status" .}} {{else}}
-      <img src="/frontend/static/img/profile-image.jpg" alt="Profile Picture" />
       <p class="session-status"><strong>Status:</strong> Not logged in</p>
+
       {{end}}
     </aside>
 
@@ -263,6 +283,62 @@
       src="https://kit.fontawesome.com/0b11e99e28.js"
       crossorigin="anonymous"
     ></script>
+    <script>
+      document
+        .querySelectorAll(".like-button")
+        .forEach((button) => {
+          button.addEventListener("click", function (event) {
+            console.log("clicked", button);
+            
+            event.preventDefault(); // prevent default button behavior if inside a form
+            const postActions = this.closest(".post-actions");
+            const postId = button.getAttribute("data-posted-id");
+            console.log(postId);
+            
+            const reaction = this.getAttribute("data-reaction");
+
+            // Log the data for debugging
+            console.log("Sending reaction:", { postId, reaction });
+
+            // Send AJAX request
+            fetch("/reaction", {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: `post_id=${postId}&reaction=${reaction}`,
+            })
+              .then((response) => response.text())
+              .then((data) => console.log("Server response:", data))
+              .catch((err) => console.error(err));
+          });
+        });
+        document
+        .querySelectorAll(".dislike-button")
+        .forEach((button) => {
+          button.addEventListener("click", function (event) {
+            console.log("clicked", button);
+            
+            event.preventDefault(); // prevent default button behavior if inside a form
+            const postActions = this.closest(".post-actions");
+            const postId = button.getAttribute("data-posted-id");
+            console.log(postId);
+            
+            const reaction = this.getAttribute("data-reaction");
+
+            // Log the data for debugging
+            // console.log("Sending reaction:", { postId, reaction });
+
+            // Send AJAX request
+            fetch("/reaction", {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: `post_id=${postId}&reaction=${reaction}`,
+            })
+              .then((response) => response.text())
+              .then((data) => console.log("Server response:", data))
+              .catch((err) => console.error(err));
+          });
+        });
+    </script>
   </body>
 </html>
 
