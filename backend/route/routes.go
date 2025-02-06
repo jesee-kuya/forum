@@ -24,8 +24,9 @@ func InitRoutes() *http.ServeMux {
 	r.HandleFunc("/upload", handler.CreatePost)
 	r.HandleFunc("/logout", handler.LogoutHandler)
 	r.HandleFunc("/comments", handler.CommentHandler)
-	r.HandleFunc("/likes", handler.LikeHandler)
-	r.HandleFunc("/dilikes", handler.DislikeHandler)
+	r.HandleFunc("/reaction", handler.ReactionHandler)
+	r.HandleFunc("/likes", handler.ReactionHandler)
+	r.HandleFunc("/dilikes", handler.ReactionHandler)
 
 	r.HandleFunc("/api/posts", handler.GetAllPostsAPI(util.DB))
 	return r
