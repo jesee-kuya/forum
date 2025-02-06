@@ -82,24 +82,3 @@ document.querySelectorAll('.submit-comment').forEach((button) => {
     }
   });
 });
-
-// Uses fetch API to fetch user details when the page loads.
-async function loadUserProfile() {
-  try {
-    const response = await fetch('/user');
-    if (!response.ok) throw new Error('Failed to fetch user');
-
-    const user = await response.json();
-    document.querySelector(
-      '.profile img'
-    ).src = `/frontend/static/img/profile-image.jpeg`;
-    document.querySelector('.profile p strong').textContent = user.name;
-    document.querySelector(
-      '.profile p:nth-of-type(2)'
-    ).innerHTML = `<strong>Email:</strong> ${user.email}`;
-  } catch (error) {
-    console.error('Error loading user profile:', error);
-  }
-}
-
-window.addEventListener('DOMContentLoaded', loadUserProfile);

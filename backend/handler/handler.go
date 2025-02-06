@@ -195,7 +195,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		Value:    session.Token,
 		Expires:  session.ExpiryTime,
 		HttpOnly: true,
-		Path:     "/filter",
+		Path:     "/reaction",
 	})
 
 	http.SetCookie(w, &http.Cookie{
@@ -249,6 +249,68 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, data)
 }
 
+type Response struct {
+	Success bool `json:"success"`
+}
+
+func SignupHandler(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+	if r.URL.Path != "/sign-up" {
+		util.ErrorHandler(w, "Page Not Found", http.StatusNotFound)
+		return
+	}
+
+	if r.Method == http.MethodPost {
+		fmt.Println("OK: ", http.StatusOK)
+
+		err := r.ParseForm()
+		if err != nil {
+			log.Printf("Failed parsing form: %v\n", err)
+			util.ErrorHandler(w, "Failed parsing form", http.StatusInternalServerError)
+			return
+		}
+
+		user.Username = strings.TrimSpace(r.PostFormValue("username"))
+		user.Email = strings.TrimSpace(r.PostFormValue("email"))
+		user.Password = strings.TrimSpace(r.PostFormValue("password"))
+
+		err = util.ValidateFormFields(user.Username, user.Email, user.Password)
+		if err != nil {
+			log.Printf("Invalid form values from user: %v\n", err)
+			response := Response{Success: false}
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+			return
+		}
+
+		hashed, err := util.PasswordEncrypt([]byte(user.Password), 10)
+		if err != nil {
+			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Printf("Failed encrypting password: %v\n", err)
+			return
+		}
+
+		_, err = repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, string(hashed))
+		if err != nil {
+			util.ErrorHandler(w, "user cannot be added", http.StatusForbidden)
+			log.Println("Error adding user:", err)
+			return
+		}
+		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
+		return
+	} else if r.Method == http.MethodGet {
+		tmpl, err := template.ParseFiles("frontend/templates/sign-up.html")
+		if err != nil {
+			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		tmpl.Execute(w, nil)
+	} else {
+		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+}
+
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/sign-in" {
 		util.ErrorHandler(w, "Page not found", http.StatusNotFound)
@@ -270,7 +332,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(r.FormValue("password")))
 		if err != nil {
 			log.Printf("Failed to hash: %v", err)
-			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
+			// util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "application/json")
+			response := Response{Success: false}
+			json.NewEncoder(w).Encode(response)
 			return
 		}
 
@@ -320,57 +385,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-	}
-}
-
-func SignupHandler(w http.ResponseWriter, r *http.Request) {
-	var user models.User
-	if r.URL.Path != "/sign-up" {
-		util.ErrorHandler(w, "Page Not Found", http.StatusNotFound)
-		return
-	}
-
-	if r.Method == http.MethodPost {
-		fmt.Println("OK: ", http.StatusOK)
-		r.ParseForm()
-		user.Username = r.PostFormValue("username")
-		user.Email = r.PostFormValue("email")
-		user.Password = r.PostFormValue("password")
-
-		if strings.TrimSpace(user.Email) == "" || strings.TrimSpace(user.Password) == "" || strings.TrimSpace(user.Username) == "" {
-			log.Println("Invalid form values from user")
-			// util.ErrorHandler(w, "Fields cannot be empty", http.StatusBadRequest)
-			return
-		}
-
-		hashed, err := util.PasswordEncrypt([]byte(user.Password), 10)
-		if err != nil {
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		_, err = repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, string(hashed))
-		if err != nil {
-			util.ErrorHandler(w, "user Can not be added", http.StatusForbidden)
-			log.Println("Error adding user:", err)
-			return
-		}
-
-		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
-		r.Method = http.MethodGet
-		SignupHandler(w, r)
-		return
-	} else if r.Method == http.MethodGet {
-		tmpl, err := template.ParseFiles("frontend/templates/sign-up.html")
-		if err != nil {
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		tmpl.Execute(w, nil)
-	} else {
-		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
 	}
 }
 
@@ -443,14 +457,8 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
-func LikeHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/like" {
-		log.Println("url not found", r.URL.Path)
-		util.ErrorHandler(w, "Not Found", http.StatusNotFound)
-		return
-	}
-
-	var session StoreSession
+func ReactionHandler(w http.ResponseWriter, r *http.Request) {
+	session := StoreSession{}
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
 		log.Printf("Cookie not found: %v", err)
@@ -464,36 +472,24 @@ func LikeHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-
 	if r.Method != http.MethodPost {
-		log.Println("Method not allowed in reactions", r.Method)
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var reqData RequestData
-	err = json.NewDecoder(r.Body).Decode(&reqData)
+	err = r.ParseForm()
 	if err != nil {
-		log.Println("Failed to decode json:", err)
-		util.ErrorHandler(w, "Invalid JSON", http.StatusBadRequest)
+		util.ErrorHandler(w, "Failed to parse form", http.StatusBadRequest)
 		return
 	}
 
-	postID, err := strconv.Atoi(reqData.ID)
-	if err != nil {
-		log.Println("Failed to change to int:", postID)
-		util.ErrorHandler(w, "An unexpected error occurred", http.StatusInternalServerError)
-		return
-	}
-
-	status := "like"
+	reactionType := r.FormValue("reaction")
+	postID, _ := strconv.Atoi(r.FormValue("post_id"))
 
 	check, reaction := repositories.CheckReactions(util.DB, session.UserId, postID)
-	log.Printf("CheckReactions: check=%v, reaction=%s", check, reaction) // Debugging
 
 	if !check {
-		log.Println("Inserting new reaction record") // Debugging
-		_, err := repositories.InsertRecord(util.DB, "tblReactions", []string{"user_id", "post_id", "reaction"}, session.UserId, postID, status)
+		_, err := repositories.InsertRecord(util.DB, "tblReactions", []string{"user_id", "post_id", "reaction"}, session.UserId, postID, reactionType)
 		if err != nil {
 			log.Println("Failed to insert record:", err)
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
@@ -503,8 +499,7 @@ func LikeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if status == reaction {
-		log.Println("Updating reaction status") // Debugging
+	if reactionType == reaction {
 		err := repositories.UpdateReactionStatus(util.DB, session.UserId, postID)
 		if err != nil {
 			log.Println("Failed to update reaction status:", err)
@@ -514,97 +509,13 @@ func LikeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	} else {
-		log.Println("Updating reaction") // Debugging
-		err := repositories.UpdateReaction(util.DB, status, session.UserId, postID)
+		err := repositories.UpdateReaction(util.DB, reactionType, session.UserId, postID)
 		if err != nil {
 			log.Println("Failed to update reaction:", err)
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-		return
 	}
-}
-
-func DislikeHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/dislike" {
-		log.Println("url not found", r.URL.Path)
-		util.ErrorHandler(w, "Not Found", http.StatusNotFound)
-		return
-	}
-
-	var session StoreSession
-	cookie, err := r.Cookie("session_token")
-	if err != nil {
-		log.Printf("Cookie not found: %v", err)
-		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
-		return
-	}
-
-	for _, v := range Sessions {
-		if v.Token == cookie.Value {
-			session = v
-			break
-		}
-	}
-
-	if r.Method != http.MethodPost {
-		log.Println("Method not allowed in reactions", r.Method)
-		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var reqData RequestData
-	err = json.NewDecoder(r.Body).Decode(&reqData)
-	if err != nil {
-		log.Println("Failed to decode json:", err)
-		util.ErrorHandler(w, "Invalid JSON", http.StatusBadRequest)
-		return
-	}
-
-	postID, err := strconv.Atoi(reqData.ID)
-	if err != nil {
-		log.Println("Failed to change to int:", postID)
-		util.ErrorHandler(w, "An unexpected error occurred", http.StatusInternalServerError)
-		return
-	}
-
-	status := "dislike"
-
-	check, reaction := repositories.CheckReactions(util.DB, session.UserId, postID)
-	log.Printf("CheckReactions: check=%v, reaction=%s", check, reaction) // Debugging
-
-	if !check {
-		log.Println("Inserting new reaction record") // Debugging
-		_, err := repositories.InsertRecord(util.DB, "tblReactions", []string{"user_id", "post_id", "reaction"}, session.UserId, postID, status)
-		if err != nil {
-			log.Println("Failed to insert record:", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-		return
-	}
-
-	if status == reaction {
-		log.Println("Updating reaction status")
-		err := repositories.UpdateReactionStatus(util.DB, session.UserId, postID)
-		if err != nil {
-			log.Println("Failed to update reaction status:", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-		return
-	} else {
-		log.Println("Updating reaction")
-		err := repositories.UpdateReaction(util.DB, status, session.UserId, postID)
-		if err != nil {
-			log.Println("Failed to update reaction:", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-		return
-	}
+	r.Method = http.MethodGet
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
