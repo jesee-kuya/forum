@@ -578,3 +578,18 @@ func renderTemplate(w http.ResponseWriter, templateFile string, data interface{}
 	}
 	tmpl.Execute(w, data)
 }
+
+func getSession(r *http.Request) (*StoreSession, error) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		return nil, fmt.Errorf("cookie not found")
+	}
+
+	for _, s := range Sessions {
+		if s.Token == cookie.Value {
+			return &s, nil
+		}
+	}
+
+	return nil, fmt.Errorf("session not found")
+}
