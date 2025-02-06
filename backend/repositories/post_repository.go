@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/jesee-kuya/forum/backend/models"
 )
@@ -52,6 +53,41 @@ func GetComments(db *sql.DB, id int) ([]models.Post, error) {
 	return posts, err
 }
 
+func FilterPostsByCategories(db *sql.DB, categories []string) ([]models.Post, error) {
+	if len(categories) == 0 {
+		return nil, fmt.Errorf("no categories provided")
+	}
+
+	placeholders := strings.Repeat("?,", len(categories)-1) + "?"
+
+	query := fmt.Sprintf(`
+		SELECT p.id, p.user_id, u.username, p.post_title, p.body, p.created_on, p.media_url
+		FROM tblPosts p
+		JOIN tblUsers u ON p.user_id = u.id
+		LEFT JOIN tblPostCategories c ON p.id = c.post_id 
+		WHERE p.parent_id IS NULL 
+		AND p.post_status = 'visible' 
+		AND c.category IN (%s)`, placeholders)
+
+	args := make([]interface{}, len(categories))
+	for i, v := range categories {
+		args[i] = v
+	}
+
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %v", err)
+	}
+	defer rows.Close()
+
+	posts, err := processSQLData(rows)
+	if err != nil {
+		return nil, fmt.Errorf("failed to process posts: %v", err)
+	}
+
+	return posts, nil
+}
+
 // FilterPosts - Fetch posts based on category or user
 func FilterPosts(db *sql.DB, filterType, filterValue string) ([]models.Post, error) {
 	var query string
@@ -65,7 +101,8 @@ func FilterPosts(db *sql.DB, filterType, filterValue string) ([]models.Post, err
 			FROM tblPosts p
 			JOIN tblUsers u ON p.user_id = u.id
 			LEFT JOIN tblPostCategories c ON p.id = c.post_id 
-			WHERE p.parent_id IS NULL AND p.post_status = 'visible' AND c.category = ? 
+			WHERE p.parent_id IS NULL AND p.post_status = 'visible' 
+			AND c.category = ? 
 			`
 	case "user":
 		query = `
