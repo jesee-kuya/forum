@@ -10,7 +10,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
@@ -290,18 +290,18 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		sessionToken := uuid.New().String()
+		sessionToken, _ := uuid.NewV4()
 		expiryTime := time.Now().Add(24 * time.Hour)
 
 		repositories.DeleteSessionByUser(user.ID)
-		if err := repositories.StoreSession(user.ID, sessionToken, expiryTime); err != nil {
+		if err := repositories.StoreSession(user.ID, sessionToken.String(), expiryTime); err != nil {
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
-		Sessions = append(Sessions, StoreSession{sessionToken, user.Email, user.ID, expiryTime})
+		Sessions = append(Sessions, StoreSession{sessionToken.String(), user.Email, user.ID, expiryTime})
 
-		http.SetCookie(w, &http.Cookie{Name: "session_token", Value: sessionToken, Expires: expiryTime, HttpOnly: true, Path: "/home"})
+		http.SetCookie(w, &http.Cookie{Name: "session_token", Value: sessionToken.String(), Expires: expiryTime, HttpOnly: true, Path: "/home"})
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 	case http.MethodGet:
 		renderTemplate(w, "frontend/templates/sign-in.html", nil)
