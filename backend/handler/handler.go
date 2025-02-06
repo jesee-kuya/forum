@@ -33,77 +33,26 @@ var (
 )
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
+	if r.URL.Path != "/" || r.Method != http.MethodGet {
+		util.ErrorHandler(w, "Page not found", http.StatusNotFound)
 		return
 	}
 
-	if r.Method != http.MethodGet {
-		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Load posts
-	posts, err := repositories.GetPosts(util.DB)
+	posts, err := loadPosts()
 	if err != nil {
-		log.Printf("Failed to get posts: %v", err)
+		log.Println("Error loading posts:", err)
 		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		return
-	}
-
-	// Fetch comments, categories, likes, and dislikes for each post
-	for i, post := range posts {
-		comments, err1 := repositories.GetComments(util.DB, post.ID)
-		if err1 != nil {
-			log.Println("Failed to get comments:", err1)
-			util.ErrorHandler(w, "An unexpected error occured", http.StatusInternalServerError)
-			return
-		}
-		categories, err3 := repositories.GetCategories(util.DB, post.ID)
-		if err3 != nil {
-			log.Println("Failed to get categories", err3)
-			util.ErrorHandler(w, "An unexpected error occured", http.StatusInternalServerError)
-			return
-		}
-		likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
-		if err4 != nil {
-			log.Println("Failed to get likes", err4)
-			util.ErrorHandler(w, "An unexpected error occured", http.StatusInternalServerError)
-			return
-		}
-		dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
-		if err != nil {
-			log.Printf("Failed to get dislikes: %v", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		posts[i].Comments = comments
-		posts[i].CommentCount = len(comments)
-		posts[i].Categories = categories
-		posts[i].Likes = len(likes)
-		posts[i].Dislikes = len(dislikes)
 	}
 
 	data := struct {
-		IsLoggedIn  bool
-		Name, Email string
-		Posts       []models.Post
-	}{
-		IsLoggedIn: false,
-		Name:       "",
-		Email:      "",
-		Posts:      posts,
-	}
+		IsLoggedIn bool
+		Name       string
+		Email      string
+		Posts      []models.Post
+	}{false, "", "", posts}
 
-	// Parse and execute the template
-	tmpl, err := template.ParseFiles("frontend/templates/index.html")
-	if err != nil {
-		log.Printf("Failed to load index template: %v", err)
-		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	tmpl.Execute(w, data)
+	renderTemplate(w, "frontend/templates/index.html", data)
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
