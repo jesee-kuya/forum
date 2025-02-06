@@ -115,6 +115,11 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "media_url", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), url, session.UserId)
 	if err != nil {
 		fmt.Println("failed to add post", err)
+
+		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
+		r.Method = http.MethodGet
+		LoginHandler(w, r)
+
 		return
 	}
 
