@@ -14,7 +14,7 @@ func ValidatePort() (string, error) {
 
 	switch len(os.Args) {
 	case 1:
-		port = ":8080"
+		port = ":9000"
 	case 2:
 		portNum, err := strconv.Atoi(os.Args[1])
 		if err != nil {
