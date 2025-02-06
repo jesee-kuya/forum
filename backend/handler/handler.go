@@ -637,3 +637,27 @@ func DislikeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func loadPosts() ([]models.Post, error) {
+	posts, err := repositories.GetPosts(util.DB)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, post := range posts {
+		comments, err1 := repositories.GetComments(util.DB, post.ID)
+		categories, err2 := repositories.GetCategories(util.DB, post.ID)
+		likes, err3 := repositories.GetReactions(util.DB, post.ID, "Like")
+		dislikes, err4 := repositories.GetReactions(util.DB, post.ID, "Dislike")
+		if err1 != nil || err2 != nil || err3 != nil || err4 != nil {
+			return nil, fmt.Errorf("failed to fetch post details")
+		}
+
+		posts[i].Comments = comments
+		posts[i].CommentCount = len(comments)
+		posts[i].Categories = categories
+		posts[i].Likes = len(likes)
+		posts[i].Dislikes = len(dislikes)
+	}
+	return posts, nil
+}
