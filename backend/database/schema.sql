@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = ON;
+
 CREATE TABLE IF NOT EXISTS tblUsers (
   id INTEGER PRIMARY KEY,
   username TEXT NOT NULL,
