@@ -51,40 +51,12 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch comments, categories, likes, and dislikes for each post
-	for i, post := range posts {
-		comments, err1 := repositories.GetComments(util.DB, post.ID)
-		if err1 != nil {
-			log.Println("Failed to get comments:", err1)
-			util.ErrorHandler(w, "An unexpected error occured", http.StatusInternalServerError)
-			return
-		}
-		categories, err3 := repositories.GetCategories(util.DB, post.ID)
-		if err3 != nil {
-			log.Println("Failed to get categories", err3)
-			util.ErrorHandler(w, "An unexpected error occured", http.StatusInternalServerError)
-			return
-		}
-		likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
-		if err4 != nil {
-			log.Println("Failed to get likes", err4)
-			util.ErrorHandler(w, "An unexpected error occured", http.StatusInternalServerError)
-			return
-		}
-		dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
-		if err != nil {
-			log.Printf("Failed to get dislikes: %v", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		posts[i].Comments = comments
-		posts[i].CommentCount = len(comments)
-		posts[i].Categories = categories
-		posts[i].Likes = len(likes)
-		posts[i].Dislikes = len(dislikes)
+	posts, err = PostDetails(posts)
+	if err != nil {
+		log.Println(err)
+		util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
+		return
 	}
-
 	data := struct {
 		IsLoggedIn  bool
 		Name, Email string
@@ -104,6 +76,38 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tmpl.Execute(w, data)
+}
+
+func PostDetails(posts []models.Post) ([]models.Post, error) {
+	for i, post := range posts {
+		comments, err1 := repositories.GetComments(util.DB, post.ID)
+		if err1 != nil {
+			log.Println("Failed to get comments:", err1)
+			return nil, fmt.Errorf("failed to get comments: %v", err1)
+		}
+		categories, err3 := repositories.GetCategories(util.DB, post.ID)
+		if err3 != nil {
+			log.Println("Failed to get categories", err3)
+			return nil, fmt.Errorf("failed to get categories: %v", err3)
+		}
+		likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
+		if err4 != nil {
+			log.Println("Failed to get likes", err4)
+			return nil, fmt.Errorf("failed to get likes: %v", err4)
+		}
+		dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
+		if err != nil {
+			log.Printf("Failed to get dislikes: %v", err)
+			return nil, fmt.Errorf("failed to get dislikes: %v", err)
+		}
+
+		posts[i].Comments = comments
+		posts[i].CommentCount = len(comments)
+		posts[i].Categories = categories
+		posts[i].Likes = len(likes)
+		posts[i].Dislikes = len(dislikes)
+	}
+	return posts, nil
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -164,7 +168,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Load posts
 	posts, err := repositories.GetPosts(util.DB)
 	if err != nil {
 		log.Printf("Failed to get posts: %v", err)
@@ -172,37 +175,11 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch comments, categories, likes, and dislikes for each post
-	for i, post := range posts {
-		comments, err1 := repositories.GetComments(util.DB, post.ID)
-		if err1 != nil {
-			log.Println("Failed to get comments:", err1)
-			return
-		}
-		categories, err3 := repositories.GetCategories(util.DB, post.ID)
-		if err3 != nil {
-			log.Println("Failed to get categories", err3)
-			util.ErrorHandler(w, "An unexpected error occured", http.StatusInternalServerError)
-			return
-		}
-		likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
-		if err4 != nil {
-			log.Println("Failed to get likes", err4)
-			util.ErrorHandler(w, "An unexpected error occured", http.StatusInternalServerError)
-			return
-		}
-		dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
-		if err != nil {
-			log.Printf("Failed to get dislikes: %v", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		posts[i].Comments = comments
-		posts[i].CommentCount = len(comments)
-		posts[i].Categories = categories
-		posts[i].Likes = len(likes)
-		posts[i].Dislikes = len(dislikes)
+	posts, err = PostDetails(posts)
+	if err != nil {
+		log.Println(err)
+		util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
+		return
 	}
 
 	http.SetCookie(w, &http.Cookie{
