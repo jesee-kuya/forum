@@ -3,34 +3,31 @@ package handler
 import (
 	"log"
 	"net/http"
-	"text/template"
 	"time"
 
-	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
 )
 
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	var session StoreSession
+type RequestData struct {
+	ID string `json:"id"`
+}
 
+type Response struct {
+	Success bool `json:"success"`
+}
+
+func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/home" {
 		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
 
-	cookie, err := r.Cookie("session_token")
+	session, cookie, err := ValidateCookie(r)
 	if err != nil {
-		log.Printf("Cookie not found: %v", err)
-		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		log.Printf("Failed to validate cookie: %v", err)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
-	}
-
-	for _, v := range Sessions {
-		if v.Token == cookie.Value {
-			session = v
-			break
-		}
 	}
 
 	// Fetch session from DB
@@ -62,7 +59,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch user information
-	user, err := repositories.GetUserByEmail(session.Email)
+	_, err = repositories.GetUserByEmail(session.Email)
 	if err != nil {
 		log.Printf("Invalid session token: %v", err)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -75,77 +72,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-
-	posts, err = PostDetails(posts)
-	if err != nil {
-		log.Println(err)
-		util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
-		return
-	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    session.Token,
-		Expires:  session.ExpiryTime,
-		HttpOnly: true,
-		Path:     "/upload",
-	})
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    session.Token,
-		Expires:  session.ExpiryTime,
-		HttpOnly: true,
-		Path:     "/reaction",
-	})
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    session.Token,
-		Expires:  session.ExpiryTime,
-		HttpOnly: true,
-		Path:     "/logout",
-	})
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    session.Token,
-		Expires:  session.ExpiryTime,
-		HttpOnly: true,
-		Path:     "/comments",
-	})
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    session.Token,
-		Expires:  session.ExpiryTime,
-		HttpOnly: true,
-		Path:     "/like",
-	})
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    session.Token,
-		Expires:  session.ExpiryTime,
-		HttpOnly: true,
-		Path:     "/dislike",
-	})
-
-	data := struct {
-		IsLoggedIn  bool
-		Name, Email string
-		Posts       []models.Post
-	}{
-		IsLoggedIn: true,
-		Name:       user.Username,
-		Email:      user.Email,
-		Posts:      posts,
-	}
-
-	// Parse and execute the template
-	tmpl, err := template.ParseFiles("frontend/templates/index.html")
-	if err != nil {
-		log.Printf("Failed to load index template: %v", err)
-		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	tmpl.Execute(w, data)
+	CookieSession(w, session)
+	PostDetails(posts, w, true, session)
 }
