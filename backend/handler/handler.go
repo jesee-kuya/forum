@@ -3,31 +3,9 @@ package handler
 import (
 	"log"
 	"net/http"
-	"text/template"
-	"time"
 
-	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
-)
-
-type StoreSession struct {
-	Token, Email string
-	UserId       int
-	ExpiryTime   time.Time
-}
-
-type RequestData struct {
-	ID string `json:"id"`
-}
-
-type Response struct {
-	Success bool `json:"success"`
-}
-
-var (
-	Session  StoreSession
-	Sessions []StoreSession
 )
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,8 +19,9 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := r.Cookie("session_token")
+	_, _, err := ValidateCookie(r)
 	if err == nil {
+		log.Printf("Cookie found")
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
@@ -54,30 +33,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	logged := false
 
-	posts, err = PostDetails(posts)
-	if err != nil {
-		log.Println(err)
-		util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
-		return
-	}
-	data := struct {
-		IsLoggedIn  bool
-		Name, Email string
-		Posts       []models.Post
-	}{
-		IsLoggedIn: false,
-		Name:       "",
-		Email:      "",
-		Posts:      posts,
-	}
-
-	// Parse and execute the template
-	tmpl, err := template.ParseFiles("frontend/templates/index.html")
-	if err != nil {
-		log.Printf("Failed to load index template: %v", err)
-		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	tmpl.Execute(w, data)
+	PostDetails(posts, w, logged, StoreSession{})
 }
