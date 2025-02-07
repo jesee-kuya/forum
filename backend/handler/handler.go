@@ -28,7 +28,7 @@ type RequestData struct {
 }
 
 type Response struct {
-	Success   bool   `json:"success"`
+	Success bool `json:"success"`
 }
 
 var (
@@ -89,6 +89,25 @@ func PostDetails(posts []models.Post) ([]models.Post, error) {
 			log.Println("Failed to get comments:", err1)
 			return nil, fmt.Errorf("failed to get comments: %v", err1)
 		}
+
+		// Getting comment reactions
+		for j, comment := range comments {
+			commentLikes, errLikes := repositories.GetReactions(util.DB, comment.ID, "Like")
+			if errLikes != nil {
+				log.Println("Failed to get likes", errLikes)
+				return nil, fmt.Errorf("failed to get likes: %v", errLikes)
+			}
+
+			commentDislikes, errDislikes := repositories.GetReactions(util.DB, comment.ID, "Dislike")
+			if errDislikes != nil {
+				log.Println("Failed to get dislikes", errDislikes)
+				return nil, fmt.Errorf("failed to get dislikes: %v", errDislikes)
+			}
+
+			comments[j].Likes = len(commentLikes)
+			comments[j].Dislikes = len(commentDislikes)
+		}
+
 		categories, err3 := repositories.GetCategories(util.DB, post.ID)
 		if err3 != nil {
 			log.Println("Failed to get categories", err3)
@@ -498,7 +517,6 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		fmt.Println("redirecting")
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
@@ -510,11 +528,8 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		fmt.Println("redirecting2")
-		// http.Redirect(w, r, "/home", http.StatusSeeOther)
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{"redirect": "/home"})
 
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	} else {
 		err := repositories.UpdateReaction(util.DB, reactionType, session.UserId, postID)
@@ -525,6 +540,5 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	r.Method = http.MethodGet
-	fmt.Println("redirecting3")
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
