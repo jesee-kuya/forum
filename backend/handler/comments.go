@@ -15,18 +15,11 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var session StoreSession
-	cookie, err := r.Cookie("session_token")
+	session, _, err := ValidateCookie(r)
 	if err != nil {
-		log.Printf("Cookie not found: %v", err)
-		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+		log.Printf("Failed to validate cookie: %v", err)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
-	}
-
-	for _, v := range Sessions {
-		if v.Token == cookie.Value {
-			session = v
-			break
-		}
 	}
 
 	if r.Method != http.MethodPost {
@@ -39,5 +32,5 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 	comment := r.FormValue("comment")
 
 	repositories.InsertRecord(util.DB, "tblPosts", []string{"user_id", "body", "parent_id", "post_title"}, userId, comment, id, "comment")
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
