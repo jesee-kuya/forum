@@ -47,6 +47,12 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, err := r.Cookie("session_token")
+	if err == nil {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		return
+	}
+
 	// Load posts
 	posts, err := repositories.GetPosts(util.DB)
 	if err != nil {

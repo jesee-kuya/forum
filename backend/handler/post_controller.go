@@ -79,12 +79,15 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Cookie not found: %v", err)
 	}
 
-	for _, v := range Sessions {
-		if v.Token == cookie.Value {
-			session = v
-			break
+	if err == nil {
+		for _, v := range Sessions {
+			if v.Token == cookie.Value {
+				session = v
+				break
+			}
 		}
 	}
+
 	if r.URL.Path != "/filter" {
 		log.Println("Path not found", r.URL.Path)
 		util.ErrorHandler(w, "Not Found", http.StatusNotFound)
