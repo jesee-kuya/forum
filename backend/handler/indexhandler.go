@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -47,6 +48,9 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		r.Method = http.MethodGet
 	}
 
+	fmt.Println("Now", time.Now())
+	fmt.Println("Expiry time", session.ExpiryTime)
+
 	if time.Now().After(session.ExpiryTime) {
 		log.Println("User session has expired. Please log in again")
 		util.ErrorHandler(w, "User session has expired. Please log in again", http.StatusUnauthorized)
@@ -72,6 +76,5 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	CookieSession(w, session)
 	PostDetails(posts, w, true, session)
 }
