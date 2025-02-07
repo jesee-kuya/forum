@@ -19,7 +19,7 @@ var (
 )
 
 func CookieSession(w http.ResponseWriter, session StoreSession) {
-	paths := []string{"/upload", "/reaction", "/logout", "/comments", "/like", "/dislike"}
+	paths := []string{"/home", "/upload", "/reaction", "/logout", "/comments", "/like", "/dislike"}
 
 	for _, v := range paths {
 		http.SetCookie(w, &http.Cookie{
