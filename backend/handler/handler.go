@@ -486,6 +486,9 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 	reactionType := r.FormValue("reaction")
 	postID, _ := strconv.Atoi(r.FormValue("post_id"))
 
+	fmt.Println("Reaction: ", reactionType)
+	fmt.Println("Post ID: ", postID)
+
 	check, reaction := repositories.CheckReactions(util.DB, session.UserId, postID)
 
 	if !check {
@@ -495,6 +498,7 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
+		fmt.Println("redirecting")
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}
@@ -506,7 +510,11 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		fmt.Println("redirecting2")
+		// http.Redirect(w, r, "/home", http.StatusSeeOther)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"redirect": "/home"})
+
 		return
 	} else {
 		err := repositories.UpdateReaction(util.DB, reactionType, session.UserId, postID)
@@ -517,5 +525,6 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	r.Method = http.MethodGet
+	fmt.Println("redirecting3")
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
