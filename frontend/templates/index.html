@@ -182,9 +182,9 @@
       {{ range .Posts}}
       <article class="post">
         <div class="post-header">
-          <p class="post-author">{{ .UserName }}</p>
+          <p class="post-author">@{{ .UserName }}</p>
           <p class="post-time">
-            <time datetime="{{ .CreatedOn }}">{{ .CreatedOn }}</time>
+            Posted: <time datetime="{{ .CreatedOn }}"> {{ .CreatedOn }}</time>
           </p>
         </div>
         <h3>{{ .PostTitle }}</h3>
