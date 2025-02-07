@@ -41,13 +41,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		sessionToken, err := uuid.NewV6()
+		sessionToken, err := uuid.NewV4()
 		if err != nil {
 			log.Printf("Failed to get uuid: %v", err)
 			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
-		expiryTime := time.Now().Add(1440 * time.Minute)
+		expiryTime := time.Now().UTC().Add(24 * time.Hour)
 
 		err = repositories.DeleteSessionByUser(user.ID)
 		if err != nil {
@@ -69,20 +69,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Session.Email = user.Email
 		Session.ExpiryTime = expiryTime
 		Sessions = append(Sessions, Session)
-		Session = StoreSession{}
 
-		http.SetCookie(w, &http.Cookie{
-			Name:     "session_token",
-			Value:    strSessionToken,
-			Expires:  expiryTime,
-			HttpOnly: true,
-			Path:     "/home",
-		})
-
+		CookieSession(w, Session)
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
-
 		return
-
 	} else if r.Method == http.MethodGet {
 		tmpl, err := template.ParseFiles("frontend/templates/sign-in.html")
 		if err != nil {
