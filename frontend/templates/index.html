@@ -1,180 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" href="/frontend/static/css/style.css" />
     <script defer src="/frontend/static/js/script.js"></script>
     <script defer src="/frontend/static/js/reactions.js"></script>
     <script defer src="/frontend/static/js/format_time.js"></script>
 
-    <title>Home</title>
-  </head>
+  <title>Home</title>
+</head>
 
-  <body>
-    <header>
-      <nav class="navbar">
-        <div class="logo">
-          <a href="/">Forum</a>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <a href="/">Forum</a>
+      </div>
+
+      <div class="right-container">
+        <div class="auth-container">
+          {{if .IsLoggedIn}}{{ else}}
+          <a href="/sign-up">Sign Up</a>
+          <a href="/sign-in">Sign In</a>
+          {{ end }}
         </div>
 
-        <div class="right-container">
-          <div class="auth-container">
-            {{if .IsLoggedIn}}{{ else}}
-            <a href="/sign-up">Sign Up</a>
-            <a href="/sign-in">Sign In</a>
-            {{ end }}
-          </div>
-
-          <div class="theme-toggler">
-            <ion-icon class="moon" name="moon"></ion-icon>
-            <ion-icon class="sunny" name="sunny"></ion-icon>
-          </div>
+        <div class="theme-toggler">
+          <ion-icon class="moon" name="moon"></ion-icon>
+          <ion-icon class="sunny" name="sunny"></ion-icon>
         </div>
-      </nav>
-    </header>
+      </div>
+    </nav>
+  </header>
 
-    <aside class="sidebar">
-      <h2>Filter By:</h2>
-      <form class="filter-form" action="/filter" method="get">
-        <fieldset>
-          <legend>Categories</legend>
-          <label
-            ><input type="checkbox" name="category" value="Technology" />
-            Technology</label
-          >
-          <label
-            ><input type="checkbox" name="category" value="Health" />
-            Health</label
-          >
-          <label
-            ><input type="checkbox" name="category" value="Education" />
-            Education</label
-          >
-          <label
-            ><input type="checkbox" name="category" value="Sports" />
-            Sports</label
-          >
-          <label
-            ><input type="checkbox" name="category" value="Entertainment" />
-            Entertainment</label
-          >
-          <label
-            ><input type="checkbox" name="category" value="Finance" />
-            Finance</label
-          >
-          <label
-            ><input type="checkbox" name="category" value="Travel" />
-            Travel</label
-          >
-          <label
-            ><input type="checkbox" name="category" value="Food" /> Food</label
-          >
-          <label
-            ><input type="checkbox" name="category" value="Lifestyle" />
-            Lifestyle</label
-          >
-          <label
-            ><input type="checkbox" name="category" value="Science" />
-            Science</label
-          >
+  <aside class="sidebar">
+    <h2>Filter By:</h2>
+    <form class="filter-form" action="/filter" method="get">
+      <fieldset>
+        <legend>Categories</legend>
+        <label><input type="checkbox" name="category" value="Technology" />
+          Technology</label>
+        <label><input type="checkbox" name="category" value="Health" />
+          Health</label>
+        <label><input type="checkbox" name="category" value="Education" />
+          Education</label>
+        <label><input type="checkbox" name="category" value="Sports" />
+          Sports</label>
+        <label><input type="checkbox" name="category" value="Entertainment" />
+          Entertainment</label>
+        <label><input type="checkbox" name="category" value="Finance" />
+          Finance</label>
+        <label><input type="checkbox" name="category" value="Travel" />
+          Travel</label>
+        <label><input type="checkbox" name="category" value="Food" /> Food</label>
+        <label><input type="checkbox" name="category" value="Lifestyle" />
+          Lifestyle</label>
+        <label><input type="checkbox" name="category" value="Science" />
+          Science</label>
+      </fieldset>
+
+      <button class="apply">Apply</button>
+    </form>
+
+    {{ if .IsLoggedIn }}
+    <form class="filter-form" action="/filter" method="get">
+      <ul class="sidebar-links">
+        <li>
+          <button type="submit" name="filter" value="created">Created</button>
+        </li>
+        <li>
+          <button type="submit" name="filter" value="liked">Liked</button>
+        </li>
+      </ul>
+    </form>
+    {{ end }}
+  </aside>
+
+  <main class="posts">
+    <section class="create-post hidden">
+      <h2>Create a New Post</h2>
+      <form name="upload" enctype="multipart/form-data" action="/upload" method="POST">
+        <label for="post-title">Title</label>
+        <input type="text" id="post-title" name="post-title" placeholder="Enter your post title" required />
+
+        <label for="post-content">Content</label>
+        <textarea id="post-content" name="post-content" placeholder="Write your post here..." required></textarea>
+
+        <fieldset class="categories" name="categories">
+          <legend>Select Category</legend>
+          <label>
+            <input type="checkbox" name="category[]" value="Technology" />
+            Technology
+          </label>
+          <label>
+            <input type="checkbox" name="category[]" value="Health" />
+            Health
+          </label>
+          <label>
+            <input type="checkbox" name="category[]" value="Education" />
+            Education
+          </label>
+          <label>
+            <input type="checkbox" name="category[]" value="Sports" />
+            Sports
+          </label>
+          <label>
+            <input type="checkbox" name="category[]" value="Entertainment" />
+            Entertainment
+          </label>
+          <label>
+            <input type="checkbox" name="category[]" value="Finance" />
+            Finance
+          </label>
+          <label>
+            <input type="checkbox" name="category[]" value="Travel" />
+            Travel
+          </label>
+          <label>
+            <input type="checkbox" name="category[]" value="Food" />
+            Food
+          </label>
+          <label>
+            <input type="checkbox" name="category[]" value="Lifestyle" />
+            Lifestyle
+          </label>
+          <label>
+            <input type="checkbox" name="category[]" value="Science" />
+            Science
+          </label>
         </fieldset>
 
-        <button class="apply">Apply</button>
+        <div class="post-operations">
+          <input type="file" name="uploaded-file" />
+
+          <button type="submit">Post</button>
+        </div>
       </form>
-
-      {{ if .IsLoggedIn }}
-      <form class="filter-form" action="/filter" method="get">
-        <ul class="sidebar-links">
-          <li>
-            <button type="submit" name="filter" value="created">Created</button>
-          </li>
-          <li>
-            <button type="submit" name="filter" value="liked">Liked</button>
-          </li>
-        </ul>
-      </form>
-      {{ end }}
-    </aside>
-
-    <main class="posts">
-      <section class="create-post hidden">
-        <h2>Create a New Post</h2>
-        <form
-          name="upload"
-          enctype="multipart/form-data"
-          action="/upload"
-          method="POST"
-        >
-          <label for="post-title">Title</label>
-          <input
-            type="text"
-            id="post-title"
-            name="post-title"
-            placeholder="Enter your post title"
-            required
-          />
-
-          <label for="post-content">Content</label>
-          <textarea
-            id="post-content"
-            name="post-content"
-            placeholder="Write your post here..."
-            required
-          ></textarea>
-
-          <fieldset class="categories" name="categories">
-            <legend>Select Category</legend>
-            <label>
-              <input type="checkbox" name="category[]" value="Technology" />
-              Technology
-            </label>
-            <label>
-              <input type="checkbox" name="category[]" value="Health" />
-              Health
-            </label>
-            <label>
-              <input type="checkbox" name="category[]" value="Education" />
-              Education
-            </label>
-            <label>
-              <input type="checkbox" name="category[]" value="Sports" />
-              Sports
-            </label>
-            <label>
-              <input type="checkbox" name="category[]" value="Entertainment" />
-              Entertainment
-            </label>
-            <label>
-              <input type="checkbox" name="category[]" value="Finance" />
-              Finance
-            </label>
-            <label>
-              <input type="checkbox" name="category[]" value="Travel" />
-              Travel
-            </label>
-            <label>
-              <input type="checkbox" name="category[]" value="Food" />
-              Food
-            </label>
-            <label>
-              <input type="checkbox" name="category[]" value="Lifestyle" />
-              Lifestyle
-            </label>
-            <label>
-              <input type="checkbox" name="category[]" value="Science" />
-              Science
-            </label>
-          </fieldset>
-
-          <div class="post-operations">
-            <input type="file" name="uploaded-file" />
-
-            <button type="submit">Post</button>
-          </div>
-        </form>
-      </section>
+    </section>
 
       <button class="floating-create-post-btn">
         <i class="fa-solid fa-plus"></i>
@@ -190,111 +155,91 @@
         <h3>{{ .PostTitle }}</h3>
         <p>{{ .Body }}</p>
 
-        {{ if .MediaURL }}
-        <img src="{{ .MediaURL }}" alt="{{ .PostTitle }}" />
-        {{ end }}
-
-        <div class="category-div">
-          {{ range .Categories }}
-          <p class="post-category"><span>{{ .CategoryName }}</span></p>
-          {{ end }}
-        </div>
-
-        <div class="post-actions" data-post-id="{{ .ID }}">
-          <!-- Like Button -->
-          <button
-            data-posted-id="{{ .ID }}"
-            class="like-button"
-            data-reaction="Like"
-            aria-label="Like this post"
-          >
-            <i class="fa-regular fa-thumbs-up"></i>
-            <span> Like <span class="like-count">{{ .Likes }}</span> </span>
-          </button>
-
-          <!-- Dislike Button -->
-          <button
-            data-posted-id="{{ .ID }}"
-            class="dislike-button"
-            data-reaction="Dislike"
-            aria-label="Dislike this post"
-          >
-            <i class="fa-regular fa-thumbs-down"></i>
-            <span>
-              Dislike <span class="dislike-count">{{ .Dislikes }}</span>
-            </span>
-          </button>
-
-          <!-- Comment Button -->
-          <button class="comment-button" aria-label="View or add comments">
-            <i class="fa-regular fa-comment"></i>
-            <span>
-              Comment <span class="comment-count">{{ .CommentCount }}</span>
-            </span>
-          </button>
-        </div>
-
-        <div class="comments-section hidden">
-          <h4>Comments</h4>
-
-          <div class="comment-input">
-            <form action="/comments" method="post">
-              <input type="hidden" name="id" value="{{.ID}}" />
-              <input
-                type="text"
-                name="comment"
-                class="comment-box"
-                placeholder="Write a comment..."
-              />
-              <button class="submit-comment">
-                <i class="fa-solid fa-paper-plane"></i>
-              </button>
-            </form>
-          </div>
-
-          {{ range .Comments }}
-          <div class="comment">
-            <p><strong>{{ .UserName }}</strong>: {{ .Body }}</p>
-            <div class="comment-actions">
-              <button class="like-comment-button">
-                <i class="fa-regular fa-thumbs-up"></i>
-                <span>{{ .Likes }}</span>
-              </button>
-              <button class="dislike-comment-button">
-                <i class="fa-regular fa-thumbs-down"></i>
-                <span>{{ .Dislikes }}</span>
-              </button>
-            </div>
-          </div>
-          {{ end }}
-        </div>
-      </article>
+      {{ if .MediaURL }}
+      <img src="{{ .MediaURL }}" alt="{{ .PostTitle }}" />
       {{ end }}
-    </main>
 
-    <aside class="profile">
-      <h2>Profile</h2>
+      <div class="category-div">
+        {{ range .Categories }}
+        <p class="post-category"><span>{{ .CategoryName }}</span></p>
+        {{ end }}
+      </div>
 
-      {{if .IsLoggedIn }} {{template "status" .}} {{else}}
-      <p class="session-status"><strong>Status:</strong> Not logged in</p>
+      <div class="post-actions" data-post-id="{{ .ID }}">
+        <!-- Like Button -->
+        <button data-posted-id="{{ .ID }}" class="like-button" data-reaction="Like" aria-label="Like this post">
+          <i class="fa-regular fa-thumbs-up"></i>
+          <span> Like <span class="like-count">{{ .Likes }}</span> </span>
+        </button>
 
-      {{end}}
-    </aside>
+        <!-- Dislike Button -->
+        <button data-posted-id="{{ .ID }}" class="dislike-button" data-reaction="Dislike"
+          aria-label="Dislike this post">
+          <i class="fa-regular fa-thumbs-down"></i>
+          <span>
+            Dislike <span class="dislike-count">{{ .Dislikes }}</span>
+          </span>
+        </button>
 
-    <!-- Ion icons -->
-    <script
-      type="module"
-      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
-    ></script>
-    <script
-      nomodule
-      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
-    ></script>
-    <script
-      src="https://kit.fontawesome.com/0b11e99e28.js"
-      crossorigin="anonymous"
-    ></script>
-  </body>
+        <!-- Comment Button -->
+        <button class="comment-button" aria-label="View or add comments">
+          <i class="fa-regular fa-comment"></i>
+          <span>
+            Comment <span class="comment-count">{{ .CommentCount }}</span>
+          </span>
+        </button>
+      </div>
+
+      <div class="comments-section hidden">
+        <h4>Comments</h4>
+
+        <div class="comment-input">
+          <form action="/comments" method="post">
+            <input type="hidden" name="id" value="{{.ID}}" />
+            <input type="text" name="comment" class="comment-box" placeholder="Write a comment..." />
+            <button class="submit-comment">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+
+        {{ range .Comments }}
+        <div class="comment" data-post-id="{{ .ID }}">
+          <p><strong>{{ .UserName }}</strong>: {{ .Body }}</p>
+          <div class="comment-actions">
+            <button data-posted-id="{{ .ID }}" data-reaction="Like"
+              aria-label="Like this post" class="like-comment-button">
+              <i class="fa-regular fa-thumbs-up"></i>
+              <span>{{ .Likes }}</span>
+            </button>
+            <button data-posted-id="{{ .ID }}" data-reaction="Dislike" aria-label="Dislike this post"
+              class="dislike-comment-button">
+              <i class="fa-regular fa-thumbs-down"></i>
+              <span>{{ .Dislikes }}</span>
+            </button>
+          </div>
+        </div>
+        {{ end }}
+      </div>
+    </article>
+    {{ end }}
+  </main>
+
+  <aside class="profile">
+    <h2>Profile</h2>
+
+    {{if .IsLoggedIn }} {{template "status" .}} {{else}}
+    <p class="session-status"><strong>Status:</strong> Not logged in</p>
+
+    {{end}}
+  </aside>
+
+  <!-- Ion icons -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="https://kit.fontawesome.com/0b11e99e28.js" crossorigin="anonymous"></script>
+</body>
+
 </html>
 
 {{ define "status"}}

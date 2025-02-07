@@ -95,6 +95,25 @@ func PostDetails(posts []models.Post) ([]models.Post, error) {
 			log.Println("Failed to get comments:", err1)
 			return nil, fmt.Errorf("failed to get comments: %v", err1)
 		}
+
+		// Getting comment reactions
+		for j, comment := range comments {
+			commentLikes, errLikes := repositories.GetReactions(util.DB, comment.ID, "Like")
+			if errLikes != nil {
+				log.Println("Failed to get likes", errLikes)
+				return nil, fmt.Errorf("failed to get likes: %v", errLikes)
+			}
+
+			commentDislikes, errDislikes := repositories.GetReactions(util.DB, comment.ID, "Dislike")
+			if errDislikes != nil {
+				log.Println("Failed to get dislikes", errDislikes)
+				return nil, fmt.Errorf("failed to get dislikes: %v", errDislikes)
+			}
+
+			comments[j].Likes = len(commentLikes)
+			comments[j].Dislikes = len(commentDislikes)
+		}
+
 		categories, err3 := repositories.GetCategories(util.DB, post.ID)
 		if err3 != nil {
 			log.Println("Failed to get categories", err3)
@@ -498,6 +517,9 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 	reactionType := r.FormValue("reaction")
 	postID, _ := strconv.Atoi(r.FormValue("post_id"))
 
+	fmt.Println("Reaction: ", reactionType)
+	fmt.Println("Post ID: ", postID)
+
 	check, reaction := repositories.CheckReactions(util.DB, session.UserId, postID)
 
 	if !check {
@@ -518,6 +540,7 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
+
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	} else {
