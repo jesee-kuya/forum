@@ -16,21 +16,12 @@ import (
 UploadMedia handler function is responsible for performing server operations to enable media upload with a file size limit of up to 25 mbs.
 */
 func CreatePost(w http.ResponseWriter, r *http.Request) {
-	var session StoreSession
-	cookie, err := r.Cookie("session_token")
-	if err != nil {
-		log.Printf("Cookie not found: %v", err)
-		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
-		return
-	}
-
 	var url string
-
-	for _, v := range Sessions {
-		if v.Token == cookie.Value {
-			session = v
-			break
-		}
+	session, _, err := ValidateCookie(r)
+	if err != nil {
+		log.Printf("Failed to validate cookie: %v", err)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
 	}
 
 	if r.Method != http.MethodPost {
@@ -135,7 +126,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		repositories.InsertRecord(util.DB, "tblPostCategories", []string{"post_id", "category"}, id, category)
 	}
 
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 	r.Method = http.MethodGet
 	IndexHandler(w, r)
 }

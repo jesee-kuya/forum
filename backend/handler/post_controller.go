@@ -73,19 +73,10 @@ func GetAllPostsAPI(db *sql.DB) http.HandlerFunc {
 
 // FilterPosts - Handles filtering posts by category or user
 func FilterPosts(w http.ResponseWriter, r *http.Request) {
-	session := StoreSession{}
-	cookie, err := r.Cookie("session_token")
-	if err != nil {
-		log.Printf("Cookie not found: %v", err)
-	}
-
+	logged := false
+	session, _, err := ValidateCookie(r)
 	if err == nil {
-		for _, v := range Sessions {
-			if v.Token == cookie.Value {
-				session = v
-				break
-			}
-		}
+		logged = true
 	}
 
 	if r.URL.Path != "/filter" {
@@ -111,10 +102,6 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 	filter := r.FormValue("filter")
 
 	if len(categories) != 0 {
-		logged := true
-		if session.UserId == 0 {
-			logged = false
-		}
 		posts, err := repositories.FilterPostsByCategories(util.DB, categories)
 		if err != nil {
 			log.Println(err)
@@ -122,29 +109,7 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		posts, err = PostDetails(posts)
-		if err != nil {
-			log.Println(err)
-			util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
-			return
-		}
-		data := struct {
-			IsLoggedIn  bool
-			Name, Email string
-			Posts       []models.Post
-		}{
-			IsLoggedIn: logged,
-			Name:       "",
-			Email:      "",
-			Posts:      posts,
-		}
-		tmpl, err := template.ParseFiles("frontend/templates/index.html")
-		if err != nil {
-			log.Printf("Failed to load index template: %v", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		tmpl.Execute(w, data)
+		PostDetails(posts, w, logged, session)
 		return
 	}
 
@@ -168,27 +133,5 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts, err = PostDetails(posts)
-	if err != nil {
-		log.Println(err)
-		util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
-		return
-	}
-	data := struct {
-		IsLoggedIn  bool
-		Name, Email string
-		Posts       []models.Post
-	}{
-		IsLoggedIn: true,
-		Name:       "",
-		Email:      "",
-		Posts:      posts,
-	}
-	tmpl, err := template.ParseFiles("frontend/templates/index.html")
-	if err != nil {
-		log.Printf("Failed to load index template: %v", err)
-		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	tmpl.Execute(w, data)
+	PostDetails(posts, w, true, session)
 }
