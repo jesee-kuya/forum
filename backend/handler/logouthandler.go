@@ -1,8 +1,8 @@
 package handler
 
 import (
+	"log"
 	"net/http"
-	"time"
 
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
@@ -14,9 +14,10 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie, err := r.Cookie("session_token")
+	_, cookie, err := ValidateCookie(r)
 	if err != nil {
-		util.ErrorHandler(w, "No active session", http.StatusUnauthorized)
+		log.Printf("Failed to validate cookie: %v", err)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
@@ -32,13 +33,5 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    "",
-		Path:     "/",
-		Expires:  time.Now().Add(-time.Hour),
-		HttpOnly: true,
-	})
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
