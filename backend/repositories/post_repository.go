@@ -16,6 +16,7 @@ func GetPosts(db *sql.DB) ([]models.Post, error) {
 		FROM tblPosts p
 		JOIN tblUsers u ON p.user_id = u.id
 		WHERE p.parent_id IS NULL AND p.post_status = 'visible'
+		ORDER BY p.created_on DESC
 		`
 
 	rows, err := db.Query(query)
@@ -38,6 +39,7 @@ func GetComments(db *sql.DB, id int) ([]models.Post, error) {
 		FROM tblPosts p
 		JOIN tblUsers u ON p.user_id = u.id
 		WHERE p.parent_id = ? AND p.post_status = 'visible'
+		ORDER BY p.created_on DESC
 	`
 	rows, err := db.Query(query, id)
 	if err != nil {
@@ -63,7 +65,7 @@ func FilterPostsByCategories(db *sql.DB, categories []string) ([]models.Post, er
 		LEFT JOIN tblPostCategories c ON p.id = c.post_id 
 		WHERE p.parent_id IS NULL 
 		AND p.post_status = 'visible' 
-		AND c.category IN (%s)`, placeholders)
+		AND c.category IN (%s) ORDER BY p.created_on DESC`, placeholders)
 
 	args := make([]interface{}, len(categories))
 	for i, v := range categories {
@@ -90,6 +92,7 @@ func FilterPostsByUser(db *sql.DB, id int) ([]models.Post, error) {
 		FROM tblPosts p
 		JOIN tblUsers u ON p.user_id = u.id
 		WHERE p.parent_id IS NULL AND p.post_status = 'visible' AND u.id = ?
+		ORDER BY p.created_on DESC
 		`
 
 	rows, err := db.Query(query, id)
@@ -118,6 +121,7 @@ func FilterPostsByLikes(db *sql.DB, id int) ([]models.Post, error) {
 		AND r.reaction_status = 'clicked' 
 		AND r.reaction = 'Like' 
 		AND r.user_id = ?
+		ORDER BY p.created_on DESC
 		`
 
 	rows, err := db.Query(query, id)
