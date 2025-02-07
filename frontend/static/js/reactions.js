@@ -13,7 +13,6 @@ document.querySelectorAll('.like-button, .dislike-button, .like-comment-button, 
     })
       .then((response) => response.text())
       .then((data) => {
-        console.log('Server response:', data);
         window.location.reload();
       })
       .catch((err) => console.error(err));
