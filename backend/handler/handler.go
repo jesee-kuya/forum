@@ -358,7 +358,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		sessionToken := uuid.New().String()
+		sessionToken, err := uuid.NewV6()
+		if err != nil {
+			log.Printf("Failed to get uuid: %v", err)
+			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
 		expiryTime := time.Now().Add(1440 * time.Minute)
 
 		err = repositories.DeleteSessionByUser(user.ID)
@@ -368,14 +373,15 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = repositories.StoreSession(user.ID, sessionToken, expiryTime)
+		strSessionToken := sessionToken.String()
+		err = repositories.StoreSession(user.ID, strSessionToken, expiryTime)
 		if err != nil {
 			log.Printf("Failed to store session token: %v", err)
 			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
-		Session.Token = sessionToken
+		Session.Token = strSessionToken
 		Session.UserId = user.ID
 		Session.Email = user.Email
 		Session.ExpiryTime = expiryTime
@@ -384,7 +390,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		http.SetCookie(w, &http.Cookie{
 			Name:     "session_token",
-			Value:    sessionToken,
+			Value:    strSessionToken,
 			Expires:  expiryTime,
 			HttpOnly: true,
 			Path:     "/home",
