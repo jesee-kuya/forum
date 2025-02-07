@@ -151,7 +151,7 @@ func TestProcessSQLData(t *testing.T) {
 	defer rows.Close()
 
 	// Call processSQLData
-	posts, err := processSQLData(rows)
+	posts, err := ProcessSQLData(rows)
 	if err != nil {
 		t.Fatalf("processSQLData failed: %v", err)
 	}
