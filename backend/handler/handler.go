@@ -27,6 +27,10 @@ type RequestData struct {
 	ID string `json:"id"`
 }
 
+type Response struct {
+	Success   bool   `json:"success"`
+}
+
 var (
 	Session  StoreSession
 	Sessions []StoreSession
@@ -247,10 +251,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tmpl.Execute(w, data)
-}
-
-type Response struct {
-	Success bool `json:"success"`
 }
 
 func SignupHandler(w http.ResponseWriter, r *http.Request) {

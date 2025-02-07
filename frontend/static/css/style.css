@@ -418,7 +418,7 @@ body.dark-theme .post-header {
 
 .post-author,
 .post-time {
-  font-weight: lighter;
+  font-weight: 300;
 }
 
 .post {

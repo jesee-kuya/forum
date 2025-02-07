@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/frontend/static/css/style.css" />
     <script defer src="/frontend/static/js/script.js"></script>
     <script defer src="/frontend/static/js/reactions.js"></script>
+    <script defer src="/frontend/static/js/format_time.js"></script>
 
     <title>Home</title>
   </head>
@@ -181,9 +182,9 @@
       {{ range .Posts}}
       <article class="post">
         <div class="post-header">
-          <p class="post-author">{{ .UserName }}</p>
+          <p class="post-author">@{{ .UserName }}</p>
           <p class="post-time">
-            <time datetime="{{ .CreatedOn }}">{{ .CreatedOn }}</time>
+            Posted: <time datetime="{{ .CreatedOn }}"> {{ .CreatedOn }}</time>
           </p>
         </div>
         <h3>{{ .PostTitle }}</h3>

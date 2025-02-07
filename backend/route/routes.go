@@ -30,5 +30,8 @@ func InitRoutes() *http.ServeMux {
 	r.HandleFunc("/filter", handler.FilterPosts)
 
 	r.HandleFunc("/api/posts", handler.GetAllPostsAPI(util.DB))
+	r.HandleFunc("/posts", func(w http.ResponseWriter, r *http.Request) {
+		handler.HandleGetPosts(w, r, util.DB)
+	})
 	return r
 }
