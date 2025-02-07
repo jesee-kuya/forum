@@ -438,6 +438,7 @@ body.dark-theme .post {
   height: auto;
   border-radius: 8px;
   margin-bottom: 0.75rem;
+  aspect-ratio: 16/9;
 }
 
 .post h3 {
@@ -682,7 +683,8 @@ body.dark-theme .comment-box {
   color: var(--utility-color);
 }
 
-.apply, .filter-form button {
+.apply,
+.filter-form button {
   width: 100%;
   padding: 0.5rem 1rem;
   margin: 0.5rem 0;
