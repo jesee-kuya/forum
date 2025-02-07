@@ -24,7 +24,7 @@ func GetPosts(db *sql.DB) ([]models.Post, error) {
 	}
 	defer rows.Close()
 
-	posts, err := processSQLData(rows)
+	posts, err := ProcessSQLData(rows)
 	if err != nil {
 		return nil, fmt.Errorf("failed process posts: %v", err)
 	}
@@ -45,7 +45,7 @@ func GetComments(db *sql.DB, id int) ([]models.Post, error) {
 	}
 	defer rows.Close()
 
-	posts, err := processSQLData(rows)
+	posts, err := ProcessSQLData(rows)
 	if err != nil {
 		return nil, fmt.Errorf("failed process comments: %v", err)
 	}
@@ -76,7 +76,7 @@ func FilterPostsByCategories(db *sql.DB, categories []string) ([]models.Post, er
 	}
 	defer rows.Close()
 
-	posts, err := processSQLData(rows)
+	posts, err := ProcessSQLData(rows)
 	if err != nil {
 		return nil, fmt.Errorf("failed to process posts: %v", err)
 	}
@@ -98,7 +98,7 @@ func FilterPostsByUser(db *sql.DB, id int) ([]models.Post, error) {
 	}
 	defer rows.Close()
 
-	posts, err := processSQLData(rows)
+	posts, err := ProcessSQLData(rows)
 	if err != nil {
 		return nil, fmt.Errorf("failed process posts: %v", err)
 	}
@@ -126,7 +126,7 @@ func FilterPostsByLikes(db *sql.DB, id int) ([]models.Post, error) {
 	}
 	defer rows.Close()
 
-	posts, err := processSQLData(rows)
+	posts, err := ProcessSQLData(rows)
 	if err != nil {
 		return nil, fmt.Errorf("failed process posts: %v", err)
 	}
@@ -134,7 +134,7 @@ func FilterPostsByLikes(db *sql.DB, id int) ([]models.Post, error) {
 	return posts, err
 }
 
-func processSQLData(rows *sql.Rows) ([]models.Post, error) {
+func ProcessSQLData(rows *sql.Rows) ([]models.Post, error) {
 	var posts []models.Post
 
 	for rows.Next() {
@@ -144,14 +144,11 @@ func processSQLData(rows *sql.Rows) ([]models.Post, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
-
 		posts = append(posts, post)
 	}
 
-	// Check for errors after iteration
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("error iterating rows: %w", err)
 	}
-
 	return posts, nil
 }
