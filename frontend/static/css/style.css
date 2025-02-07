@@ -18,6 +18,18 @@
   --dark-box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.1);
 }
 
+.web-icon {
+  height: auto;
+  width: 1.2rem;
+  filter: invert(27%) sepia(62%) saturate(3148%) hue-rotate(189deg)
+    brightness(95%) contrast(100%);
+}
+
+.web-icon.light {
+  filter: invert(91%) sepia(9%) saturate(0%) hue-rotate(0deg) brightness(107%)
+    contrast(85%);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -137,9 +149,8 @@ body.dark-theme .right-container .auth-container a:last-child {
   transition: var(--transition);
 }
 
-.theme-toggler ion-icon {
-  font-size: 1.5rem;
-  color: var(--primary-color);
+.theme-toggler img {
+  height: auto;
   transition: var(--transition);
 }
 
@@ -149,7 +160,6 @@ body.dark-theme .right-container .auth-container a:last-child {
 
 body.dark-theme .theme-toggler .sunny {
   display: block;
-  color: var(--dark-text-color);
 }
 
 body.dark-theme .theme-toggler .moon {
@@ -355,7 +365,6 @@ body.dark-theme .create-post form label {
   align-self: flex-start;
   padding: 0.75rem 1.5rem;
   background-color: var(--primary-color);
-  color: var(--dark-text-color);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -372,7 +381,6 @@ body.dark-theme .create-post form label {
   bottom: 20px;
   right: 20px;
   background: var(--primary-color);
-  color: #ffffff;
   border: none;
   border-radius: 50%;
   width: 50px;
@@ -384,6 +392,11 @@ body.dark-theme .create-post form label {
   cursor: pointer;
   box-shadow: var(--light-box-shadow);
   transition: transform 0.3s ease-in-out;
+}
+
+.floating-create-post-btn img {
+  filter: invert(91%) sepia(9%) saturate(0%) hue-rotate(0deg) brightness(107%)
+    contrast(85%);
 }
 
 body.dark-theme .floating-create-post-btn {
@@ -472,8 +485,20 @@ body.dark-theme .post p {
 
 .post-actions {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   margin-top: 0.75rem;
+}
+
+.post-actions img {
+  height: 20px;
+  margin: 0;
+  filter: invert(27%) sepia(62%) saturate(3148%) hue-rotate(189deg)
+    brightness(95%) contrast(100%);
+}
+
+.post-actions button span {
+  margin-top: 5px;
 }
 
 .post-operations {
@@ -486,7 +511,7 @@ body.dark-theme .post p {
 .post-actions button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
   border: none;
   background: none;
   cursor: pointer;
@@ -666,12 +691,20 @@ body.dark-theme .comment-box {
   transition: 0.3s;
 }
 
+.submit-comment img {
+  filter: invert(91%) sepia(9%) saturate(0%) hue-rotate(0deg) brightness(107%)
+    contrast(85%);
+}
+
 .submit-comment:hover {
   background-color: var(--secondary-color);
 }
 
 .comment-actions {
+  width: 50%;
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
@@ -687,8 +720,13 @@ body.dark-theme .comment-box {
   font-size: 0.9rem;
 }
 
-.comment-actions button:hover {
-  color: var(--utility-color);
+.comment-actions button img {
+  filter: invert(27%) sepia(62%) saturate(3148%) hue-rotate(189deg)
+    brightness(95%) contrast(100%);
+}
+
+.comment-actions button span {
+  margin-top: 5px;
 }
 
 .apply,
