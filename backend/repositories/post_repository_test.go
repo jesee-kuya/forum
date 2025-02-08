@@ -73,20 +73,20 @@ func TestGetPosts(t *testing.T) {
 	// Verify the results
 	expectedPosts := []models.Post{
 		{
-			ID:           1,
-			UserID:       1,
-			UserName:     "user1",
-			PostTitle:    "Post 1",
-			Body:         "Content 1",
-			CreatedOn:    time.Date(2023, 10, 1, 10, 0, 0, 0, time.UTC),
+			ID:        1,
+			UserID:    1,
+			UserName:  "user1",
+			PostTitle: "Post 1",
+			Body:      "Content 1",
+			CreatedOn: time.Date(2023, 10, 1, 10, 0, 0, 0, time.UTC),
 		},
 		{
-			ID:           2,
-			UserID:       2,
-			UserName:     "user2",
-			PostTitle:    "Post 2",
-			Body:         "Content 2",
-			CreatedOn:    time.Date(2023, 10, 2, 11, 0, 0, 0, time.UTC),
+			ID:        2,
+			UserID:    2,
+			UserName:  "user2",
+			PostTitle: "Post 2",
+			Body:      "Content 2",
+			CreatedOn: time.Date(2023, 10, 2, 11, 0, 0, 0, time.UTC),
 		},
 	}
 
@@ -114,12 +114,12 @@ func TestGetComments(t *testing.T) {
 	// Verify the results
 	expectedComments := []models.Post{
 		{
-			ID:           3,
-			UserID:       1,
-			UserName:     "user1",
-			PostTitle:    "Comment 1",
-			Body:         "Comment Content 1",
-			CreatedOn:    time.Date(2023, 10, 1, 10, 30, 0, 0, time.UTC),
+			ID:        3,
+			UserID:    1,
+			UserName:  "user1",
+			PostTitle: "Comment 1",
+			Body:      "Comment Content 1",
+			CreatedOn: time.Date(2023, 10, 1, 10, 30, 0, 0, time.UTC),
 		},
 	}
 
@@ -151,7 +151,7 @@ func TestProcessSQLData(t *testing.T) {
 	defer rows.Close()
 
 	// Call processSQLData
-	posts, err := processSQLData(rows)
+	posts, err := ProcessSQLData(rows)
 	if err != nil {
 		t.Fatalf("processSQLData failed: %v", err)
 	}
@@ -159,20 +159,20 @@ func TestProcessSQLData(t *testing.T) {
 	// Verify the results
 	expectedPosts := []models.Post{
 		{
-			ID:           1,
-			UserID:       1,
-			UserName:     "user1",
-			PostTitle:    "Post 1",
-			Body:         "Content 1",
-			CreatedOn:    time.Date(2023, 10, 1, 10, 0, 0, 0, time.UTC),
+			ID:        1,
+			UserID:    1,
+			UserName:  "user1",
+			PostTitle: "Post 1",
+			Body:      "Content 1",
+			CreatedOn: time.Date(2023, 10, 1, 10, 0, 0, 0, time.UTC),
 		},
 		{
-			ID:           2,
-			UserID:       2,
-			UserName:     "user2",
-			PostTitle:    "Post 2",
-			Body:         "Content 2",
-			CreatedOn:    time.Date(2023, 10, 2, 11, 0, 0, 0, time.UTC),
+			ID:        2,
+			UserID:    2,
+			UserName:  "user2",
+			PostTitle: "Post 2",
+			Body:      "Content 2",
+			CreatedOn: time.Date(2023, 10, 2, 11, 0, 0, 0, time.UTC),
 		},
 	}
 

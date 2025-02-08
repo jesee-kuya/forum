@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = ON;
+
 CREATE TABLE IF NOT EXISTS tblUsers (
   id INTEGER PRIMARY KEY,
   username TEXT NOT NULL,
@@ -14,7 +16,7 @@ CREATE TABLE IF NOT EXISTS tblPosts (
   parent_id INTEGER DEFAULT NULL,
   created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   post_status TEXT DEFAULT 'visible',
-  media_url TEXT DEFAULT '',
+  media_url TEXT DEFAULT '', 
   FOREIGN KEY (user_id) REFERENCES tblUsers (id),
   FOREIGN KEY (parent_id) REFERENCES tblPosts (id)
 );

@@ -418,21 +418,19 @@ body.dark-theme .post-header {
 
 .post-author,
 .post-time {
-  font-weight: lighter;
+  font-weight: 300;
 }
 
 .post {
   background-color: #f9f9f9;
   padding: 1rem;
   border-radius: 8px;
-  box-shadow: var(--light-box-shadow);
   margin-bottom: 1rem;
   transition: var(--transition);
 }
 
 body.dark-theme .post {
   background-color: var(--dark-neutral-color);
-  box-shadow: var(--dark-box-shadow);
 }
 
 .post img {
@@ -498,10 +496,6 @@ body.dark-theme .post p {
 
 body.dark-theme .post-actions button {
   color: var(--dark-text-color);
-}
-
-.post-actions button:hover {
-  color: var(--utility-color);
 }
 
 .post-actions button.active {
@@ -686,4 +680,30 @@ body.dark-theme .comment-box {
 
 .comment-actions button:hover {
   color: var(--utility-color);
+}
+
+.apply, .filter-form button {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--dark-text-color);
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.filter-form .sidebar-links {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 1rem;
+}
+
+.filter-form .sidebar-links button {
+  background-color: var(--secondary-color);
 }

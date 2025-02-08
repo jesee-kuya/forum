@@ -73,20 +73,65 @@ func GetAllPostsAPI(db *sql.DB) http.HandlerFunc {
 
 // FilterPosts - Handles filtering posts by category or user
 func FilterPosts(w http.ResponseWriter, r *http.Request) {
-	filterType := r.URL.Query().Get("type")
-	filterValue := r.URL.Query().Get("value")
+	logged := false
+	session, _, err := ValidateCookie(r)
+	if err == nil {
+		logged = true
+	}
 
-	posts, err := repositories.FilterPosts(util.DB, filterType, filterValue)
-	if err != nil {
-		log.Printf("Failed to filter posts: %v", err)
-		util.ErrorHandler(w, "Could not filter posts", http.StatusInternalServerError)
+	if r.URL.Path != "/filter" {
+		log.Println("Path not found", r.URL.Path)
+		util.ErrorHandler(w, "Not Found", http.StatusNotFound)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(posts)
-	if err != nil {
-		log.Printf("Failed to encode posts: %v", err)
-		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+	if r.Method != http.MethodGet {
+		log.Println("Method not allowed", r.Method)
+		util.ErrorHandler(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
+	err = r.ParseForm()
+	if err != nil {
+		log.Println("Error parsing form", err)
+		util.ErrorHandler(w, "Unknown Error", http.StatusInternalServerError)
+		return
+	}
+
+	categories := r.Form["category"]
+	filter := r.FormValue("filter")
+
+	if len(categories) != 0 {
+		posts, err := repositories.FilterPostsByCategories(util.DB, categories)
+		if err != nil {
+			log.Println(err)
+			util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
+			return
+		}
+
+		PostDetails(posts, w, logged, session)
+		return
+	}
+
+	if session.UserId == 0 {
+		log.Println("Unauthorized session")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	posts := []models.Post{}
+
+	if filter == "created" {
+		posts, err = repositories.FilterPostsByUser(util.DB, session.UserId)
+	}
+	if filter == "liked" {
+		posts, err = repositories.FilterPostsByLikes(util.DB, session.UserId)
+	}
+	if err != nil {
+		log.Println(err)
+		util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
+		return
+	}
+
+	PostDetails(posts, w, true, session)
 }
