@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/jesee-kuya/forum/backend/repositories"
-	"github.com/jesee-kuya/forum/backend/util"
 )
 
 // Authenticate middleware to check session token
@@ -14,14 +13,14 @@ func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 		cookie, err := r.Cookie("session_token")
 		if err != nil {
 			log.Println("NO session token", err)
-			util.ErrorHandler(w, "Unauthorized: No session token", http.StatusUnauthorized)
+			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
 
 		userID, err := repositories.ValidateSession(cookie.Value)
 		if err != nil {
 			log.Printf("Invalid session token: %v", err)
-			util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
+			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
 
