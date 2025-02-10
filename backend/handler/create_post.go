@@ -19,7 +19,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	var url string
 	if r.Method != http.MethodPost {
 		log.Println("Invalid request method:", r.Method)
-		util.ErrorHandler(w, "Invalid request method", http.StatusMethodNotAllowed)
+		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
