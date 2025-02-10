@@ -14,24 +14,17 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, cookie, err := ValidateCookie(r)
+	cookie, err := getSessionID(r)
 	if err != nil {
-		log.Printf("Failed to validate cookie: %v", err)
+		log.Println("Invalid Session")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
-	err = repositories.DeleteSession(cookie.Value)
+	err = repositories.DeleteSession(cookie)
 	if err != nil {
 		util.ErrorHandler(w, "Failed to log out", http.StatusInternalServerError)
 		return
-	}
-
-	for i, session := range Sessions {
-		if session.Token == cookie.Value {
-			Sessions[i] = StoreSession{}
-			break
-		}
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
