@@ -18,6 +18,11 @@
   --dark-box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.1);
 }
 
+body.dark-theme .icon {
+  filter: invert(100%) sepia(3%) saturate(2485%) hue-rotate(188deg)
+    brightness(112%) contrast(95%) !important;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -137,9 +142,8 @@ body.dark-theme .right-container .auth-container a:last-child {
   transition: var(--transition);
 }
 
-.theme-toggler ion-icon {
-  font-size: 1.5rem;
-  color: var(--primary-color);
+.theme-toggler img {
+  height: auto;
   transition: var(--transition);
 }
 
@@ -149,7 +153,6 @@ body.dark-theme .right-container .auth-container a:last-child {
 
 body.dark-theme .theme-toggler .sunny {
   display: block;
-  color: var(--dark-text-color);
 }
 
 body.dark-theme .theme-toggler .moon {
@@ -159,7 +162,7 @@ body.dark-theme .theme-toggler .moon {
 .sidebar {
   padding: 1.5rem;
   background-color: #f9f9f9;
-  border-right: 1px solid #ccc;
+  border-radius: 8px;
   height: calc(100vh - 80px);
   transition: var(--transition);
 }
@@ -355,7 +358,6 @@ body.dark-theme .create-post form label {
   align-self: flex-start;
   padding: 0.75rem 1.5rem;
   background-color: var(--primary-color);
-  color: var(--dark-text-color);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -372,7 +374,6 @@ body.dark-theme .create-post form label {
   bottom: 20px;
   right: 20px;
   background: var(--primary-color);
-  color: #ffffff;
   border: none;
   border-radius: 50%;
   width: 50px;
@@ -384,6 +385,13 @@ body.dark-theme .create-post form label {
   cursor: pointer;
   box-shadow: var(--light-box-shadow);
   transition: transform 0.3s ease-in-out;
+}
+
+.floating-create-post-btn img {
+  height: 100px;
+  width: 1.2rem;
+  filter: invert(100%) sepia(3%) saturate(2485%) hue-rotate(188deg)
+    brightness(112%) contrast(95%);
 }
 
 body.dark-theme .floating-create-post-btn {
@@ -433,11 +441,11 @@ body.dark-theme .post {
   background-color: var(--dark-neutral-color);
 }
 
-.post img {
+.uploaded-file {
   width: 100%;
   height: auto;
   border-radius: 8px;
-  margin-bottom: 0.75rem;
+  aspect-ratio: 16/9;
 }
 
 .post h3 {
@@ -471,8 +479,15 @@ body.dark-theme .post p {
 
 .post-actions {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   margin-top: 0.75rem;
+}
+
+body.dark-theme .post-actions span,
+body.dark-theme .comment-actions span
+ {
+  color: #f9f9f9;
 }
 
 .post-operations {
@@ -485,17 +500,13 @@ body.dark-theme .post p {
 .post-actions button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
   border: none;
   background: none;
   cursor: pointer;
   color: var(--primary-color);
   font-size: 1rem;
   transition: var(--transition);
-}
-
-body.dark-theme .post-actions button {
-  color: var(--dark-text-color);
 }
 
 .post-actions button.active {
@@ -505,7 +516,7 @@ body.dark-theme .post-actions button {
 .profile {
   padding: 1rem;
   background-color: #f9f9f9;
-  border-left: 1px solid #ccc;
+  border-radius: 8px;
   height: calc(80vh - 80px);
   display: grid;
   align-items: center;
@@ -632,6 +643,14 @@ body.dark-theme .comment p {
   margin-bottom: 1rem;
 }
 
+.comment-input form {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 1rem;
+}
+
 .comment-box {
   flex: 1;
   padding: 0.5rem;
@@ -657,12 +676,20 @@ body.dark-theme .comment-box {
   transition: 0.3s;
 }
 
+.submit-comment img {
+  filter: invert(91%) sepia(9%) saturate(0%) hue-rotate(0deg) brightness(107%)
+    contrast(85%);
+}
+
 .submit-comment:hover {
   background-color: var(--secondary-color);
 }
 
 .comment-actions {
+  width: 50%;
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
@@ -678,11 +705,12 @@ body.dark-theme .comment-box {
   font-size: 0.9rem;
 }
 
-.comment-actions button:hover {
-  color: var(--utility-color);
+.comment-actions button span {
+  margin-top: 5px;
 }
 
-.apply, .filter-form button {
+.apply,
+.filter-form button {
   width: 100%;
   padding: 0.5rem 1rem;
   margin: 0.5rem 0;
