@@ -10,7 +10,7 @@ import (
 	"github.com/jesee-kuya/forum/backend/util"
 )
 
-func PostDetails(posts []models.Post, w http.ResponseWriter, logged bool, session StoreSession) {
+func PostDetails(w http.ResponseWriter, r *http.Request, posts []models.Post, logged bool) {
 	for i, post := range posts {
 		comments, err1 := repositories.GetComments(util.DB, post.ID)
 		if err1 != nil {
@@ -64,14 +64,36 @@ func PostDetails(posts []models.Post, w http.ResponseWriter, logged bool, sessio
 		posts[i].Likes = len(likes)
 		posts[i].Dislikes = len(dislikes)
 	}
+	var user models.User
+	if logged {
+		cookie, err := getSessionID(r)
+		if err != nil {
+			log.Println("Invalid Session")
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+		sessionData, err := getSessionData(cookie)
+		if err != nil {
+			log.Println("Invalid Session")
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+		user, err = repositories.GetUserByEmail(sessionData["userEmail"].(string))
+		if err != nil {
+			log.Println("User not found", err)
+			util.ErrorHandler(w, "Unexpected error occured", http.StatusInternalServerError)
+			return
+		}
+	}
+
 	data := struct {
 		IsLoggedIn  bool
 		Name, Email string
 		Posts       []models.Post
 	}{
 		IsLoggedIn: logged,
-		Name:       "",
-		Email:      session.Email,
+		Name:       user.Username,
+		Email:      user.Email,
 		Posts:      posts,
 	}
 
