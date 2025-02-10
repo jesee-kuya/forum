@@ -13,6 +13,7 @@ func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_token")
 		if err != nil {
+			log.Println("NO session token", err)
 			util.ErrorHandler(w, "Unauthorized: No session token", http.StatusUnauthorized)
 			return
 		}
