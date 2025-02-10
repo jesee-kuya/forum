@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/jesee-kuya/forum/backend/repositories"
+	"github.com/jesee-kuya/forum/backend/util"
 )
 
 /*
@@ -40,7 +41,7 @@ func HandleGetPosts(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	posts, err := repositories.GetPosts(db)
 	if err != nil {
-		http.Error(w, `{"error": "Failed to fetch posts"}`, http.StatusInternalServerError)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 
@@ -50,6 +51,7 @@ func HandleGetPosts(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	if err := json.NewEncoder(w).Encode(posts); err != nil {
 		log.Printf("Failed to encode response: %v\n", err)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 }

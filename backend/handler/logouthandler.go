@@ -23,7 +23,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = repositories.DeleteSession(cookie)
 	if err != nil {
-		util.ErrorHandler(w, "Failed to log out", http.StatusInternalServerError)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 	delete(SessionStore, cookie)

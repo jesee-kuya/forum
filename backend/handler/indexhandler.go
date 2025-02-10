@@ -50,7 +50,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	posts, err := repositories.GetPosts(util.DB)
 	if err != nil {
 		log.Printf("Failed to get posts: %v", err)
-		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 	PostDetails(w, r, posts, true)

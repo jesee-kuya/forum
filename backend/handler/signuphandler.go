@@ -26,7 +26,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
 			log.Printf("Failed parsing form: %v\n", err)
-			util.ErrorHandler(w, "Failed parsing form", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
@@ -45,7 +45,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 
 		hashed, err := util.PasswordEncrypt([]byte(user.Password), 10)
 		if err != nil {
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			log.Printf("Failed encrypting password: %v\n", err)
 			return
 		}
@@ -61,7 +61,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == http.MethodGet {
 		tmpl, err := template.ParseFiles("frontend/templates/sign-up.html")
 		if err != nil {
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 		tmpl.Execute(w, nil)

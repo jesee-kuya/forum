@@ -43,7 +43,7 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 		_, err := repositories.InsertRecord(util.DB, "tblReactions", []string{"user_id", "post_id", "reaction"}, sessionData["userId"].(int), postID, reactionType)
 		if err != nil {
 			log.Println("Failed to insert record:", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
@@ -54,7 +54,7 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 		err := repositories.UpdateReactionStatus(util.DB, sessionData["userId"].(int), postID)
 		if err != nil {
 			log.Println("Failed to update reaction status:", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
@@ -64,7 +64,7 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 		err := repositories.UpdateReaction(util.DB, reactionType, sessionData["userId"].(int), postID)
 		if err != nil {
 			log.Println("Failed to update reaction:", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 	}
