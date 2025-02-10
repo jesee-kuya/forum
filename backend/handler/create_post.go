@@ -113,8 +113,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("failed to add post", err)
 		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
-		r.Method = http.MethodGet
-		LoginHandler(w, r)
 		return
 	}
 
