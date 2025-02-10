@@ -14,23 +14,28 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 		util.ErrorHandler(w, "Not Found", http.StatusNotFound)
 		return
 	}
-	var session StoreSession
-	session, _, err := ValidateCookie(r)
-	if err != nil {
-		log.Printf("Failed to validate cookie: %v", err)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 
 	if r.Method != http.MethodPost {
 		log.Println("Method not allowed in comment handler", r.Method)
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	cookie, err := getSessionID(r)
+	if err != nil {
+		log.Println("Invalid Session")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	sessionData, err := getSessionData(cookie)
+	if err != nil {
+		log.Println("Invalid Session")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	id := r.FormValue("id")
-	userId := session.UserId
+	userId := sessionData["userId"].(int)
 	comment := r.FormValue("comment")
 
 	repositories.InsertRecord(util.DB, "tblPosts", []string{"user_id", "body", "parent_id", "post_title"}, userId, comment, id, "comment")
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }

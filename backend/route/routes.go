@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/jesee-kuya/forum/backend/handler"
+	"github.com/jesee-kuya/forum/backend/middleware"
 	"github.com/jesee-kuya/forum/backend/util"
 )
 
@@ -17,16 +18,16 @@ func InitRoutes() *http.ServeMux {
 	r.Handle("/uploads/", http.StripPrefix("/uploads/", uploadFs))
 
 	// App routes
-	r.HandleFunc("/home", handler.IndexHandler)
+	r.HandleFunc("/home", middleware.Authenticate(handler.IndexHandler))
 	r.HandleFunc("/", handler.HomeHandler)
 	r.HandleFunc("/sign-in", handler.LoginHandler)
 	r.HandleFunc("/sign-up", handler.SignupHandler)
-	r.HandleFunc("/upload", handler.CreatePost)
-	r.HandleFunc("/logout", handler.LogoutHandler)
-	r.HandleFunc("/comments", handler.CommentHandler)
-	r.HandleFunc("/reaction", handler.ReactionHandler)
-	r.HandleFunc("/likes", handler.ReactionHandler)
-	r.HandleFunc("/dilikes", handler.ReactionHandler)
+	r.HandleFunc("/upload", middleware.Authenticate(handler.CreatePost))
+	r.HandleFunc("/logout", middleware.Authenticate(handler.LogoutHandler))
+	r.HandleFunc("/comments", middleware.Authenticate(handler.CommentHandler))
+	r.HandleFunc("/reaction", middleware.Authenticate(handler.ReactionHandler))
+	r.HandleFunc("/likes", middleware.Authenticate(handler.ReactionHandler))
+	r.HandleFunc("/dilikes", middleware.Authenticate(handler.ReactionHandler))
 	r.HandleFunc("/filter", handler.FilterPosts)
 
 	r.HandleFunc("/api/posts", handler.GetAllPostsAPI(util.DB))

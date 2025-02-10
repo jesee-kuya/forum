@@ -74,11 +74,6 @@ func GetAllPostsAPI(db *sql.DB) http.HandlerFunc {
 // FilterPosts - Handles filtering posts by category or user
 func FilterPosts(w http.ResponseWriter, r *http.Request) {
 	logged := false
-	session, _, err := ValidateCookie(r)
-	if err == nil {
-		logged = true
-	}
-
 	if r.URL.Path != "/filter" {
 		log.Println("Path not found", r.URL.Path)
 		util.ErrorHandler(w, "Not Found", http.StatusNotFound)
@@ -91,7 +86,7 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		log.Println("Error parsing form", err)
 		util.ErrorHandler(w, "Unknown Error", http.StatusInternalServerError)
@@ -109,12 +104,24 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		PostDetails(posts, w, logged, session)
+		_, err = getSessionID(r)
+		if err == nil {
+			logged = true
+		}
+
+		PostDetails(w, r, posts, logged)
 		return
 	}
 
-	if session.UserId == 0 {
-		log.Println("Unauthorized session")
+	cookie, err := getSessionID(r)
+	if err != nil {
+		log.Println("Invalid Session")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	sessionData, err := getSessionData(cookie)
+	if err != nil {
+		log.Println("Invalid Session")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -122,10 +129,10 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 	posts := []models.Post{}
 
 	if filter == "created" {
-		posts, err = repositories.FilterPostsByUser(util.DB, session.UserId)
+		posts, err = repositories.FilterPostsByUser(util.DB, sessionData["userId"].(int))
 	}
 	if filter == "liked" {
-		posts, err = repositories.FilterPostsByLikes(util.DB, session.UserId)
+		posts, err = repositories.FilterPostsByLikes(util.DB, sessionData["userId"].(int))
 	}
 	if err != nil {
 		log.Println(err)
@@ -133,5 +140,5 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	PostDetails(posts, w, true, session)
+	PostDetails(w, r, posts, true)
 }

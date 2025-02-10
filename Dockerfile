@@ -10,15 +10,8 @@ WORKDIR /app
 COPY . .
 RUN go mod tidy
 
-RUN CGO_ENABLED=0 GOOG=LINUX go build -o /forum
+RUN go build -o /forum
 
 EXPOSE 9000
 
-CMD ["./forum"]
-
-
-# Docker permission setup (optional)
-# Commands to install Docker in rootless mode
-# curl -fsSL https://get.docker.com/rootless | sh
-# export PATH=/home/docker/bin:$PATH
-# export DOCKER_HOST=unix:///run/user/10531/docker.sock
+CMD ["/forum"]
