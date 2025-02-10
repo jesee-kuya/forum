@@ -93,6 +93,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
 	}
 }
 
