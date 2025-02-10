@@ -86,6 +86,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		tmpl, err := template.ParseFiles("frontend/templates/sign-in.html")
 		if err != nil {
 			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			return
 		}
 
 		tmpl.Execute(w, nil)
