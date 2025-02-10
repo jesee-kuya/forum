@@ -132,9 +132,8 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		repositories.InsertRecord(util.DB, "tblPostCategories", []string{"post_id", "category"}, id, category)
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
 	r.Method = http.MethodGet
-	IndexHandler(w, r)
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
 /*
