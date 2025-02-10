@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -29,9 +28,6 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 
 	reactionType := r.FormValue("reaction")
 	postID, _ := strconv.Atoi(r.FormValue("post_id"))
-
-	fmt.Println("Reaction: ", reactionType)
-	fmt.Println("Post ID: ", postID)
 
 	check, reaction := repositories.CheckReactions(util.DB, session.UserId, postID)
 
