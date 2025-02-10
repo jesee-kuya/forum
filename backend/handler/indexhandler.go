@@ -18,11 +18,13 @@ type Response struct {
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/home" {
+		log.Println("path not found", r.URL.Path)
 		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
 
 	if r.Method != http.MethodGet {
+		log.Println("wrong method used", r.Method)
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
