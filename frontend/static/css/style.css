@@ -18,16 +18,9 @@
   --dark-box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.1);
 }
 
-.web-icon {
-  height: auto;
-  width: 1.2rem;
-  filter: invert(27%) sepia(62%) saturate(3148%) hue-rotate(189deg)
-    brightness(95%) contrast(100%);
-}
-
-.web-icon.light {
-  filter: invert(91%) sepia(9%) saturate(0%) hue-rotate(0deg) brightness(107%)
-    contrast(85%);
+body.dark-theme .icon {
+  filter: invert(100%) sepia(3%) saturate(2485%) hue-rotate(188deg)
+    brightness(112%) contrast(95%);
 }
 
 * {
@@ -169,7 +162,7 @@ body.dark-theme .theme-toggler .moon {
 .sidebar {
   padding: 1.5rem;
   background-color: #f9f9f9;
-  border-right: 1px solid #ccc;
+  border-radius: 8px;
   height: calc(100vh - 80px);
   transition: var(--transition);
 }
@@ -395,8 +388,10 @@ body.dark-theme .create-post form label {
 }
 
 .floating-create-post-btn img {
-  filter: invert(91%) sepia(9%) saturate(0%) hue-rotate(0deg) brightness(107%)
-    contrast(85%);
+  height: 100px;
+  width: 1.2rem;
+  filter: invert(100%) sepia(3%) saturate(2485%) hue-rotate(188deg)
+    brightness(112%) contrast(95%);
 }
 
 body.dark-theme .floating-create-post-btn {
@@ -446,11 +441,10 @@ body.dark-theme .post {
   background-color: var(--dark-neutral-color);
 }
 
-.post img {
+.uploaded-file {
   width: 100%;
   height: auto;
   border-radius: 8px;
-  margin-bottom: 0.75rem;
   aspect-ratio: 16/9;
 }
 
@@ -490,17 +484,6 @@ body.dark-theme .post p {
   margin-top: 0.75rem;
 }
 
-.post-actions img {
-  height: 20px;
-  margin: 0;
-  filter: invert(27%) sepia(62%) saturate(3148%) hue-rotate(189deg)
-    brightness(95%) contrast(100%);
-}
-
-.post-actions button span {
-  margin-top: 5px;
-}
-
 .post-operations {
   width: 100%;
   display: flex;
@@ -520,10 +503,6 @@ body.dark-theme .post p {
   transition: var(--transition);
 }
 
-body.dark-theme .post-actions button {
-  color: var(--dark-text-color);
-}
-
 .post-actions button.active {
   color: var(--utility-color);
 }
@@ -531,7 +510,7 @@ body.dark-theme .post-actions button {
 .profile {
   padding: 1rem;
   background-color: #f9f9f9;
-  border-left: 1px solid #ccc;
+  border-radius: 8px;
   height: calc(80vh - 80px);
   display: grid;
   align-items: center;
@@ -718,11 +697,6 @@ body.dark-theme .comment-box {
   cursor: pointer;
   color: var(--secondary-color);
   font-size: 0.9rem;
-}
-
-.comment-actions button img {
-  filter: invert(27%) sepia(62%) saturate(3148%) hue-rotate(189deg)
-    brightness(95%) contrast(100%);
 }
 
 .comment-actions button span {

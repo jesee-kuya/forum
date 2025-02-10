@@ -29,12 +29,24 @@
 
           <div class="theme-toggler">
             <img
-              class="web-icon moon"
+              style="
+                height: 25px;
+                width: 1.2rem;
+                filter: invert(17%) sepia(27%) saturate(7051%)
+                  hue-rotate(205deg) brightness(90%) contrast(99%);
+              "
+              class="moon"
               src="/frontend/static/assets/moon-regular.svg"
               alt="Moon Icon"
             />
             <img
-              class="web-icon sunny"
+              style="
+                height: 25px;
+                width: 1.2rem;
+                filter: invert(100%) sepia(3%) saturate(2485%)
+                  hue-rotate(188deg) brightness(112%) contrast(95%);
+              "
+              class="sunny"
               src="/frontend/static/assets/sun-regular.svg"
               alt="Sunny Icon"
             />
@@ -204,7 +216,11 @@
         <p>{{ .Body }}</p>
 
         {{ if .MediaURL }}
-        <img src="{{ .MediaURL }}" alt="{{ .PostTitle }}" />
+        <img
+          class="uploaded-file"
+          src="{{ .MediaURL }}"
+          alt="{{ .PostTitle }}"
+        />
         {{ end }}
 
         <div class="category-div">
@@ -221,8 +237,15 @@
             aria-label="Like this post"
           >
             <img
+              class="icon"
+              style="
+                height: 25px;
+                width: 1.2rem;
+                filter: invert(17%) sepia(27%) saturate(7051%)
+                  hue-rotate(205deg) brightness(90%) contrast(99%);
+                margin-right: 5px;
+              "
               src="/frontend/static/assets/thumbs-up-regular.svg"
-              class="web-icon"
               alt="thumbs-up-regular"
             />
             <span class="like-count">{{ .Likes }}</span>
@@ -235,6 +258,14 @@
             aria-label="Dislike this post"
           >
             <img
+              class="icon"
+              style="
+                height: 25px;
+                width: 1.2rem;
+                filter: invert(17%) sepia(27%) saturate(7051%)
+                  hue-rotate(205deg) brightness(90%) contrast(99%);
+                margin-right: 5px;
+              "
               src="/frontend/static/assets/thumbs-down-regular.svg"
               class="web-icon"
               alt="thumbs-down-regular"
@@ -244,6 +275,14 @@
 
           <button class="comment-button" aria-label="View or add comments">
             <img
+              class="icon"
+              style="
+                height: 25px;
+                width: 1.2rem;
+                filter: invert(17%) sepia(27%) saturate(7051%)
+                  hue-rotate(205deg) brightness(90%) contrast(99%);
+                margin-right: 5px;
+              "
               src="/frontend/static/assets/comment-regular.svg"
               class="web-icon"
               alt="comment-regular"
@@ -265,7 +304,8 @@
                 placeholder="Write a comment..."
               />
               <button class="submit-comment">
-                <img style="height: 20px; margin: 0"
+                <img
+                  style="height: 20px; margin: 0"
                   src="/frontend/static/assets/paper-plane-regular.svg"
                   class="web-icon"
                   alt="paper-plane-regular"
@@ -284,7 +324,15 @@
                 aria-label="Like this post"
                 class="like-comment-button"
               >
-                <img style="height: 20px; margin: 0;"
+                <img
+                  class="icon"
+                  style="
+                    height: 25px;
+                    width: 1.2rem;
+                    filter: invert(17%) sepia(27%) saturate(7051%)
+                      hue-rotate(205deg) brightness(90%) contrast(99%);
+                    margin-right: 5px;
+                  "
                   src="/frontend/static/assets/thumbs-up-regular.svg"
                   class="web-icon"
                   alt="thumbs-up-regular"
@@ -297,10 +345,18 @@
                 aria-label="Dislike this post"
                 class="dislike-comment-button"
               >
-                <img style="height: 20px; margin: 0;"
+                <img
+                  class="icon"
+                  style="
+                    height: 25px;
+                    width: 1.2rem;
+                    filter: invert(17%) sepia(27%) saturate(7051%)
+                      hue-rotate(205deg) brightness(90%) contrast(99%);
+                    margin-right: 5px;
+                  "
                   src="/frontend/static/assets/thumbs-down-regular.svg"
                   class="web-icon"
-                  alt="thumbs-up-regular"
+                  alt="thumbs-down-regular"
                 />
                 <span>{{ .Dislikes }}</span>
               </button>
