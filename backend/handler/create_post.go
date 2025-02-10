@@ -17,13 +17,6 @@ UploadMedia handler function is responsible for performing server operations to 
 */
 func CreatePost(w http.ResponseWriter, r *http.Request) {
 	var url string
-	session, _, err := ValidateCookie(r)
-	if err != nil {
-		log.Printf("Failed to validate cookie: %v", err)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-
 	if r.Method != http.MethodPost {
 		util.ErrorHandler(w, "Invalid request method", http.StatusMethodNotAllowed)
 		log.Println("Invalid request method:", r.Method)
@@ -38,7 +31,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Parse the multipart form with a 25MB limit
-	err = r.ParseMultipartForm(25 << 20)
+	err := r.ParseMultipartForm(25 << 20)
 	if err != nil {
 		util.ErrorHandler(w, "Failed parsing form data", http.StatusBadRequest)
 		log.Println("Failed parsing multipart form:", err)
@@ -103,7 +96,20 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		url = fmt.Sprintf("%v", tempFilePath)
 	}
 
-	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "media_url", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), url, session.UserId)
+	cookie, err := getSessionID(r)
+	if err != nil {
+		log.Println("Invalid Session")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	sessionData, err := getSessionData(cookie)
+	if err != nil {
+		log.Println("Invalid Session")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "media_url", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), url, sessionData["userId"].(int))
 	if err != nil {
 		fmt.Println("failed to add post", err)
 
@@ -126,9 +132,8 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		repositories.InsertRecord(util.DB, "tblPostCategories", []string{"post_id", "category"}, id, category)
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
 	r.Method = http.MethodGet
-	IndexHandler(w, r)
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
 /*

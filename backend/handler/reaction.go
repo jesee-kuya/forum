@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,26 +10,17 @@ import (
 )
 
 func ReactionHandler(w http.ResponseWriter, r *http.Request) {
-	session := StoreSession{}
-	cookie, err := r.Cookie("session_token")
-	if err != nil {
-		log.Printf("Cookie not found: %v", err)
-		util.ErrorHandler(w, "Unauthorized: Invalid session", http.StatusUnauthorized)
-		return
-	}
-
-	for _, v := range Sessions {
-		if v.Token == cookie.Value {
-			session = v
-			break
-		}
+	session := struct {
+		UserId int
+	}{
+		1,
 	}
 	if r.Method != http.MethodPost {
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	err = r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		util.ErrorHandler(w, "Failed to parse form", http.StatusBadRequest)
 		return
@@ -38,9 +28,6 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 
 	reactionType := r.FormValue("reaction")
 	postID, _ := strconv.Atoi(r.FormValue("post_id"))
-
-	fmt.Println("Reaction: ", reactionType)
-	fmt.Println("Post ID: ", postID)
 
 	check, reaction := repositories.CheckReactions(util.DB, session.UserId, postID)
 

@@ -10,7 +10,7 @@ import (
 
 // validates the session token and sets the user in the context
 func SessionMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sessionID, err := getSessionID(r)
 		if err != nil {
 			util.ErrorHandler(w, "Unauthorized", http.StatusUnauthorized)

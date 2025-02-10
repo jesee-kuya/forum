@@ -1,149 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" href="/frontend/static/css/style.css" />
     <script defer src="/frontend/static/js/script.js"></script>
     <script defer src="/frontend/static/js/reactions.js"></script>
     <script defer src="/frontend/static/js/format_time.js"></script>
 
-  <title>Home</title>
-</head>
+    <title>Home</title>
+  </head>
 
-<body>
-  <header>
-    <nav class="navbar">
-      <div class="logo">
-        <a href="/">Forum</a>
-      </div>
-
-      <div class="right-container">
-        <div class="auth-container">
-          {{if .IsLoggedIn}}{{ else}}
-          <a href="/sign-up">Sign Up</a>
-          <a href="/sign-in">Sign In</a>
-          {{ end }}
+  <body>
+    <header>
+      <nav class="navbar">
+        <div class="logo">
+          <a href="/">Forum</a>
         </div>
 
-        <div class="theme-toggler">
-          <ion-icon class="moon" name="moon"></ion-icon>
-          <ion-icon class="sunny" name="sunny"></ion-icon>
+        <div class="right-container">
+          <div class="auth-container">
+            {{if .IsLoggedIn}}{{ else}}
+            <a href="/sign-up">Sign Up</a>
+            <a href="/sign-in">Sign In</a>
+            {{ end }}
+          </div>
+
+          <div class="theme-toggler">
+            <img
+              style="
+                height: 25px;
+                width: 1.2rem;
+                filter: invert(17%) sepia(27%) saturate(7051%)
+                  hue-rotate(205deg) brightness(90%) contrast(99%);
+              "
+              class="moon"
+              src="/frontend/static/assets/moon-regular.svg"
+              alt="Moon Icon"
+            />
+            <img
+              style="
+                height: 25px;
+                width: 1.2rem;
+                filter: invert(100%) sepia(3%) saturate(2485%)
+                  hue-rotate(188deg) brightness(112%) contrast(95%);
+              "
+              class="sunny"
+              src="/frontend/static/assets/sun-regular.svg"
+              alt="Sunny Icon"
+            />
+          </div>
         </div>
-      </div>
-    </nav>
-  </header>
+      </nav>
+    </header>
 
-  <aside class="sidebar">
-    <h2>Filter By:</h2>
-    <form class="filter-form" action="/filter" method="get">
-      <fieldset>
-        <legend>Categories</legend>
-        <label><input type="checkbox" name="category" value="Technology" />
-          Technology</label>
-        <label><input type="checkbox" name="category" value="Health" />
-          Health</label>
-        <label><input type="checkbox" name="category" value="Education" />
-          Education</label>
-        <label><input type="checkbox" name="category" value="Sports" />
-          Sports</label>
-        <label><input type="checkbox" name="category" value="Entertainment" />
-          Entertainment</label>
-        <label><input type="checkbox" name="category" value="Finance" />
-          Finance</label>
-        <label><input type="checkbox" name="category" value="Travel" />
-          Travel</label>
-        <label><input type="checkbox" name="category" value="Food" /> Food</label>
-        <label><input type="checkbox" name="category" value="Lifestyle" />
-          Lifestyle</label>
-        <label><input type="checkbox" name="category" value="Science" />
-          Science</label>
-      </fieldset>
-
-      <button class="apply">Apply</button>
-    </form>
-
-    {{ if .IsLoggedIn }}
-    <form class="filter-form" action="/filter" method="get">
-      <ul class="sidebar-links">
-        <li>
-          <button type="submit" name="filter" value="created">Created</button>
-        </li>
-        <li>
-          <button type="submit" name="filter" value="liked">Liked</button>
-        </li>
-      </ul>
-    </form>
-    {{ end }}
-  </aside>
-
-  <main class="posts">
-    <section class="create-post hidden">
-      <h2>Create a New Post</h2>
-      <form name="upload" enctype="multipart/form-data" action="/upload" method="POST">
-        <label for="post-title">Title</label>
-        <input type="text" id="post-title" name="post-title" placeholder="Enter your post title" required />
-
-        <label for="post-content">Content</label>
-        <textarea id="post-content" name="post-content" placeholder="Write your post here..." required></textarea>
-
-        <fieldset class="categories" name="categories">
-          <legend>Select Category</legend>
-          <label>
-            <input type="checkbox" name="category[]" value="Technology" />
-            Technology
-          </label>
-          <label>
-            <input type="checkbox" name="category[]" value="Health" />
-            Health
-          </label>
-          <label>
-            <input type="checkbox" name="category[]" value="Education" />
-            Education
-          </label>
-          <label>
-            <input type="checkbox" name="category[]" value="Sports" />
-            Sports
-          </label>
-          <label>
-            <input type="checkbox" name="category[]" value="Entertainment" />
-            Entertainment
-          </label>
-          <label>
-            <input type="checkbox" name="category[]" value="Finance" />
-            Finance
-          </label>
-          <label>
-            <input type="checkbox" name="category[]" value="Travel" />
-            Travel
-          </label>
-          <label>
-            <input type="checkbox" name="category[]" value="Food" />
-            Food
-          </label>
-          <label>
-            <input type="checkbox" name="category[]" value="Lifestyle" />
-            Lifestyle
-          </label>
-          <label>
-            <input type="checkbox" name="category[]" value="Science" />
-            Science
-          </label>
+    <aside class="sidebar">
+      <h2>Filter By:</h2>
+      <form class="filter-form" action="/filter" method="get">
+        <fieldset>
+          <legend>Categories</legend>
+          <label
+            ><input type="checkbox" name="category" value="Technology" />
+            Technology</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Health" />
+            Health</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Education" />
+            Education</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Sports" />
+            Sports</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Entertainment" />
+            Entertainment</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Finance" />
+            Finance</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Travel" />
+            Travel</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Food" /> Food</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Lifestyle" />
+            Lifestyle</label
+          >
+          <label
+            ><input type="checkbox" name="category" value="Science" />
+            Science</label
+          >
         </fieldset>
 
-        <div class="post-operations">
-          <input type="file" name="uploaded-file" />
-
-          <button type="submit">Post</button>
-        </div>
+        <button class="apply">Apply Filter</button>
       </form>
-    </section>
+
+      {{ if .IsLoggedIn }}
+      <form class="filter-form" action="/filter" method="get">
+        <ul class="sidebar-links">
+          <li>
+            <button type="submit" name="filter" value="created">Created</button>
+          </li>
+          <li>
+            <button type="submit" name="filter" value="liked">Liked</button>
+          </li>
+        </ul>
+      </form>
+      {{ end }}
+    </aside>
+
+    <main class="posts">
+      <section class="create-post hidden">
+        <h2>Create a New Post</h2>
+        <form
+          name="upload"
+          enctype="multipart/form-data"
+          action="/upload"
+          method="POST"
+        >
+          <label for="post-title">Title</label>
+          <input
+            type="text"
+            id="post-title"
+            name="post-title"
+            placeholder="Enter your post title"
+            required
+          />
+
+          <label for="post-content">Content</label>
+          <textarea
+            id="post-content"
+            name="post-content"
+            placeholder="Write your post here..."
+            required
+          ></textarea>
+
+          <fieldset class="categories" name="categories">
+            <legend>Select Category</legend>
+            <label>
+              <input type="checkbox" name="category[]" value="Technology" />
+              Technology
+            </label>
+            <label>
+              <input type="checkbox" name="category[]" value="Health" />
+              Health
+            </label>
+            <label>
+              <input type="checkbox" name="category[]" value="Education" />
+              Education
+            </label>
+            <label>
+              <input type="checkbox" name="category[]" value="Sports" />
+              Sports
+            </label>
+            <label>
+              <input type="checkbox" name="category[]" value="Entertainment" />
+              Entertainment
+            </label>
+            <label>
+              <input type="checkbox" name="category[]" value="Finance" />
+              Finance
+            </label>
+            <label>
+              <input type="checkbox" name="category[]" value="Travel" />
+              Travel
+            </label>
+            <label>
+              <input type="checkbox" name="category[]" value="Food" />
+              Food
+            </label>
+            <label>
+              <input type="checkbox" name="category[]" value="Lifestyle" />
+              Lifestyle
+            </label>
+            <label>
+              <input type="checkbox" name="category[]" value="Science" />
+              Science
+            </label>
+          </fieldset>
+
+          <div class="post-operations">
+            <input type="file" name="uploaded-file" />
+
+            <button type="submit">Post</button>
+          </div>
+        </form>
+      </section>
 
       <button class="floating-create-post-btn">
-        <i class="fa-solid fa-plus"></i>
+        <img
+          class="web-icon"
+          src="/frontend/static/assets/plus-solid.svg"
+          alt="create-post"
+        />
       </button>
+
       {{ range .Posts}}
       <article class="post">
         <div class="post-header">
@@ -155,91 +215,166 @@
         <h3>{{ .PostTitle }}</h3>
         <p>{{ .Body }}</p>
 
-      {{ if .MediaURL }}
-      <img src="{{ .MediaURL }}" alt="{{ .PostTitle }}" />
-      {{ end }}
-
-      <div class="category-div">
-        {{ range .Categories }}
-        <p class="post-category"><span>{{ .CategoryName }}</span></p>
+        {{ if .MediaURL }}
+        <img
+          class="uploaded-file"
+          src="{{ .MediaURL }}"
+          alt="{{ .PostTitle }}"
+        />
         {{ end }}
-      </div>
 
-      <div class="post-actions" data-post-id="{{ .ID }}">
-        <!-- Like Button -->
-        <button data-posted-id="{{ .ID }}" class="like-button" data-reaction="Like" aria-label="Like this post">
-          <i class="fa-regular fa-thumbs-up"></i>
-          <span> Like <span class="like-count">{{ .Likes }}</span> </span>
-        </button>
-
-        <!-- Dislike Button -->
-        <button data-posted-id="{{ .ID }}" class="dislike-button" data-reaction="Dislike"
-          aria-label="Dislike this post">
-          <i class="fa-regular fa-thumbs-down"></i>
-          <span>
-            Dislike <span class="dislike-count">{{ .Dislikes }}</span>
-          </span>
-        </button>
-
-        <!-- Comment Button -->
-        <button class="comment-button" aria-label="View or add comments">
-          <i class="fa-regular fa-comment"></i>
-          <span>
-            Comment <span class="comment-count">{{ .CommentCount }}</span>
-          </span>
-        </button>
-      </div>
-
-      <div class="comments-section hidden">
-        <h4>Comments</h4>
-
-        <div class="comment-input">
-          <form action="/comments" method="post">
-            <input type="hidden" name="id" value="{{.ID}}" />
-            <input type="text" name="comment" class="comment-box" placeholder="Write a comment..." />
-            <button class="submit-comment">
-              <i class="fa-solid fa-paper-plane"></i>
-            </button>
-          </form>
+        <div class="category-div">
+          {{ range .Categories }}
+          <p class="post-category"><span>{{ .CategoryName }}</span></p>
+          {{ end }}
         </div>
 
-        {{ range .Comments }}
-        <div class="comment" data-post-id="{{ .ID }}">
-          <p><strong>{{ .UserName }}</strong>: {{ .Body }}</p>
-          <div class="comment-actions">
-            <button data-posted-id="{{ .ID }}" data-reaction="Like"
-              aria-label="Like this post" class="like-comment-button">
-              <i class="fa-regular fa-thumbs-up"></i>
-              <span>{{ .Likes }}</span>
-            </button>
-            <button data-posted-id="{{ .ID }}" data-reaction="Dislike" aria-label="Dislike this post"
-              class="dislike-comment-button">
-              <i class="fa-regular fa-thumbs-down"></i>
-              <span>{{ .Dislikes }}</span>
-            </button>
+        <div class="post-actions" data-post-id="{{ .ID }}">
+          <button
+            data-posted-id="{{ .ID }}"
+            class="like-button"
+            data-reaction="Like"
+            aria-label="Like this post"
+          >
+            <img
+              class="icon"
+              style="
+                height: 25px;
+                width: 1.2rem;
+                filter: invert(17%) sepia(27%) saturate(7051%)
+                  hue-rotate(205deg) brightness(90%) contrast(99%);
+                margin-right: 5px;
+              "
+              src="/frontend/static/assets/thumbs-up-regular.svg"
+              alt="thumbs-up-regular"
+            />
+            <span class="like-count">{{ .Likes }}</span>
+          </button>
+
+          <button
+            data-posted-id="{{ .ID }}"
+            class="dislike-button"
+            data-reaction="Dislike"
+            aria-label="Dislike this post"
+          >
+            <img
+              class="icon"
+              style="
+                height: 25px;
+                width: 1.2rem;
+                filter: invert(17%) sepia(27%) saturate(7051%)
+                  hue-rotate(205deg) brightness(90%) contrast(99%);
+                margin-right: 5px;
+              "
+              src="/frontend/static/assets/thumbs-down-regular.svg"
+              class="web-icon"
+              alt="thumbs-down-regular"
+            />
+            <span class="dislike-count">{{ .Dislikes }}</span>
+          </button>
+
+          <button class="comment-button" aria-label="View or add comments">
+            <img
+              class="icon"
+              style="
+                height: 25px;
+                width: 1.2rem;
+                filter: invert(17%) sepia(27%) saturate(7051%)
+                  hue-rotate(205deg) brightness(90%) contrast(99%);
+                margin-right: 5px;
+              "
+              src="/frontend/static/assets/comment-regular.svg"
+              class="web-icon"
+              alt="comment-regular"
+            />
+            <span class="comment-count">{{ .CommentCount }}</span>
+          </button>
+        </div>
+
+        <div class="comments-section hidden">
+          <h4>Comments</h4>
+
+          <div class="comment-input">
+            <form action="/comments" method="post">
+              <input type="hidden" name="id" value="{{.ID}}" />
+              <input
+                type="text"
+                name="comment"
+                class="comment-box"
+                placeholder="Write a comment..."
+              />
+              <button class="submit-comment">
+                <img
+                  style="height: 20px; margin: 0"
+                  src="/frontend/static/assets/paper-plane-regular.svg"
+                  class="web-icon"
+                  alt="paper-plane-regular"
+                />
+              </button>
+            </form>
           </div>
+
+          {{ range .Comments }}
+          <div class="comment" data-post-id="{{ .ID }}">
+            <p><strong>{{ .UserName }}</strong>: {{ .Body }}</p>
+            <div class="comment-actions">
+              <button
+                data-posted-id="{{ .ID }}"
+                data-reaction="Like"
+                aria-label="Like this post"
+                class="like-comment-button"
+              >
+                <img
+                  class="icon"
+                  style="
+                    height: 25px;
+                    width: 1.2rem;
+                    filter: invert(17%) sepia(27%) saturate(7051%)
+                      hue-rotate(205deg) brightness(90%) contrast(99%);
+                  "
+                  src="/frontend/static/assets/thumbs-up-regular.svg"
+                  class="web-icon"
+                  alt="thumbs-up-regular"
+                />
+                <span>{{ .Likes }}</span>
+              </button>
+              <button
+                data-posted-id="{{ .ID }}"
+                data-reaction="Dislike"
+                aria-label="Dislike this post"
+                class="dislike-comment-button"
+              >
+                <img
+                  class="icon"
+                  style="
+                    height: 25px;
+                    width: 1.2rem;
+                    filter: invert(17%) sepia(27%) saturate(7051%)
+                      hue-rotate(205deg) brightness(90%) contrast(99%);
+                  "
+                  src="/frontend/static/assets/thumbs-down-regular.svg"
+                  class="web-icon"
+                  alt="thumbs-down-regular"
+                />
+                <span>{{ .Dislikes }}</span>
+              </button>
+            </div>
+          </div>
+          {{ end }}
         </div>
-        {{ end }}
-      </div>
-    </article>
-    {{ end }}
-  </main>
+      </article>
+      {{ end }}
+    </main>
 
-  <aside class="profile">
-    <h2>Profile</h2>
+    <aside class="profile">
+      <h2>Profile</h2>
 
-    {{if .IsLoggedIn }} {{template "status" .}} {{else}}
-    <p class="session-status"><strong>Status:</strong> Not logged in</p>
+      {{if .IsLoggedIn }} {{template "status" .}} {{else}}
+      <p class="session-status"><strong>Status:</strong> Not logged in</p>
 
-    {{end}}
-  </aside>
-
-  <!-- Ion icons -->
-  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-  <script src="https://kit.fontawesome.com/0b11e99e28.js" crossorigin="anonymous"></script>
-</body>
-
+      {{end}}
+    </aside>
+  </body>
 </html>
 
 {{ define "status"}}

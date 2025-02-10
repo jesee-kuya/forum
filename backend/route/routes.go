@@ -18,7 +18,7 @@ func InitRoutes() *http.ServeMux {
 	r.Handle("/uploads/", http.StripPrefix("/uploads/", uploadFs))
 
 	// App routes
-	r.HandleFunc("/home", handler.IndexHandler)
+	r.HandleFunc("/home", middleware.Authenticate(handler.IndexHandler))
 	r.HandleFunc("/", handler.HomeHandler)
 	r.HandleFunc("/sign-in", handler.LoginHandler)
 	r.HandleFunc("/sign-up", handler.SignupHandler)
@@ -29,7 +29,6 @@ func InitRoutes() *http.ServeMux {
 	r.Handle("/likes", middleware.SessionMiddleware(http.HandlerFunc(handler.ReactionHandler)))
 	r.Handle("/dilikes", middleware.SessionMiddleware(http.HandlerFunc(handler.ReactionHandler)))
 	r.Handle("/filter", middleware.SessionMiddleware(http.HandlerFunc(handler.FilterPosts)))
-
 	r.HandleFunc("/api/posts", handler.GetAllPostsAPI(util.DB))
 	r.HandleFunc("/posts", func(w http.ResponseWriter, r *http.Request) {
 		handler.HandleGetPosts(w, r, util.DB)
