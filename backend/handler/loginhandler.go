@@ -29,15 +29,15 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		if isValidEmail(email) {
 			user, err = repositories.GetUserByEmail(email)
 			if err != nil {
-				util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
 				log.Println("Error fetching user", err)
+				util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
 				return
 			}
 		} else {
 			user, err = repositories.GetUserByName(email)
 			if err != nil {
-				util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
 				log.Println("Error fetching user", err)
+				util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
 				return
 			}
 		}
@@ -82,6 +82,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == http.MethodGet {
 		tmpl, err := template.ParseFiles("frontend/templates/sign-in.html")
 		if err != nil {
+			log.Println("Error parsing sign in template:", err)
 			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
@@ -89,6 +90,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		tmpl.Execute(w, nil)
 
 	} else {
+		log.Println("Method not allowed", r.Method)
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
