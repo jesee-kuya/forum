@@ -37,5 +37,5 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 	comment := r.FormValue("comment")
 
 	repositories.InsertRecord(util.DB, "tblPosts", []string{"user_id", "body", "parent_id", "post_title"}, userId, comment, id, "comment")
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
