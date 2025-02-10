@@ -19,6 +19,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	var err error
 	if r.URL.Path != "/sign-in" {
+		log.Println("Path not found", r.URL.Path)
 		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
