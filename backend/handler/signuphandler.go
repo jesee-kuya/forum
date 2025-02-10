@@ -52,8 +52,8 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 
 		_, err = repositories.InsertRecord(util.DB, "tblUsers", []string{"username", "email", "user_password"}, user.Username, user.Email, string(hashed))
 		if err != nil {
-			util.ErrorHandler(w, "user cannot be added", http.StatusForbidden)
 			log.Println("Error adding user:", err)
+			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
 		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
