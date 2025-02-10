@@ -30,14 +30,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			user, err = repositories.GetUserByEmail(email)
 			if err != nil {
 				log.Println("Error fetching user", err)
-				util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
+				util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 				return
 			}
 		} else {
 			user, err = repositories.GetUserByName(email)
 			if err != nil {
 				log.Println("Error fetching user", err)
-				util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
+				util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 				return
 			}
 		}

@@ -34,7 +34,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(25 << 20)
 	if err != nil {
 		log.Println("Failed parsing multipart form:", err)
-		util.ErrorHandler(w, "Failed parsing form data", http.StatusBadRequest)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 
@@ -44,7 +44,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 			log.Println("No file uploaded, continuing process.")
 		} else {
 			log.Println("Failed retrieving media file:", err)
-			util.ErrorHandler(w, "File upload error", http.StatusBadRequest)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 	}
@@ -58,7 +58,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		fileExt, err := ValidateMimeType(file)
 		if err != nil {
 			log.Println("Invalid extension associated with file:", err)
-			util.ErrorHandler(w, err.Error(), http.StatusBadRequest)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
