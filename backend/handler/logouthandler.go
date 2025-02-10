@@ -26,5 +26,6 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		util.ErrorHandler(w, "Failed to log out", http.StatusInternalServerError)
 		return
 	}
+	delete(SessionStore, cookie)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
