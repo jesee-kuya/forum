@@ -11,7 +11,7 @@ import (
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		log.Println("method not allowed")
-		util.ErrorHandler(w, "Method not allowed", http.StatusMethodNotAllowed)
+		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
