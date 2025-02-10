@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"text/template"
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
 	"golang.org/x/crypto/bcrypt"
@@ -17,6 +19,8 @@ import (
 var SessionStore = make(map[string]map[string]interface{})
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+	var err error
 	if r.URL.Path != "/sign-in" {
 		util.ErrorHandler(w, "Page not found", http.StatusNotFound)
 		return
@@ -24,11 +28,20 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 		email := r.FormValue("email")
-		user, err := repositories.GetUserByEmail(email)
-		if err != nil {
-			util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
-			log.Println("Error fetching user", err)
-			return
+		if isValidEmail(email) {
+			user, err = repositories.GetUserByEmail(email)
+			if err != nil {
+				util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
+				log.Println("Error fetching user", err)
+				return
+			}
+		} else {
+			user, err = repositories.GetUserByName(email)
+			if err != nil {
+				util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
+				log.Println("Error fetching user", err)
+				return
+			}
 		}
 
 		// decrypt password & authorize user
@@ -124,4 +137,10 @@ func EnableCors(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:9000")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+}
+
+func isValidEmail(email string) bool {
+	emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	re := regexp.MustCompile(emailRegex)
+	return re.MatchString(email)
 }

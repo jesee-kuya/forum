@@ -14,6 +14,12 @@ func ValidateFormFields(userName, email, password string) error {
 		return fmt.Errorf("username field cannot be empty")
 	}
 
+	for _, v := range userName {
+		if (v < '0' || v > '9') && (v < 'a' || v > 'z') && (v < 'A' || v > 'Z') {
+			return fmt.Errorf("username must contain only letters and numbers")
+		}
+	}
+
 	if len(strings.TrimSpace(email)) == 0 {
 		return fmt.Errorf("email field cannot be empty")
 	}
