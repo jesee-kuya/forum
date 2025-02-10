@@ -15,7 +15,7 @@ import (
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	if r.URL.Path != "/sign-up" {
-		util.ErrorHandler(w, "Page Not Found", http.StatusNotFound)
+		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
 

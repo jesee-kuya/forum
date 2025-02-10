@@ -76,7 +76,7 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 	logged := false
 	if r.URL.Path != "/filter" {
 		log.Println("Path not found", r.URL.Path)
-		util.ErrorHandler(w, "Not Found", http.StatusNotFound)
+		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
 
