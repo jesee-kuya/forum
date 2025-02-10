@@ -17,7 +17,7 @@ func ReactionHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
 	if err != nil {
-		util.ErrorHandler(w, "Failed to parse form", http.StatusBadRequest)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 
