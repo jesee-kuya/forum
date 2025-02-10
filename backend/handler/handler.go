@@ -19,13 +19,6 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, _, err := ValidateCookie(r)
-	if err == nil {
-		log.Printf("Cookie found")
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
-		return
-	}
-
 	// Load posts
 	posts, err := repositories.GetPosts(util.DB)
 	if err != nil {
@@ -33,7 +26,6 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	logged := false
 
-	PostDetails(posts, w, logged, StoreSession{})
+	PostDetails(w, r, posts, false)
 }
