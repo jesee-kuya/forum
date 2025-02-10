@@ -31,7 +31,5 @@ func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 
 		ctx := context.WithValue(r.Context(), newSession, userID)
 		next.ServeHTTP(w, r.WithContext(ctx))
-
-		next(w, r)
 	}
 }

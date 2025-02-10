@@ -5,7 +5,6 @@ import (
 
 	"github.com/jesee-kuya/forum/backend/handler"
 	"github.com/jesee-kuya/forum/backend/middleware"
-	"github.com/jesee-kuya/forum/backend/util"
 )
 
 func InitRoutes() *http.ServeMux {
@@ -29,10 +28,5 @@ func InitRoutes() *http.ServeMux {
 	r.HandleFunc("/likes", middleware.Authenticate(handler.ReactionHandler))
 	r.HandleFunc("/dilikes", middleware.Authenticate(handler.ReactionHandler))
 	r.HandleFunc("/filter", handler.FilterPosts)
-
-	r.HandleFunc("/api/posts", handler.GetAllPostsAPI(util.DB))
-	r.HandleFunc("/posts", func(w http.ResponseWriter, r *http.Request) {
-		handler.HandleGetPosts(w, r, util.DB)
-	})
 	return r
 }

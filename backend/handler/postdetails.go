@@ -15,7 +15,7 @@ func PostDetails(w http.ResponseWriter, r *http.Request, posts []models.Post, lo
 		comments, err1 := repositories.GetComments(util.DB, post.ID)
 		if err1 != nil {
 			log.Println("Failed to get comments:", err1)
-			util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
@@ -24,14 +24,14 @@ func PostDetails(w http.ResponseWriter, r *http.Request, posts []models.Post, lo
 			commentLikes, errLikes := repositories.GetReactions(util.DB, comment.ID, "Like")
 			if errLikes != nil {
 				log.Println("Failed to get likes", errLikes)
-				util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
+				util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 				return
 			}
 
 			commentDislikes, errDislikes := repositories.GetReactions(util.DB, comment.ID, "Dislike")
 			if errDislikes != nil {
 				log.Println("Failed to get dislikes", errDislikes)
-				util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
+				util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 				return
 			}
 
@@ -42,19 +42,19 @@ func PostDetails(w http.ResponseWriter, r *http.Request, posts []models.Post, lo
 		categories, err3 := repositories.GetCategories(util.DB, post.ID)
 		if err3 != nil {
 			log.Println("Failed to get categories", err3)
-			util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 		likes, err4 := repositories.GetReactions(util.DB, post.ID, "Like")
 		if err4 != nil {
 			log.Println("Failed to get likes", err4)
-			util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 		dislikes, err := repositories.GetReactions(util.DB, post.ID, "Dislike")
 		if err != nil {
 			log.Printf("Failed to get dislikes: %v", err)
-			util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
@@ -81,7 +81,7 @@ func PostDetails(w http.ResponseWriter, r *http.Request, posts []models.Post, lo
 		user, err = repositories.GetUserByEmail(sessionData["userEmail"].(string))
 		if err != nil {
 			log.Println("User not found", err)
-			util.ErrorHandler(w, "Unexpected error occured", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 	}
@@ -101,7 +101,7 @@ func PostDetails(w http.ResponseWriter, r *http.Request, posts []models.Post, lo
 	tmpl, err := template.ParseFiles("frontend/templates/index.html")
 	if err != nil {
 		log.Printf("Failed to load index template: %v", err)
-		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 	tmpl.Execute(w, data)

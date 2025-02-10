@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -16,17 +15,15 @@ import (
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	if r.URL.Path != "/sign-up" {
-		util.ErrorHandler(w, "Page Not Found", http.StatusNotFound)
+		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
 
 	if r.Method == http.MethodPost {
-		fmt.Println("OK: ", http.StatusOK)
-
 		err := r.ParseForm()
 		if err != nil {
 			log.Printf("Failed parsing form: %v\n", err)
-			util.ErrorHandler(w, "Failed parsing form", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
@@ -45,8 +42,8 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 
 		hashed, err := util.PasswordEncrypt([]byte(user.Password), 10)
 		if err != nil {
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			log.Printf("Failed encrypting password: %v\n", err)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
@@ -61,11 +58,13 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == http.MethodGet {
 		tmpl, err := template.ParseFiles("frontend/templates/sign-up.html")
 		if err != nil {
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Println("failed parsing files:", err)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 		tmpl.Execute(w, nil)
 	} else {
+		log.Println("Method not allowed", r.Method)
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}

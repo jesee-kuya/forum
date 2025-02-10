@@ -18,23 +18,23 @@ UploadMedia handler function is responsible for performing server operations to 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
 	var url string
 	if r.Method != http.MethodPost {
-		util.ErrorHandler(w, "Invalid request method", http.StatusMethodNotAllowed)
 		log.Println("Invalid request method:", r.Method)
+		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	// Create the img directory if it does not exist
 	if err := os.MkdirAll("uploads", os.ModePerm); err != nil {
-		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		log.Println("Failed to create uploads directory:", err)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 
 	// Parse the multipart form with a 25MB limit
 	err := r.ParseMultipartForm(25 << 20)
 	if err != nil {
-		util.ErrorHandler(w, "Failed parsing form data", http.StatusBadRequest)
 		log.Println("Failed parsing multipart form:", err)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 
@@ -43,8 +43,8 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		if err.Error() == "http: no such file" {
 			log.Println("No file uploaded, continuing process.")
 		} else {
-			util.ErrorHandler(w, "File upload error", http.StatusBadRequest)
 			log.Println("Failed retrieving media file:", err)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 	}
@@ -57,39 +57,39 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		// Validate MIME type and get the file extension
 		fileExt, err := ValidateMimeType(file)
 		if err != nil {
-			util.ErrorHandler(w, err.Error(), http.StatusBadRequest)
 			log.Println("Invalid extension associated with file:", err)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
 		_, err = file.Seek(0, 0)
 		if err != nil {
-			util.ErrorHandler(w, "Failed to reset file pointer", http.StatusInternalServerError)
 			log.Println("Failed to reset file pointer:", err)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
 		// Create a temporary file with the correct extension
 		tempFile, err := os.CreateTemp("uploads", "upload-*"+fileExt)
 		if err != nil {
-			util.ErrorHandler(w, "Failed to create file", http.StatusInternalServerError)
 			log.Println("Failed to read file:", err)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 		defer tempFile.Close()
 
 		fileBytes, err := io.ReadAll(file)
 		if err != nil {
-			util.ErrorHandler(w, "Failed to read file", http.StatusInternalServerError)
 			log.Println("Failed to read file:", err)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
 		// Write the uploaded file content to the temp file
 		_, err = tempFile.Write(fileBytes)
 		if err != nil {
-			util.ErrorHandler(w, "Failed to write file", http.StatusInternalServerError)
 			log.Println("Failed to write file:", err)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 		tempFilePath := tempFile.Name()
@@ -111,18 +111,15 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
 	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "media_url", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), url, sessionData["userId"].(int))
 	if err != nil {
-		fmt.Println("failed to add post", err)
-
+		log.Println("failed to add post", err)
 		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
-		r.Method = http.MethodGet
-		LoginHandler(w, r)
-
 		return
 	}
 
 	err = r.ParseForm()
 	if err != nil {
-		http.Error(w, "Failed to parse form", http.StatusBadRequest)
+		log.Println("error parsing form:", err)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 

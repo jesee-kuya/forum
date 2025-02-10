@@ -11,7 +11,7 @@ import (
 func CommentHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/comments" {
 		log.Println("url not found", r.URL.Path)
-		util.ErrorHandler(w, "Not Found", http.StatusNotFound)
+		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
 
