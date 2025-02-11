@@ -76,7 +76,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
-
+		response := Response{Success: true}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	} else if r.Method == http.MethodGet {
