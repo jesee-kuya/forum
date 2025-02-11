@@ -36,18 +36,13 @@ document.querySelectorAll('.comment-button').forEach((button) => {
 document.addEventListener('DOMContentLoaded', () => {
   const createPostSection = document.querySelector('.create-post');
   const createPostBtn = document.querySelector('.floating-create-post-btn');
-  const postsContainer = document.querySelector('main.posts'); // Target the scrollable container
+  const postsContainer = document.querySelector('main.posts');
 
   createPostBtn.addEventListener('click', () => {
     createPostSection.classList.toggle('hidden');
 
     if (postsContainer) {
       postsContainer.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      });
-    } else {
-      window.scrollTo({
         top: 0,
         behavior: 'smooth',
       });
