@@ -1,31 +1,43 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const signInForm = document.getElementById('signin-form');
-  const errorMessage = document.querySelector('.error-message');
-
-  signInForm.addEventListener('submit', async function (e) {
+  const signinForm = document.getElementById('signin-form');
+  const popup = document.getElementById('message-popup');
+  
+  signinForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const signinFormData = new URLSearchParams(new FormData(signinForm));
+    console.log(Object.fromEntries(signinFormData));
 
-    // Convert FormData to URL-encoded format
-    const signInFormData = new URLSearchParams(new FormData(signInForm));
-    const signInResponse = await fetch('/sign-in', {
-      method: 'POST',
-      body: signInFormData,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
+    try {
+      const response = await fetch('/sign-in', {
+        method: 'POST',
+        body: signinFormData,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
 
-    if (signInResponse.redirected) {
-      window.location.href = signInResponse.url;
-      return;
-    }
+      const data = await response.json();
 
-    const signInResult = await signInResponse.json();
-    if (!signInResult.success) {
-      errorMessage.classList.add('show');
-      setTimeout(() => {
-        errorMessage.classList.remove('show');
-      }, 3000);
+      if (data.success) {
+        showMessage('Sign In Successful!', true);
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+      } else {
+        showMessage('Sign In Failed. Please check your input.', false);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showMessage('An error occurred. Try again later.', false);
     }
   });
+
+  function showMessage(message, isSuccess) {
+    popup.textContent = message;
+    popup.classList.add('show');
+
+    setTimeout(() => {
+      popup.classList.remove('show');
+    }, 3000);
+  }
 });

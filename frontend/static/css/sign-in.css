@@ -116,8 +116,9 @@ body.dark-theme input {
   width: 100%;
 }
 
-.success-message {
-  display: none;
+.message-popup {
+  visibility: hidden;
+  opacity: 0;
   position: absolute;
   right: 1rem;
   top: 5rem;
@@ -128,8 +129,9 @@ body.dark-theme input {
   transition: var(--transition);
 }
 
-.success-message.show-success {
-  display: block;
+.message-popup.show {
+  visibility: visible;
+  opacity: 1;
 }
 
 .feedback-message {

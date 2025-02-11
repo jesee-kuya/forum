@@ -28,10 +28,10 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		user.Username = strings.TrimSpace(r.PostFormValue("username"))
-		user.Email = strings.TrimSpace(r.PostFormValue("email"))
-		user.Password = strings.TrimSpace(r.PostFormValue("password"))
-		user.ConfirmedPassword = strings.TrimSpace(r.PostFormValue("confirmed-password"))
+		user.Username = strings.TrimSpace(r.FormValue("username"))
+		user.Email = strings.TrimSpace(r.FormValue("email"))
+		user.Password = strings.TrimSpace(r.FormValue("password"))
+		user.ConfirmedPassword = strings.TrimSpace(r.FormValue("confirmed-password"))
 
 		err = util.ValidateFormFields(user.Username, user.Email, user.Password)
 		if err != nil {
@@ -63,6 +63,9 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
+		response := Response{Success: true}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 		return
 	} else if r.Method == http.MethodGet {
