@@ -19,7 +19,7 @@ func GetAllPosts(db *sql.DB, tmpl *template.Template, posts []models.Post) http.
 			comments, err := repositories.GetComments(db, post.ID)
 			if err != nil {
 				log.Printf("Failed to get comments: %v", err)
-				util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+				util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 				return
 			}
 
@@ -35,7 +35,7 @@ func GetAllPosts(db *sql.DB, tmpl *template.Template, posts []models.Post) http.
 		}{Posts: posts})
 		if err != nil {
 			log.Printf("Failed to render template: %v", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 	}
@@ -46,7 +46,7 @@ func GetAllPostsAPI(db *sql.DB) http.HandlerFunc {
 		posts, err := repositories.GetPosts(db)
 		if err != nil {
 			log.Printf("Failed to get posts: %v", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 		// fetch comments for each post
@@ -54,7 +54,7 @@ func GetAllPostsAPI(db *sql.DB) http.HandlerFunc {
 			comments, err := repositories.GetComments(db, post.ID)
 			if err != nil {
 				log.Printf("Failed to get posts: %v", err)
-				util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+				util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 				return
 			}
 
@@ -65,7 +65,7 @@ func GetAllPostsAPI(db *sql.DB) http.HandlerFunc {
 
 		if err = json.NewEncoder(w).Encode(posts); err != nil {
 			log.Printf("Failed to encode posts to JSON: %v", err)
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 	}
@@ -76,7 +76,7 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 	logged := false
 	if r.URL.Path != "/filter" {
 		log.Println("Path not found", r.URL.Path)
-		util.ErrorHandler(w, "Not Found", http.StatusNotFound)
+		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
 
@@ -89,7 +89,7 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		log.Println("Error parsing form", err)
-		util.ErrorHandler(w, "Unknown Error", http.StatusInternalServerError)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 
@@ -99,8 +99,8 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 	if len(categories) != 0 {
 		posts, err := repositories.FilterPostsByCategories(util.DB, categories)
 		if err != nil {
-			log.Println(err)
-			util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
+			log.Println("error filtering posts:",err)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
@@ -115,13 +115,13 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 
 	cookie, err := getSessionID(r)
 	if err != nil {
-		log.Println("Invalid Session")
+		log.Println("Invalid Session:", err)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	sessionData, err := getSessionData(cookie)
 	if err != nil {
-		log.Println("Invalid Session")
+		log.Println("Invalid Session:", err)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -136,7 +136,7 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 	}
 	if err != nil {
 		log.Println(err)
-		util.ErrorHandler(w, "Unkown error Occured", http.StatusInternalServerError)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 

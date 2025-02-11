@@ -2,13 +2,12 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"text/template"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/jesee-kuya/forum/backend/models"
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
 	"golang.org/x/crypto/bcrypt"
@@ -17,18 +16,30 @@ import (
 var SessionStore = make(map[string]map[string]interface{})
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+	var err error
 	if r.URL.Path != "/sign-in" {
-		util.ErrorHandler(w, "Page not found", http.StatusNotFound)
+		log.Println("Path not found", r.URL.Path)
+		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
 
 	if r.Method == http.MethodPost {
 		email := r.FormValue("email")
-		user, err := repositories.GetUserByEmail(email)
-		if err != nil {
-			util.ErrorHandler(w, "Error fetching user", http.StatusForbidden)
-			log.Println("Error fetching user", err)
-			return
+		if isValidEmail(email) {
+			user, err = repositories.GetUserByEmail(email)
+			if err != nil {
+				log.Println("Error fetching user", err)
+				util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+				return
+			}
+		} else {
+			user, err = repositories.GetUserByName(email)
+			if err != nil {
+				log.Println("Error fetching user", err)
+				util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+				return
+			}
 		}
 
 		// decrypt password & authorize user
@@ -37,7 +48,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(r.FormValue("password")))
 		if err != nil {
 			log.Printf("Failed to hash: %v", err)
-			// util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
 			w.Header().Set("Content-Type", "application/json")
 			response := Response{Success: false}
 			json.NewEncoder(w).Encode(response)
@@ -49,7 +59,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		err = repositories.DeleteSessionByUser(user.ID)
 		if err != nil {
 			log.Printf("Failed to delete session token: %v", err)
-			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
@@ -63,7 +73,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		err = repositories.StoreSession(user.ID, sessionToken, expiryTime)
 		if err != nil {
 			log.Printf("Failed to store session token: %v", err)
-			util.ErrorHandler(w, "Internal server error", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
@@ -72,56 +82,16 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == http.MethodGet {
 		tmpl, err := template.ParseFiles("frontend/templates/sign-in.html")
 		if err != nil {
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Println("Error parsing sign in template:", err)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+			return
 		}
 
 		tmpl.Execute(w, nil)
 
 	} else {
+		log.Println("Method not allowed", r.Method)
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
 	}
-}
-
-func createSession() string {
-	sessionID := uuid.Must(uuid.NewV4()).String()
-	SessionStore[sessionID] = make(map[string]interface{})
-	return sessionID
-}
-
-func setSessionCookie(w http.ResponseWriter, sessionID string) {
-	cookie := &http.Cookie{
-		Name:     "session_token",
-		Value:    sessionID,
-		Path:     "/",
-		Expires:  time.Now().UTC().Add(24 * time.Hour),
-		HttpOnly: true,
-		Secure:   true,
-	}
-	http.SetCookie(w, cookie)
-}
-
-func getSessionID(r *http.Request) (string, error) {
-	cookie, err := r.Cookie("session_token")
-	if err != nil {
-		return "", err
-	}
-	return cookie.Value, nil
-}
-
-func getSessionData(sessionID string) (map[string]interface{}, error) {
-	sessionData, exists := SessionStore[sessionID]
-	if !exists {
-		return nil, fmt.Errorf("session not found")
-	}
-	return sessionData, nil
-}
-
-func setSessionData(sessionID string, key string, value interface{}) {
-	SessionStore[sessionID][key] = value
-}
-
-func EnableCors(w http.ResponseWriter) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:9000")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 }

@@ -2,36 +2,34 @@ package middleware
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/jesee-kuya/forum/backend/repositories"
-	"github.com/jesee-kuya/forum/backend/util"
 )
 
-// validates the session token and sets the user in the context
-func SessionMiddleware(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		sessionID, err := getSessionID(r)
+type contextSession string
+
+var newSession contextSession = "userId"
+
+// Authenticate middleware to check session token
+func Authenticate(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("session_token")
 		if err != nil {
-			util.ErrorHandler(w, "Unauthorized", http.StatusUnauthorized)
+			log.Println("NO session token", err)
+			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
 
-		userID, err := repositories.ValidateSession(sessionID)
+		userID, err := repositories.ValidateSession(cookie.Value)
 		if err != nil {
-			util.ErrorHandler(w, "Unauthorized", http.StatusUnauthorized)
+			log.Printf("Invalid session token: %v", err)
+			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "userID", userID)
+		ctx := context.WithValue(r.Context(), newSession, userID)
 		next.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
-
-func getSessionID(r *http.Request) (string, error) {
-	cookie, err := r.Cookie("session_token")
-	if err != nil {
-		return "", err
 	}
-	return cookie.Value, nil
 }

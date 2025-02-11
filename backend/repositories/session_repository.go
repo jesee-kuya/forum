@@ -62,7 +62,7 @@ func DeleteSessionByUser(userId int) error {
 }
 
 // GetSessionByUserEmail fetches the session token associated with a given user email.
-func GetSessionByUserEmail(user_id int) (string, error) {
+func GetSessionByUserId(user_id int) (string, error) {
 	var sessionToken string
 
 	query := "SELECT session_token FROM tblSessions WHERE user_id = ?"
