@@ -35,6 +35,11 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	userId := sessionData["userId"].(int)
 	comment := r.FormValue("comment")
+	if comment == "" {
+		log.Println("Empty comment")
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		return
+	}
 
 	repositories.InsertRecord(util.DB, "tblPosts", []string{"user_id", "body", "parent_id", "post_title"}, userId, comment, id, "comment")
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
