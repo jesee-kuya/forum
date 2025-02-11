@@ -99,13 +99,13 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	cookie, err := getSessionID(r)
 	if err != nil {
 		log.Println("Invalid Session")
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 		return
 	}
 	sessionData, err := getSessionData(cookie)
 	if err != nil {
 		log.Println("Invalid Session")
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 		return
 	}
 

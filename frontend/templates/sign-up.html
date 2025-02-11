@@ -3,66 +3,89 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="pragma" content="no-cache" />
 
     <link rel="stylesheet" href="/frontend/static/css/style.css" />
     <link rel="stylesheet" href="/frontend/static/css/sign-up.css" />
     <script defer src="/frontend/static/js/script.js"></script>
     <script defer src="/frontend/static/js/signup_validation.js"></script>
 
-    <title>Sign up</title>
+    <title>Sign Up</title>
   </head>
-
   <body>
     <header>
       <nav class="navbar">
-        <div class="logo">
-          <a href="/">Forum</a>
-        </div>
+        <div class="logo"><a href="/">Forum</a></div>
+        <div class="theme-toggler">
+          <span class="tooltip-text">Toggle Mode</span>
 
-        <div class="right-container">
-          <div class="theme-toggler">
-            <img
-              class="web-icon moon"
-              src="/frontend/static/assets/moon-regular.svg"
-              alt="Moon Icon"
-            />
-            <img
-              class="web-icon sunny"
-              src="/frontend/static/assets/sun-regular.svg"
-              alt="Sunny Icon"
-            />
-          </div>
+          <img
+            style="
+              height: 25px;
+              width: 1.2rem;
+              filter: invert(17%) sepia(27%) saturate(7051%) hue-rotate(205deg)
+                brightness(90%) contrast(99%);
+            "
+            class="moon"
+            src="/frontend/static/assets/moon-regular.svg"
+            alt="Moon Icon"
+          />
+          <img
+            style="
+              height: 25px;
+              width: 1.2rem;
+              filter: invert(100%) sepia(3%) saturate(2485%) hue-rotate(188deg)
+                brightness(112%) contrast(95%);
+            "
+            class="sunny"
+            src="/frontend/static/assets/sun-regular.svg"
+            alt="Sunny Icon"
+          />
         </div>
       </nav>
     </header>
 
-    <div class="signup-container">
-      <p class="error-message">Invalid credentials. Try again!</p>
-      <h1>Sign Up</h1>
-      <form
-        id="signup-form"
-        method="post"
-        enctype="application/x-www-form-urlencoded"
-      >
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" id="username" name="username" required />
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required />
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" required />
-        </div>
-        <button type="submit" class="signup-button" action="submit">
-          Create Account
-        </button>
-      </form>
-      <div class="signup-footer">
-        Already have an account? <a href="/sign-in">Sign In</a>
+    <main>
+      <p class="success-message" id="success-message">Sign Up Successful!</p>
+      <div class="form-container">
+        <h2>Sign Up</h2>
+        <form action="/sign-up" method="POST" id="signup-form">
+          <div class="input-group">
+            <label for="name">Username</label>
+            <input type="text" id="username" name="username" required />
+          </div>
+
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div class="password">
+            <div class="input-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" required />
+            </div>
+
+            <div class="input-group">
+              <label for="confirmed-password">Confirm Password</label>
+              <input
+                type="password"
+                id="confirmed-password"
+                name="confirmed-password"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="line"></div>
+          <button type="submit" class="sign-up-btn btn">Create Account</button>
+        </form>
+        <p class="switch-form">
+          Already have an account? <a href="/sign-in">Sign In</a>
+        </p>
       </div>
-    </div>
+    </main>
   </body>
 </html>
