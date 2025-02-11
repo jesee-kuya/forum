@@ -49,3 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// Password toggle
+document.querySelectorAll('.toggle-password').forEach((button) => {
+  button.addEventListener('click', () => {
+    const input = document.getElementById(button.dataset.target);
+    if (input.type === 'password') {
+      input.type = 'text';
+    } else {
+      input.type = 'password';
+    }
+  });
+});
