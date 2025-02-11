@@ -102,4 +102,44 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
     }
   });
+
+  const popup = document.getElementById('message-popup');
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const signUpFormData = new URLSearchParams(new FormData(signupForm));
+    console.log(Object.fromEntries(signUpFormData));
+
+    try {
+      const response = await fetch('/sign-up', {
+        method: 'POST',
+        body: signUpFormData,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showMessage('Sign Up Successful!', true);
+        setTimeout(() => {
+          window.location.href = '/sign-in';
+        }, 1000);
+      } else {
+        showMessage('Sign Up Failed. Please check your input.', false);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showMessage('An error occurred. Try again later.', false);
+    }
+  });
+
+  function showMessage(message, isSuccess) {
+    popup.textContent = message;
+    popup.classList.add('show');
+
+    setTimeout(() => {
+      popup.classList.remove('show');
+    }, 3000);
+  }
 });
