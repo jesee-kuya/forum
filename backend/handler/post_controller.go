@@ -99,13 +99,14 @@ func FilterPosts(w http.ResponseWriter, r *http.Request) {
 	if len(categories) != 0 {
 		posts, err := repositories.FilterPostsByCategories(util.DB, categories)
 		if err != nil {
-			log.Println("error filtering posts:",err)
+			log.Println("error filtering posts:", err)
 			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
-		_, err = getSessionID(r)
-		if err == nil {
+		cookie, _ := getSessionID(r)
+		_, ok := SessionStore[cookie]
+		if ok {
 			logged = true
 		}
 
