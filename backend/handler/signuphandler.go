@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"reflect"
 	"strings"
 	"text/template"
 
@@ -30,10 +31,19 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		user.Username = strings.TrimSpace(r.PostFormValue("username"))
 		user.Email = strings.TrimSpace(r.PostFormValue("email"))
 		user.Password = strings.TrimSpace(r.PostFormValue("password"))
+		user.ConfirmedPassword = strings.TrimSpace(r.PostFormValue("confirmed-password"))
 
 		err = util.ValidateFormFields(user.Username, user.Email, user.Password)
 		if err != nil {
 			log.Printf("Invalid form values from user: %v\n", err)
+			response := Response{Success: false}
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+			return
+		}
+
+		if !reflect.DeepEqual(user.Password, user.ConfirmedPassword) {
+			log.Printf("User password %q and confirmed password %q do not match.\n", user.Password, user.ConfirmedPassword)
 			response := Response{Success: false}
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
