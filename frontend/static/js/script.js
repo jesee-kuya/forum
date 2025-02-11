@@ -36,7 +36,7 @@ document.querySelectorAll('.comment-button').forEach((button) => {
 document.addEventListener('DOMContentLoaded', () => {
   const createPostSection = document.querySelector('.create-post');
   const createPostBtn = document.querySelector('.floating-create-post-btn');
-  const postsContainer = document.querySelector('main.posts'); // Target the scrollable container
+  const postsContainer = document.querySelector('main.posts');
 
   createPostBtn.addEventListener('click', () => {
     createPostSection.classList.toggle('hidden');
@@ -46,11 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
         top: 0,
         behavior: 'smooth',
       });
+    }
+  });
+});
+
+// Password toggle
+document.querySelectorAll('.toggle-password').forEach((button) => {
+  button.addEventListener('click', () => {
+    const input = document.getElementById(button.dataset.target);
+    if (input.type === 'password') {
+      input.type = 'text';
     } else {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      });
+      input.type = 'password';
     }
   });
 });

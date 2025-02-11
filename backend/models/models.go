@@ -8,11 +8,12 @@ import (
 
 // User model
 type User struct {
-	ID       int       `json:"id"`
-	Username string    `json:"username"`
-	Email    string    `json:"email"`
-	Password string    `json:"password"`
-	JoinedOn time.Time `json:"joined_on"`
+	ID                int       `json:"id"`
+	Username          string    `json:"username"`
+	Email             string    `json:"email"`
+	Password          string    `json:"password"`
+	ConfirmedPassword string    `json:"confirmed-password"`
+	JoinedOn          time.Time `json:"joined_on"`
 }
 
 // Post model

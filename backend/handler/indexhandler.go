@@ -13,16 +13,19 @@ type RequestData struct {
 }
 
 type Response struct {
-	Success bool `json:"success"`
+	Success bool   `json:"success"`
+	Message string `json:"message"`
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/home" {
+		log.Println("path not found", r.URL.Path)
 		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
 
 	if r.Method != http.MethodGet {
+		log.Println("wrong method used", r.Method)
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
@@ -50,7 +53,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	posts, err := repositories.GetPosts(util.DB)
 	if err != nil {
 		log.Printf("Failed to get posts: %v", err)
-		util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 	PostDetails(w, r, posts, true)

@@ -2,9 +2,9 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
+	"reflect"
 	"strings"
 	"text/template"
 
@@ -16,23 +16,22 @@ import (
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	if r.URL.Path != "/sign-up" {
-		util.ErrorHandler(w, "Page Not Found", http.StatusNotFound)
+		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
 
 	if r.Method == http.MethodPost {
-		fmt.Println("OK: ", http.StatusOK)
-
 		err := r.ParseForm()
 		if err != nil {
 			log.Printf("Failed parsing form: %v\n", err)
-			util.ErrorHandler(w, "Failed parsing form", http.StatusInternalServerError)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
-		user.Username = strings.TrimSpace(r.PostFormValue("username"))
-		user.Email = strings.TrimSpace(r.PostFormValue("email"))
-		user.Password = strings.TrimSpace(r.PostFormValue("password"))
+		user.Username = strings.TrimSpace(r.FormValue("username"))
+		user.Email = strings.TrimSpace(r.FormValue("email"))
+		user.Password = strings.TrimSpace(r.FormValue("password"))
+		user.ConfirmedPassword = strings.TrimSpace(r.FormValue("confirmed-password"))
 
 		err = util.ValidateFormFields(user.Username, user.Email, user.Password)
 		if err != nil {
@@ -43,10 +42,18 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if !reflect.DeepEqual(user.Password, user.ConfirmedPassword) {
+			log.Printf("User password %q and confirmed password %q do not match.\n", user.Password, user.ConfirmedPassword)
+			response := Response{Success: false}
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+			return
+		}
+
 		hashed, err := util.PasswordEncrypt([]byte(user.Password), 10)
 		if err != nil {
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
 			log.Printf("Failed encrypting password: %v\n", err)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 
@@ -56,16 +63,21 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
+		response := Response{Success: true}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 		return
 	} else if r.Method == http.MethodGet {
 		tmpl, err := template.ParseFiles("frontend/templates/sign-up.html")
 		if err != nil {
-			util.ErrorHandler(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Println("failed parsing files:", err)
+			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 			return
 		}
 		tmpl.Execute(w, nil)
 	} else {
+		log.Println("Method not allowed", r.Method)
 		util.ErrorHandler(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}

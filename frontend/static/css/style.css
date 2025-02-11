@@ -473,7 +473,6 @@ body.dark-theme .post p {
   color: var(--dark-text-color);
   padding: 0.25rem 0.5rem;
   margin: 0.5rem 0;
-  font-weight: 500;
   border-radius: 8px;
 }
 
@@ -481,12 +480,11 @@ body.dark-theme .post p {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 body.dark-theme .post-actions span,
-body.dark-theme .comment-actions span
- {
+body.dark-theme .comment-actions span {
   color: #f9f9f9;
 }
 
@@ -599,7 +597,7 @@ body.dark-theme .logout-button:hover {
   background-color: #f9f9f9;
   border-radius: 8px;
   border: 1px solid #ddd;
-  display: none;
+  /* display: none; */
   transition: var(--transition);
 }
 
@@ -734,4 +732,30 @@ body.dark-theme .comment-box {
 
 .filter-form .sidebar-links button {
   background-color: var(--secondary-color);
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  flex: 1;
+  padding-right: 2.5rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 5px;
+  top: 10px;
+  padding: 5px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.toggle-password box-icon {
+  fill: var(--primary-color);
+  font-size: 1rem;
 }
