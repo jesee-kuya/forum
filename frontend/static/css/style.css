@@ -484,8 +484,7 @@ body.dark-theme .post p {
 }
 
 body.dark-theme .post-actions span,
-body.dark-theme .comment-actions span
- {
+body.dark-theme .comment-actions span {
   color: #f9f9f9;
 }
 
@@ -733,4 +732,30 @@ body.dark-theme .comment-box {
 
 .filter-form .sidebar-links button {
   background-color: var(--secondary-color);
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  flex: 1;
+  padding-right: 2.5rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 5px;
+  top: 10px;
+  padding: 5px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.toggle-password box-icon {
+  fill: var(--primary-color);
+  font-size: 1rem;
 }
