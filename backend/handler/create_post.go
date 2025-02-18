@@ -138,10 +138,22 @@ ValidateMimeType is used to check the MIME type of an uploaded file. It returns 
 */
 func ValidateMimeType(file multipart.File) (string, error) {
 	allowedMIMEs := map[string]string{
-		"image/jpeg": ".jpg",
-		"image/png":  ".png",
-		"image/gif":  ".gif",
-		"image/webp": ".webp",
+		"image/jpeg":    ".jpg",
+		"image/jpg":     ".jpg",
+		"image/jfif":    ".jjif",
+		"image/pjpeg":   ".pjpeg",
+		"image/pjp":     ".pjp",
+		"image/png":     ".png",
+		"image/gif":     ".gif",
+		"image/webp":    ".webp",
+		"image/svg+xml": ".svg",
+		"image/bmp":     ".bmp",
+		"image/avif":    ".avif",
+		"image/x-ico":   ".ico",
+		"image/cur":     ".cur",
+		"image/tiff":    ".tiff",
+		"image/tif":     ".tif",
+		"image/apng":    ".apng",
 	}
 
 	buffer := make([]byte, 512)
