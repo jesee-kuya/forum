@@ -63,7 +63,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		fileExt, err := ValidateMimeType(file)
 		if err != nil {
 			log.Println("Invalid extension associated with file:", err)
-			util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
+			util.ErrorHandler(w, "Invalid extension associated with file", http.StatusBadRequest)
 			return
 		}
 
