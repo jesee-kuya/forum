@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"html"
 	"log"
 	"net/http"
 
@@ -35,6 +36,7 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.FormValue("id")
 	userId := sessionData["userId"].(int)
 	comment := r.FormValue("comment")
+	comment = html.EscapeString(comment)
 	if comment == "" {
 		log.Println("Empty comment")
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
