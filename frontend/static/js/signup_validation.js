@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (error) {
       console.error('Error:', error);
-      showMessage('An error occurred. Try again later.', false);
+      showMessage('Sign Up Failed. Please check your input.', false);
     }
   });
 

@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     } catch (error) {
       console.error('Error:', error);
-      showMessage('An error occurred. Try again later.', false);
+      showMessage('Sign In Failed. Please check your input.', false);
     }
   });
 
