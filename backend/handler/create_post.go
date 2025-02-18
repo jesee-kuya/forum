@@ -13,7 +13,7 @@ import (
 )
 
 /*
-UploadMedia handler function is responsible for performing server operations to enable media upload with a file size limit of up to 25 mbs.
+UploadMedia handler function is responsible for performing server operations to enable media upload with a file size limit of up to 20 megabytes.
 */
 func CreatePost(w http.ResponseWriter, r *http.Request) {
 	var url string
@@ -30,15 +30,15 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse the multipart form with a 25MB limit
-	err := r.ParseMultipartForm(25 << 20)
+	// Parse the multipart form with a 20MB limit
+	err := r.ParseMultipartForm(20 << 20)
 	if err != nil {
 		log.Println("Failed parsing multipart form:", err)
 		util.ErrorHandler(w, "An Unexpected Error Occurred. Try Again Later", http.StatusInternalServerError)
 		return
 	}
 
-	file, handler, err := r.FormFile("uploaded-file")
+	file, header, err := r.FormFile("uploaded-file")
 	if err != nil {
 		if err.Error() == "http: no such file" {
 			log.Println("No file uploaded, continuing process.")
@@ -52,7 +52,11 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	if file != nil {
 		defer file.Close()
 
-		log.Printf("Success in uploading %q, content type %v.\n", handler.Filename, handler.Header)
+		if header.Size > 20<<20 {
+			log.Println("File size exceeds 20MB limit")
+			util.ErrorHandler(w, "The uploaded file is too large. Please upload a file less than 20MB.", http.StatusBadRequest)
+			return
+		}
 
 		// Validate MIME type and get the file extension
 		fileExt, err := ValidateMimeType(file)
