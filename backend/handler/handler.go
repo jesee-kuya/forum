@@ -10,7 +10,6 @@ import (
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		log.Println("path not found", r.URL.Path)
 		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}

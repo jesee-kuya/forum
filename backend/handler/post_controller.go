@@ -75,7 +75,6 @@ func GetAllPostsAPI(db *sql.DB) http.HandlerFunc {
 func FilterPosts(w http.ResponseWriter, r *http.Request) {
 	logged := false
 	if r.URL.Path != "/filter" {
-		log.Println("Path not found", r.URL.Path)
 		util.ErrorHandler(w, "Page does not exist", http.StatusNotFound)
 		return
 	}
