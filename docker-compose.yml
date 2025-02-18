@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 version: '3.4'
 
 services:
@@ -9,30 +8,3 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 9000:9001
-=======
-version: "3.8"
-
-services:
-  forum-app:
-    image: forum
-    build:
-      context: .
-    container_name: forum-server
-    hostname: forum-server
-    networks:
-      - mynet
-    ports:
-      - 9000:9000
-    volumes:
-      - forum-data:/app/data
-    deploy:
-      restart_policy:
-        condition: on-failure
-
-volumes:
-  forum-data:
-
-networks:
-  mynet:
-    driver: bridge
->>>>>>> main
