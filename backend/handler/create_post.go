@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"html"
 	"io"
 	"log"
 	"mime/multipart"
@@ -113,7 +114,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "media_url", "user_id"}, r.FormValue("post-title"), r.FormValue("post-content"), url, sessionData["userId"].(int))
+	id, err := repositories.InsertRecord(util.DB, "tblPosts", []string{"post_title", "body", "media_url", "user_id"}, html.EscapeString(r.FormValue("post-title")), html.EscapeString(r.FormValue("post-content")), url, sessionData["userId"].(int))
 	if err != nil {
 		log.Println("failed to add post", err)
 		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)

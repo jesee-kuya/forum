@@ -58,3 +58,20 @@ func isValidEmail(email string) bool {
 	re := regexp.MustCompile(emailRegex)
 	return re.MatchString(email)
 }
+
+func deleteSession(userId int) {
+	if len(SessionStore) == 0 {
+		return
+	}
+	for k := range SessionStore {
+		sessionData, _ := getSessionData(k)
+		if len(sessionData) == 0 {
+			continue
+		}
+		id := sessionData["userId"].(int)
+		if id == userId {
+			delete(SessionStore, k)
+			return
+		}
+	}
+}

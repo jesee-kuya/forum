@@ -55,6 +55,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		sessionToken := createSession()
 
+		if user.ID != 0 {
+			deleteSession(user.ID)
+		}
 		err = repositories.DeleteSessionByUser(user.ID)
 		if err != nil {
 			log.Printf("Failed to delete session token: %v", err)
