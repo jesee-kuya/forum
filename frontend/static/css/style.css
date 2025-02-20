@@ -759,3 +759,42 @@ body.dark-theme .comment-box {
   fill: var(--primary-color);
   font-size: 1rem;
 }
+
+.oauth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.oauth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color var(--transition);
+}
+
+.oauth-btn.google-btn {
+  background-color: #4285f4;
+  color: white;
+}
+
+.oauth-btn.github-btn {
+  background-color: #333;
+  color: white;
+}
+
+.oauth-btn:hover {
+  opacity: 0.9;
+}
+
+.oauth-btn img {
+  width: 20px;
+  height: 20px;
+}
