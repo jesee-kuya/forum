@@ -762,7 +762,7 @@ body.dark-theme .comment-box {
 
 .oauth-buttons {
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   gap: 10px;
   margin-top: 20px;
 }
@@ -771,6 +771,7 @@ body.dark-theme .comment-box {
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: left;
   gap: 10px;
   padding: 10px;
   border: none;
