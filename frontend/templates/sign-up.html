@@ -100,6 +100,30 @@
           <div class="line"></div>
           <button type="submit" class="sign-up-btn btn">Create Account</button>
         </form>
+
+        <p>or</p>
+
+        <div class="oauth-buttons">
+          <button
+            type="button"
+            class="oauth-btn google-btn"
+            onclick="window.location.href='/auth/google'"
+          >
+            <box-icon type="logo" name="google"></box-icon>
+            Sign up with Google
+          </button>
+          <button
+            type="button"
+            class="oauth-btn github-btn"
+            onclick="window.location.href='/auth/github'"
+          >
+            <img
+              src="/frontend/static/assets/github-icon.svg"
+              alt="GitHub Icon"
+            />
+            Sign up with GitHub
+          </button>
+        </div>
         <p class="switch-form">
           Already have an account? <a href="/sign-in">Sign In</a>
         </p>
