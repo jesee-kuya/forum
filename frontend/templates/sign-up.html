@@ -101,7 +101,9 @@
           <button type="submit" class="sign-up-btn btn">Create Account</button>
         </form>
 
-        <p>or</p>
+        <br />
+
+        <p style="font-weight: 600; color: var(--primary-color)">or</p>
 
         <div class="oauth-buttons">
           <button
@@ -109,19 +111,16 @@
             class="oauth-btn google-btn"
             onclick="window.location.href='/auth/google'"
           >
-            <box-icon type="logo" name="google"></box-icon>
-            Sign up with Google
+            <box-icon style="fill: white" type="logo" name="google"></box-icon>
+            Sign Up With Google
           </button>
           <button
             type="button"
             class="oauth-btn github-btn"
             onclick="window.location.href='/auth/github'"
           >
-            <img
-              src="/frontend/static/assets/github-icon.svg"
-              alt="GitHub Icon"
-            />
-            Sign up with GitHub
+            <box-icon style="fill: white" type="logo" name="github"></box-icon>
+            Sign Up With GitHub
           </button>
         </div>
         <p class="switch-form">
