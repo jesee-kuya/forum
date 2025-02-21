@@ -34,7 +34,7 @@ body.dark-theme .theme-toggler span {
 }
 
 .form-container {
-  width: 400px;
+  width: 500px;
   background-color: var(--text-color);
   padding: 1rem 2rem;
   border-radius: 0.75rem;
@@ -146,6 +146,7 @@ body.dark-theme input {
   /* transition: background-color var(--transition); */
 }
 
+.switch-form a,
 body.dark-theme .switch-form a {
-  color: var(--utility-color);
+  color: var(--primary-color);
 }
