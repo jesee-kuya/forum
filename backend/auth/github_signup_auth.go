@@ -7,11 +7,6 @@ const (
 	GithubEmailsURL = "https://api.github.com/user/emails"
 )
 
-var (
-	GithubClientID     = "GITHUB_CLIENT_ID"
-	GithubClientSecret = "GITHUB_CLIENT_SECRET"
-)
-
 type GitHubUser struct {
 	Login, Email string
 }
