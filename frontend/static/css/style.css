@@ -680,6 +680,7 @@ body.dark-theme .comment p {
   border-radius: 4px;
   outline: none;
   font-size: 1rem;
+  transition: var(--transition);
 }
 
 body.dark-theme .comment-box {
