@@ -369,6 +369,35 @@ body.dark-theme .create-post form label {
   background-color: var(--secondary-color);
 }
 
+.floating-create-post-btn-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.floating-create-post-btn-container p {
+  position: absolute;
+  right: 100%;
+  top: -35px;
+  margin-right: 60px;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.floating-create-post-btn-container:hover p {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 .floating-create-post-btn {
   position: fixed;
   bottom: 20px;
@@ -384,7 +413,6 @@ body.dark-theme .create-post form label {
   font-size: 1.5rem;
   cursor: pointer;
   box-shadow: var(--light-box-shadow);
-  transition: transform 0.3s ease-in-out;
 }
 
 .floating-create-post-btn img {
@@ -396,10 +424,6 @@ body.dark-theme .create-post form label {
 
 body.dark-theme .floating-create-post-btn {
   box-shadow: var(--dark-box-shadow);
-}
-
-.floating-create-post-btn:hover {
-  transform: scale(1.1);
 }
 
 .floating-create-post-btn i {

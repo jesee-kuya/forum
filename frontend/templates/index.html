@@ -199,13 +199,18 @@
         </form>
       </section>
 
-      <button class="floating-create-post-btn">
-        <img
-          class="web-icon"
-          src="/frontend/static/assets/plus-solid.svg"
-          alt="create-post"
-        />
-      </button>
+      <div class="floating-create-post-btn-container">
+        <p>Create a Post</p>
+        
+
+        <button class="floating-create-post-btn">
+          <img
+            class="web-icon"
+            src="/frontend/static/assets/plus-solid.svg"
+            alt="create-post"
+          />
+        </button>
+      </div>
 
       {{ range .Posts}}
       <article class="post">
