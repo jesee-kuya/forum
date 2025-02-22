@@ -8,7 +8,10 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 
+	"github.com/jesee-kuya/forum/backend/handler"
+	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
 )
 
@@ -74,8 +77,37 @@ func GoogleSignInCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	setSessionCookie(w, userID)
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	sessionToken := handler.CreateSession()
+
+	// Delete any existing sessions for this user
+	if userID != 0 {
+		handler.DeleteSession(userID)
+	}
+	err = repositories.DeleteSessionByUser(userID)
+	if err != nil {
+		log.Printf("Failed to delete session token: %v", err)
+		http.Redirect(w, r, "/sign-in?error=session_error", http.StatusTemporaryRedirect)
+		return
+	}
+
+	// Enable CORS
+	handler.EnableCors(w)
+
+	// Set session cookie and data
+	handler.SetSessionCookie(w, sessionToken)
+	handler.SetSessionData(sessionToken, "userId", userID)
+	handler.SetSessionData(sessionToken, "userEmail", user.Email)
+
+	// Store session with expiry time
+	expiryTime := time.Now().Add(24 * time.Hour)
+	err = repositories.StoreSession(userID, sessionToken, expiryTime)
+	if err != nil {
+		log.Printf("Failed to store session token: %v", err)
+		http.Redirect(w, r, "/sign-in?error=session_error", http.StatusTemporaryRedirect)
+		return
+	}
+
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
 /*
