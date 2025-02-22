@@ -21,7 +21,7 @@ func GoogleSignIn(w http.ResponseWriter, r *http.Request) {
 	redirectURL := fmt.Sprintf(
 		"%s?client_id=%s&redirect_uri=%s&response_type=code&scope=openid email profile&state=%s&prompt=select_account&access_type=offline",
 		GoogleAuthURL,
-		GoogleClientID,
+		util.GoogleClientID,
 		url.QueryEscape("http://localhost:9000/auth/google/signin/callback"),
 		state,
 	)
@@ -84,8 +84,8 @@ exchangeGoogleTokenSignIn exchanges the authorization code for an access token f
 func exchangeGoogleTokenSignIn(code string) (string, error) {
 	data := url.Values{
 		"code":          {code},
-		"client_id":     {GoogleClientID},
-		"client_secret": {GoogleClientSecret},
+		"client_id":     {util.GoogleClientID},
+		"client_secret": {util.GoogleClientSecret},
 		"redirect_uri":  {"http://localhost:9000/auth/google/signin/callback"},
 		"grant_type":    {"authorization_code"},
 	}
