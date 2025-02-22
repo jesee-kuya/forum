@@ -37,9 +37,9 @@ func InitRoutes() *http.ServeMux {
 	r.HandleFunc("/auth/google/signin", auth.GoogleSignIn)
 	r.HandleFunc("/auth/google/signin/callback", auth.GoogleSignInCallback)
 
-	// r.HandleFunc("/auth/github", auth.GitHubSignUp)
-	// r.HandleFunc("/auth/github/callback", auth.GitHubCallback)
-	// r.HandleFunc("/auth/google/signin", GitHubSignIn)
-	// r.HandleFunc("/auth/google/signin/callback", GitHubSignInCallback)
+	r.HandleFunc("/auth/github", auth.GitHubSignUp)
+	r.HandleFunc("/auth/github/callback", auth.GitHubCallback)
+	r.HandleFunc("/auth/google/signin", auth.GitHubSignIn)
+	r.HandleFunc("/auth/google/signin/callback", auth.GitHubSignInCallback)
 	return r
 }
