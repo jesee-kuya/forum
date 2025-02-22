@@ -22,7 +22,6 @@ func generateStateCookie(w http.ResponseWriter) string {
 	}
 
 	state := base64.URLEncoding.EncodeToString(b)
-	log.Printf("setting state cookie with value: %s", state)
 
 	// Set the cookie
 	http.SetCookie(w, &http.Cookie{
@@ -49,7 +48,6 @@ func handleUserAuth(w http.ResponseWriter, email, username string) bool {
 
 	// Create a new user if not found in db
 	if errors.Is(err, sql.ErrNoRows) {
-		log.Printf("Creating new user with email: %s", email)
 		res, err := util.DB.Exec(
 			"INSERT INTO tblUsers(username, email) VALUES(?, ?)",
 			username, email,
@@ -60,7 +58,6 @@ func handleUserAuth(w http.ResponseWriter, email, username string) bool {
 		}
 		id, _ := res.LastInsertId()
 		userID = int(id)
-		log.Printf("New user created with ID: %d", userID)
 	} else if err != nil {
 		log.Printf("Database error: %v", err)
 		return false
@@ -103,8 +100,6 @@ func validateState(r *http.Request) error {
 		log.Printf("Cookie error: %v", err)
 		return err
 	}
-
-	log.Printf("State from URL: %s, State from cookie: %s", state, cookie.Value)
 
 	// Check if the two states match
 	if cookie.Value != state {
