@@ -64,12 +64,12 @@ func handleUserAuth(w http.ResponseWriter, email, username string) bool {
 	}
 
 	// Set the session cookie for the user
-	setSessionCookie(w, userID)
+	SetSessionCookie(w, userID)
 	return true
 }
 
-// setSessionCookie sets a session cookie for the given user ID.
-func setSessionCookie(w http.ResponseWriter, userID int) {
+// SetSessionCookie sets a session cookie for the given user ID.
+func SetSessionCookie(w http.ResponseWriter, userID int) {
 	token := generateSessionToken()
 	_, err := util.DB.Exec(
 		"INSERT INTO tblSessions(user_id, session_token) VALUES(?, ?)",
