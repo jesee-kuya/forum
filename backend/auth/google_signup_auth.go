@@ -6,18 +6,14 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
+
+	"github.com/jesee-kuya/forum/backend/util"
 )
 
 const (
 	GoogleAuthURL  = "https://accounts.google.com/o/oauth2/v2/auth"
 	GoogleTokenURL = "https://oauth2.googleapis.com/token"
 	GoogleUserInfo = "https://www.googleapis.com/oauth2/v3/userinfo"
-)
-
-var (
-	GoogleClientID     = os.Getenv("GOOGLE_CLIENT_ID")
-	GoogleClientSecret = os.Getenv("GOOGLE_CLIENT_SECRET")
 )
 
 type GoogleUser struct {
@@ -33,7 +29,7 @@ func GoogleSignUp(w http.ResponseWriter, r *http.Request) {
 	redirectURL := fmt.Sprintf(
 		"%s?client_id=%s&redirect_uri=%s&response_type=code&scope=openid email profile&state=%s&prompt=select_account&access_type=offline",
 		GoogleAuthURL,
-		GoogleClientID,
+		util.GoogleClientID,
 		url.QueryEscape("http://localhost:9000/auth/google/callback"),
 		state,
 	)
@@ -83,8 +79,8 @@ func exchangeGoogleToken(code string) (string, error) {
 	// Prepare the data for the token exchange request
 	data := url.Values{
 		"code":          {code},
-		"client_id":     {GoogleClientID},
-		"client_secret": {GoogleClientSecret},
+		"client_id":     {util.GoogleClientID},
+		"client_secret": {util.GoogleClientSecret},
 		"redirect_uri":  {"http://localhost:9000/auth/google/callback"},
 		"grant_type":    {"authorization_code"},
 	}
