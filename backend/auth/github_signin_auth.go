@@ -17,7 +17,7 @@ func GitHubSignIn(w http.ResponseWriter, r *http.Request) {
 		"redirect_uri": {RedirectBaseURL + "/auth/github/callback"},
 		"scope":        {"user:email"},
 		"state":        {state},
-		"prompt":       {"consent select_account"},
+		"prompt":       {"consent"},
 	}
 
 	redirectURL := fmt.Sprintf("%s?%s", GithubAuthURL, params.Encode())
