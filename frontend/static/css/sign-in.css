@@ -134,6 +134,14 @@ body.dark-theme input {
   opacity: 1;
 }
 
+.message-popup.success {
+  background-color: #4caf50 !important;
+}
+
+.message-popup.error {
+  background-color: #f44336 !important;
+}
+
 .feedback-message {
   font-weight: 500;
   margin-top: 0.25rem;
