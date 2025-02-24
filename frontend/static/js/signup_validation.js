@@ -117,6 +117,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 3000);
   }
 
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('status') && urlParams.get('status') === 'success') {
+    showMessage('Sign Up Successful!', true);
+    history.replaceState(null, '', window.location.pathname);
+  } else if (urlParams.has('error')) {
+    showMessage(`OAuth Signup failed: ${urlParams.get('error')}`, false);
+    history.replaceState(null, '', window.location.pathname);
+  }
+
   // Attach event listeners to OAuth buttons
   document.querySelector('.google-btn').addEventListener('click', (e) => {
     e.preventDefault();
