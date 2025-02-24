@@ -88,7 +88,8 @@ func GitHubCallback(w http.ResponseWriter, r *http.Request) {
 	case "signup":
 		if handleUserAuth(w, user.Email, user.Login) {
 			log.Printf("User signup successful")
-			http.Redirect(w, r, "/sign-in", http.StatusTemporaryRedirect)
+			// http.Redirect(w, r, "/sign-in", http.StatusTemporaryRedirect)
+			http.Redirect(w, r, "/sign-in?status=success", http.StatusTemporaryRedirect)
 		} else {
 			log.Printf("User signup failed")
 			http.Redirect(w, r, "/sign-in?error=auth_failed", http.StatusTemporaryRedirect)
@@ -120,7 +121,8 @@ func GitHubCallback(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		// http.Redirect(w, r, "/home", http.StatusSeeOther)
+		http.Redirect(w, r, "/home?status=success", http.StatusSeeOther)
 
 	default:
 		http.Redirect(w, r, "/sign-in?error=invalid_flow", http.StatusTemporaryRedirect)

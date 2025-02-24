@@ -67,7 +67,8 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	// Attempt to create or authenticate the user
 	if handleUserAuth(w, user.Email, user.Name) {
 		log.Printf("User authentication successful")
-		http.Redirect(w, r, "/sign-in", http.StatusTemporaryRedirect)
+		// http.Redirect(w, r, "/sign-in", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/sign-in?status=success", http.StatusTemporaryRedirect)
 	} else {
 		log.Printf("User authentication failed")
 		http.Redirect(w, r, "/sign-in?error=auth_failed", http.StatusTemporaryRedirect)

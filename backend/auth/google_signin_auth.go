@@ -107,7 +107,8 @@ func GoogleSignInCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
+	// http.Redirect(w, r, "/home", http.StatusSeeOther)
+	http.Redirect(w, r, "/home?status=success", http.StatusSeeOther)
 }
 
 /*
