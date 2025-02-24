@@ -108,10 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Function to show messages
   function showMessage(message, isSuccess) {
     popup.textContent = message;
-    popup.classList.add('show');
+    popup.classList.remove('success', 'error');
+
+    popup.classList.add('show', isSuccess ? 'success' : 'error');
 
     setTimeout(() => {
-      popup.classList.remove('show');
+      popup.classList.remove('show', 'success', 'error');
     }, 3000);
   }
 
@@ -144,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.success) {
         showMessage('Sign Up Successful!', true);
+
         setTimeout(() => {
           window.location.href = '/sign-in';
         }, 1000);

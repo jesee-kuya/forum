@@ -4,10 +4,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function showMessage(message, isSuccess) {
     popup.textContent = message;
-    popup.classList.add('show');
+    popup.classList.remove('success', 'error');
+
+    popup.classList.add('show', isSuccess ? 'success' : 'error');
 
     setTimeout(() => {
-      popup.classList.remove('show');
+      popup.classList.remove('show', 'success', 'error');
     }, 3000);
   }
 
@@ -40,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       if (data.success) {
         showMessage('Sign In Successful!', true);
+
         setTimeout(() => {
           window.location.href = '/';
         }, 1000);
