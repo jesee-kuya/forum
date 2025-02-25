@@ -493,7 +493,7 @@ body.dark-theme .post p {
 
 .post-category span {
   font-size: 0.9rem;
-  background-color: var(--utility-color);
+  background-color: var(--secondary-color);
   color: var(--dark-text-color);
   padding: 0.25rem 0.5rem;
   margin: 0.5rem 0;
@@ -605,10 +605,6 @@ body.dark-theme .session-status {
 
 .logout-button:hover {
   background-color: var(--primary-color);
-}
-
-body.dark-theme .logout-button {
-  background-color: var(--utility-color);
 }
 
 body.dark-theme .logout-button:hover {
