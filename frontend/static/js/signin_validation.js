@@ -13,6 +13,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 3000);
   }
 
+  // Handle OAuth Result
+  async function handleOAuthResult(result) {
+    if (result.success) {
+      showMessage('Sign In Successful!', true);
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
+    } else {
+      showMessage(
+        `OAuth Sign-in failed: ${result.error || 'Unknown error'}`,
+        false
+      );
+    }
+  }
+
+  // Check URL parameters on page load
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('status') && urlParams.get('status') === 'success') {
     showMessage('Sign Up Successful!', true);
@@ -22,21 +38,30 @@ document.addEventListener('DOMContentLoaded', function () {
     history.replaceState(null, '', window.location.pathname);
   }
 
-  // Attach event listeners to OAuth buttons
-  document.querySelector('.google-btn').addEventListener('click', (e) => {
+  // Attach event listeners to OAuth buttons using popup
+  document.querySelector('.google-btn').addEventListener('click', async (e) => {
     e.preventDefault();
-    window.location.href = '/auth/google/signin';
+    try {
+      const result = await openOAuthPopup('/auth/google?flow=signin');
+      handleOAuthResult(result);
+    } catch (error) {
+      showMessage(`Error: ${error.message}`, false);
+    }
   });
 
-  document.querySelector('.github-btn').addEventListener('click', (e) => {
+  document.querySelector('.github-btn').addEventListener('click', async (e) => {
     e.preventDefault();
-    window.location.href = '/auth/github/signin';
+    try {
+      const result = await openOAuthPopup('/auth/github?flow=signin');
+      handleOAuthResult(result);
+    } catch (error) {
+      showMessage(`Error: ${error.message}`, false);
+    }
   });
 
   signinForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const signinFormData = new URLSearchParams(new FormData(signinForm));
-    console.log(Object.fromEntries(signinFormData));
 
     try {
       const response = await fetch('/sign-in', {

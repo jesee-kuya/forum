@@ -2,8 +2,10 @@ package auth
 
 import (
 	"crypto/rand"
+	"database/sql"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -28,9 +30,15 @@ type GitHubUser struct {
 	Login, Email string
 }
 
-// GitHubSignUp initiates the GitHub sign-up process by redirecting the user to GitHub's OAuth 2.0 server for authentication.
-func GitHubSignUp(w http.ResponseWriter, r *http.Request) {
-	state := generateGithubStateCookie(w, "signup")
+// GitHubAuth handles both sign-in and sign-up flows using a flow parameter
+func GitHubAuth(w http.ResponseWriter, r *http.Request) {
+	// Get the flow type from query parameter (signup or signin)
+	flow := r.URL.Query().Get("flow")
+	if flow != "signup" && flow != "signin" {
+		flow = "signup" // Default to signup if not specified
+	}
+
+	state := generateGithubStateCookie(w, flow)
 
 	params := url.Values{
 		"client_id":    {util.GithubClientID},
@@ -44,27 +52,24 @@ func GitHubSignUp(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, redirectURL, http.StatusTemporaryRedirect)
 }
 
-// GitHubCallback handles the callback from GitHub's OAuth 2.0 server after the user has granted the necessary permissions.
+// GitHubCallback handles the callback from GitHub's OAuth 2.0 server for both signup and signin
 func GitHubCallback(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("oauth_state")
 	if err != nil {
 		log.Printf("Cookie error: %v", err)
-		http.Redirect(w, r, "/sign-in?error=invalid_state", http.StatusTemporaryRedirect)
 		return
 	}
 
 	// Split the state data to get original state and flow type
 	stateParts := strings.Split(cookie.Value, ":")
 	if len(stateParts) != 2 {
-		http.Redirect(w, r, "/sign-in?error=invalid_state", http.StatusTemporaryRedirect)
 		return
 	}
-	originalState, flowType := stateParts[0], stateParts[1]
+	originalState, flow := stateParts[0], stateParts[1]
 
 	// Validate state from URL against original state
 	if r.URL.Query().Get("state") != originalState {
 		log.Printf("State mismatch")
-		http.Redirect(w, r, "/sign-in?error=invalid_state", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -72,40 +77,44 @@ func GitHubCallback(w http.ResponseWriter, r *http.Request) {
 	token, err := exchangeGitHubToken(code, "/auth/github/callback")
 	if err != nil {
 		log.Printf("Token exchange failed: %v\n", err)
-		http.Redirect(w, r, "/sign-in?error=token_exchange_failed", http.StatusTemporaryRedirect)
 		return
 	}
 
 	user, err := getGitHubUser(token)
 	if err != nil {
 		log.Printf("Failed to get user info: %v\n", err)
-		http.Redirect(w, r, "/sign-in?error=user_info_failed", http.StatusTemporaryRedirect)
 		return
 	}
 
 	// Handle based on flow type
-	switch flowType {
+	switch flow {
 	case "signup":
 		if handleUserAuth(w, user.Email, user.Login) {
 			log.Printf("User signup successful")
-			// http.Redirect(w, r, "/sign-in", http.StatusTemporaryRedirect)
-			http.Redirect(w, r, "/sign-in?status=success", http.StatusTemporaryRedirect)
 		} else {
 			log.Printf("User signup failed")
-			http.Redirect(w, r, "/sign-in?error=auth_failed", http.StatusTemporaryRedirect)
 		}
 
 	case "signin":
 		var userID int
 		err = util.DB.QueryRow("SELECT id FROM tblUsers WHERE email = ?", user.Email).Scan(&userID)
 		if err != nil {
-			http.Redirect(w, r, "/sign-up?error=no_account", http.StatusTemporaryRedirect)
+			if errors.Is(err, sql.ErrNoRows) {
+				return
+			}
+			log.Printf("Database error: %v", err)
+
 			return
 		}
 
 		sessionToken := handler.CreateSession()
 		if userID != 0 {
 			handler.DeleteSession(userID)
+		}
+		err = repositories.DeleteSessionByUser(userID)
+		if err != nil {
+			log.Printf("Failed to delete session token: %v", err)
+			return
 		}
 
 		handler.EnableCors(w)
@@ -117,15 +126,8 @@ func GitHubCallback(w http.ResponseWriter, r *http.Request) {
 		err = repositories.StoreSession(userID, sessionToken, expiryTime)
 		if err != nil {
 			log.Printf("Failed to store session token: %v", err)
-			http.Redirect(w, r, "/sign-in?error=session_error", http.StatusTemporaryRedirect)
 			return
 		}
-
-		// http.Redirect(w, r, "/home", http.StatusSeeOther)
-		http.Redirect(w, r, "/home?status=success", http.StatusSeeOther)
-
-	default:
-		http.Redirect(w, r, "/sign-in?error=invalid_flow", http.StatusTemporaryRedirect)
 	}
 }
 

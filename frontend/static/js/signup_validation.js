@@ -117,6 +117,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 3000);
   }
 
+  async function handleOAuthResult(result) {
+    if (result.success) {
+      showMessage('Sign Up Successful!', true);
+      setTimeout(() => {
+        window.location.href = '/sign-in';
+      }, 1000);
+    } else {
+      showMessage(
+        `OAuth Signup failed: ${result.error || 'Unknown error'}`,
+        false
+      );
+    }
+  }
+
+  // Check URL parameters on page load
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('status') && urlParams.get('status') === 'success') {
     showMessage('Sign Up Successful!', true);
@@ -126,15 +141,24 @@ document.addEventListener('DOMContentLoaded', () => {
     history.replaceState(null, '', window.location.pathname);
   }
 
-  // Attach event listeners to OAuth buttons
-  document.querySelector('.google-btn').addEventListener('click', (e) => {
+  document.querySelector('.google-btn').addEventListener('click', async (e) => {
     e.preventDefault();
-    window.location.href = '/auth/google';
+    try {
+      const result = await openOAuthPopup('/auth/google?flow=signup');
+      handleOAuthResult(result);
+    } catch (error) {
+      showMessage(`Error: ${error.message}`, false);
+    }
   });
 
-  document.querySelector('.github-btn').addEventListener('click', (e) => {
+  document.querySelector('.github-btn').addEventListener('click', async (e) => {
     e.preventDefault();
-    window.location.href = '/auth/github';
+    try {
+      const result = await openOAuthPopup('/auth/github?flow=signup');
+      handleOAuthResult(result);
+    } catch (error) {
+      showMessage(`Error: ${error.message}`, false);
+    }
   });
 
   // Handle regular form submission
