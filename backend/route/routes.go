@@ -3,9 +3,9 @@ package route
 import (
 	"net/http"
 
-	"github.com/jesee-kuya/forum/backend/auth"
 	"github.com/jesee-kuya/forum/backend/handler"
 	"github.com/jesee-kuya/forum/backend/middleware"
+	openauth "github.com/jesee-kuya/forum/backend/open_auth"
 )
 
 func InitRoutes() *http.ServeMux {
@@ -32,13 +32,9 @@ func InitRoutes() *http.ServeMux {
 
 	r.HandleFunc("/validate", handler.ValidateInputHandler)
 
-	r.HandleFunc("/auth/google", auth.GoogleSignUp)
-	r.HandleFunc("/auth/google/callback", auth.GoogleCallback)
-	r.HandleFunc("/auth/google/signin", auth.GoogleSignIn)
-	r.HandleFunc("/auth/google/signin/callback", auth.GoogleSignInCallback)
-
-	r.HandleFunc("/auth/github", auth.GitHubSignUp)
-	r.HandleFunc("/auth/github/signin", auth.GitHubSignIn)
-	r.HandleFunc("/auth/github/callback", auth.GitHubCallback)
+	http.HandleFunc("/auth/google", openauth.GoogleAuth)
+	http.HandleFunc("/auth/google/callback", openauth.GoogleCallback)
+	http.HandleFunc("/auth/github", openauth.GitHubAuth)
+	http.HandleFunc("/auth/github/callback", openauth.GitHubCallback)
 	return r
 }
