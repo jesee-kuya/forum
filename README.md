@@ -1,8 +1,9 @@
-# forum
+# forum-authentication
 
 This project is a web forum that allows users to communicate, share posts, comment, and interact with one another through likes/dislikes, filtering, and more.
 
 ---
+
 ## Objectives
 
 - **User Communication**:  
@@ -16,34 +17,46 @@ This project is a web forum that allows users to communicate, share posts, comme
 
 - **Filtering**:  
   Implement filtering for posts by:
+
   - Categories
   - Created posts (for the logged-in user)
   - Liked posts (for the logged-in user)
+
+- **Authentication**:  
+   A user can create an account by using the following third party services:
+  - Google
+  - GitHub
 
 ---
 
 ## Technologies Used
 
 - **Language**: Go (Golang), HTML, CSS
+
 - **Database**: SQLite
+
   - SQLite is chosen for its simplicity as an embedded database and ease of integration in web applications.
 
-- **Authentication and Session Management**:  
+- **Authentication and Session Management**:
   - User registration and login with email, username, and password.
   - Use cookies for session management with a 24-hour time period.
     - Encrypting passwords using `bcyrpt`.
     - Implementing session identifiers using `UUID`.
-- **Docker**:  
+
+- **Docker**:
   - Containerizing the application for consistent deployment and easy environment management.
 
 ---
+
 ## Authentication
 
 ### User Registration
 
 - **Input Requirements:**
   - **Email**: Must be unique. Cannot register a user if the email is already registered.
+
   - **Username**
+
   - **Password**:Encrypted when stored (uses `bcrypt` for encryption).
 
 ### Login
@@ -73,10 +86,13 @@ This project is a web forum that allows users to communicate, share posts, comme
 ---
 
 ### Filtering
+
 - **Categories:**  
   Users can filter posts by specific categories (similar to subforums).
+
 - **Created Posts:**  
   Registered users can filter posts that they have created.
+  
 - **Liked Posts:**  
   Registered users can filter posts that they have liked.
 
@@ -86,10 +102,10 @@ This project is a web forum that allows users to communicate, share posts, comme
 
 1. Clone the repository:
 
-    ```bash
-    git clone https://github.com/jesee-kuya/forum.git
-    cd forum
-    ```
+   ```bash
+   git clone https://learn.zone01kisumu.ke/git/johnodhiambo0/forum-authentication.git
+   cd forum-authentication
+   ```
 
 2. Compile and run the program with a file as input:
 
@@ -97,24 +113,26 @@ This project is a web forum that allows users to communicate, share posts, comme
    go run main.go
    ```
 
-
 ### Docker
 
 To ensure ease of deployment and consistency across environments, this project uses Docker.
 
+**Building an Image**:
 
-**Building an Image**:  
-   ```bash
-   docker build -t forum .
-   ```
+```bash
+docker build -t forum .
+```
 
 - You can build using `docker-compose.yml`:
+
 ```bash
 docker compose up --build
 ```
+
 ## Contribution
+
 - To make a contribution to the project, open an issue with a title, a tag and a description of your idea on the [repository issues' page](https://github.com/jesee-kuya/forum/issues).
 
-
 ## Licence
+
 This project is licenced under [MIT](https://github.com/jesee-kuya/forum/blob/main/LICENSE)
