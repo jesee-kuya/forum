@@ -53,10 +53,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		sessionToken := createSession()
+		sessionToken := CreateSession()
 
 		if user.ID != 0 {
-			deleteSession(user.ID)
+			DeleteSession(user.ID)
 		}
 		err = repositories.DeleteSessionByUser(user.ID)
 		if err != nil {
@@ -67,9 +67,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		EnableCors(w)
 
-		setSessionCookie(w, sessionToken)
-		setSessionData(sessionToken, "userId", user.ID)
-		setSessionData(sessionToken, "userEmail", user.Email)
+		SetSessionCookie(w, sessionToken)
+		SetSessionData(sessionToken, "userId", user.ID)
+		SetSessionData(sessionToken, "userEmail", user.Email)
 		expiryTime := time.Now().Add(24 * time.Hour)
 
 		err = repositories.StoreSession(user.ID, sessionToken, expiryTime)

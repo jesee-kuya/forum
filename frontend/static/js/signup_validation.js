@@ -104,10 +104,43 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const popup = document.getElementById('message-popup');
+
+  // Function to show messages
+  function showMessage(message, isSuccess) {
+    popup.textContent = message;
+    popup.classList.remove('success', 'error');
+
+    popup.classList.add('show', isSuccess ? 'success' : 'error');
+
+    setTimeout(() => {
+      popup.classList.remove('show', 'success', 'error');
+    }, 3000);
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('status') && urlParams.get('status') === 'success') {
+    showMessage('Sign Up Successful!', true);
+    history.replaceState(null, '', window.location.pathname);
+  } else if (urlParams.has('error')) {
+    showMessage(`OAuth Signup failed: ${urlParams.get('error')}`, false);
+    history.replaceState(null, '', window.location.pathname);
+  }
+
+  // Attach event listeners to OAuth buttons
+  document.querySelector('.google-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '/auth/google';
+  });
+
+  document.querySelector('.github-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '/auth/github';
+  });
+
+  // Handle regular form submission
   signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const signUpFormData = new URLSearchParams(new FormData(signupForm));
-    console.log(Object.fromEntries(signUpFormData));
 
     try {
       const response = await fetch('/sign-up', {
@@ -122,24 +155,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.success) {
         showMessage('Sign Up Successful!', true);
+
         setTimeout(() => {
           window.location.href = '/sign-in';
         }, 1000);
       } else {
-        showMessage('Sign Up Failed. Please check your input.', false);
+        showMessage('Operation failed. Please check your input.', false);
       }
     } catch (error) {
       console.error('Error:', error);
-      showMessage('Sign Up Failed. Please check your input.', false);
+      showMessage('Operation failed. Please check your input.', false);
     }
   });
-
-  function showMessage(message, isSuccess) {
-    popup.textContent = message;
-    popup.classList.add('show');
-
-    setTimeout(() => {
-      popup.classList.remove('show');
-    }, 3000);
-  }
 });

@@ -43,9 +43,9 @@ body {
 }
 
 .form-container {
-  width: 400px;
-  background-color: var(--text-color);
-  padding: 2rem;
+  width: 500px;
+  background-color: #f9f9f9;
+  padding: 1rem 2rem;
   border-radius: 0.75rem;
   box-shadow: var(--light-box-shadow);
   text-align: center;
@@ -143,6 +143,14 @@ body.dark-theme input {
   opacity: 1;
 }
 
+.message-popup.success {
+  background-color: #4caf50 !important;
+}
+
+.message-popup.error {
+  background-color: #f44336 !important;
+}
+
 .feedback-message {
   font-weight: 500;
   margin-top: 0.25rem;
@@ -155,6 +163,7 @@ body.dark-theme input {
   /* transition: background-color var(--transition); */
 }
 
+.switch-form a,
 body.dark-theme .switch-form a {
-  color: var(--utility-color);
+  color: var(--primary-color);
 }

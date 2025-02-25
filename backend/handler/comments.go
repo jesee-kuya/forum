@@ -4,6 +4,7 @@ import (
 	"html"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
@@ -37,8 +38,9 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 	userId := sessionData["userId"].(int)
 	comment := r.FormValue("comment")
 	comment = html.EscapeString(comment)
-	if comment == "" {
+	if len(strings.TrimSpace(comment)) == 0 {
 		log.Println("Empty comment")
+		util.ErrorHandler(w, "Bad Request", http.StatusBadRequest)
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		return
 	}

@@ -97,9 +97,34 @@
             </div>
           </div>
 
-          <div class="line"></div>
+          <!-- <div class="line"></div> -->
           <button type="submit" class="sign-up-btn btn">Create Account</button>
         </form>
+
+        <br />
+
+        <p style="font-size: small;">Or Sign Up Using</p>
+
+        <div class="oauth-buttons">
+          <button
+            style="width: 45%"
+            type="button"
+            class="oauth-btn google-btn"
+            onclick="window.location.href='/auth/google'"
+          >
+            <box-icon style="fill: white" type="logo" name="google"></box-icon>
+            Google
+          </button>
+          <button
+            style="width: 45%"
+            type="button"
+            class="oauth-btn github-btn"
+            onclick="window.location.href='/auth/github'"
+          >
+            <box-icon style="fill: white" type="logo" name="github"></box-icon>
+            GitHub
+          </button>
+        </div>
         <p class="switch-form">
           Already have an account? <a href="/sign-in">Sign In</a>
         </p>

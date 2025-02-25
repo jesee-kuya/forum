@@ -3,6 +3,7 @@ package route
 import (
 	"net/http"
 
+	"github.com/jesee-kuya/forum/backend/auth"
 	"github.com/jesee-kuya/forum/backend/handler"
 	"github.com/jesee-kuya/forum/backend/middleware"
 )
@@ -30,5 +31,14 @@ func InitRoutes() *http.ServeMux {
 	r.HandleFunc("/filter", handler.FilterPosts)
 
 	r.HandleFunc("/validate", handler.ValidateInputHandler)
+
+	r.HandleFunc("/auth/google", auth.GoogleSignUp)
+	r.HandleFunc("/auth/google/callback", auth.GoogleCallback)
+	r.HandleFunc("/auth/google/signin", auth.GoogleSignIn)
+	r.HandleFunc("/auth/google/signin/callback", auth.GoogleSignInCallback)
+
+	r.HandleFunc("/auth/github", auth.GitHubSignUp)
+	r.HandleFunc("/auth/github/signin", auth.GitHubSignIn)
+	r.HandleFunc("/auth/github/callback", auth.GitHubCallback)
 	return r
 }

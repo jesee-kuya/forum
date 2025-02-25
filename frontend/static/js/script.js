@@ -20,18 +20,6 @@ applyTheme(savedTheme);
 
 document.querySelector('.theme-toggler').addEventListener('click', toggleTheme);
 
-// Toggle comment button
-document.querySelectorAll('.comment-button').forEach((button) => {
-  button.addEventListener('click', () => {
-    const post = button.closest('.post');
-    const commentsSection = post.querySelector('.comments-section');
-    commentsSection.classList.toggle('hidden');
-    commentsSection.style.display = commentsSection.classList.contains('hidden')
-      ? 'none'
-      : 'block';
-  });
-});
-
 // Toggle post creation window
 document.addEventListener('DOMContentLoaded', () => {
   const createPostSection = document.querySelector('.create-post');

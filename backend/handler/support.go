@@ -9,13 +9,13 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func createSession() string {
+func CreateSession() string {
 	sessionID := uuid.Must(uuid.NewV4()).String()
 	SessionStore[sessionID] = make(map[string]interface{})
 	return sessionID
 }
 
-func setSessionCookie(w http.ResponseWriter, sessionID string) {
+func SetSessionCookie(w http.ResponseWriter, sessionID string) {
 	cookie := &http.Cookie{
 		Name:     "session_token",
 		Value:    sessionID,
@@ -43,7 +43,7 @@ func getSessionData(sessionID string) (map[string]interface{}, error) {
 	return sessionData, nil
 }
 
-func setSessionData(sessionID string, key string, value interface{}) {
+func SetSessionData(sessionID string, key string, value interface{}) {
 	SessionStore[sessionID][key] = value
 }
 
@@ -59,7 +59,7 @@ func isValidEmail(email string) bool {
 	return re.MatchString(email)
 }
 
-func deleteSession(userId int) {
+func DeleteSession(userId int) {
 	if len(SessionStore) == 0 {
 		return
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -10,6 +11,12 @@ import (
 )
 
 func main() {
+	err := util.LoadEnv(".env")
+	if err != nil {
+		fmt.Println("Error loading .env file:", err)
+		return
+	}
+
 	util.Init()
 	defer util.DB.Close()
 
