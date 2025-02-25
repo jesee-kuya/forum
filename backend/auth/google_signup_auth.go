@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/jesee-kuya/forum/backend/repositories"
 	"github.com/jesee-kuya/forum/backend/util"
 )
 
@@ -62,6 +63,11 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Failed to get user info: %v\n", err)
 		http.Redirect(w, r, "/sign-in?error=user_info_failed", http.StatusTemporaryRedirect)
 		return
+	}
+
+	_, err = repositories.GetUserByEmail(user.Email)
+	if err == nil {
+		http.Redirect(w, r, "/sign-in?error=user already exists", http.StatusTemporaryRedirect)
 	}
 
 	// Attempt to create or authenticate the user
