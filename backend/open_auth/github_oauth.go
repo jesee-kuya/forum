@@ -47,7 +47,6 @@ func GitHubAuth(w http.ResponseWriter, r *http.Request) {
 
 // GitHubCallback handles the callback from GitHub's OAuth server
 func GitHubCallback(w http.ResponseWriter, r *http.Request) {
-	// Validate the state to prevent CSRF attacks
 	if err := validateState(r); err != nil {
 		log.Printf("State validation failed: %v", err)
 		http.Redirect(w, r, "/auth-error?type=invalid_state", http.StatusTemporaryRedirect)
@@ -69,7 +68,6 @@ func GitHubCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if user already exists
 	var userID int
 	err = util.DB.QueryRow("SELECT id FROM tblUsers WHERE email = ?", user.Email).Scan(&userID)
 
@@ -77,7 +75,6 @@ func GitHubCallback(w http.ResponseWriter, r *http.Request) {
 
 	// If user doesn't exist, create a new one
 	if errors.Is(err, sql.ErrNoRows) {
-		// Check if username is already taken
 		var count int
 		err = util.DB.QueryRow("SELECT COUNT(*) FROM tblUsers WHERE username = ?", user.Login).Scan(&count)
 		if err != nil {

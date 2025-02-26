@@ -27,7 +27,6 @@ type GoogleUser struct {
 
 // GoogleAuth initiates the Google authentication process (signup or signin)
 func GoogleAuth(w http.ResponseWriter, r *http.Request) {
-	// Generate a random state and set it as a cookie to prevent CSRF attacks
 	state := generateStateCookie(w)
 
 	// Construct the Google OAuth 2.0 authorization URL with necessary parameters
@@ -35,20 +34,17 @@ func GoogleAuth(w http.ResponseWriter, r *http.Request) {
 		"%s?client_id=%s&redirect_uri=%s&response_type=code&scope=openid email profile&state=%s&prompt=select_account&access_type=offline",
 		GoogleAuthURL,
 		util.GoogleClientID,
-		url.QueryEscape(RedirectBaseURL + "/auth/google/callback"),
+		url.QueryEscape(RedirectBaseURL+"/auth/google/callback"),
 		state,
 	)
 
-	// Set the CORS header to allow the request to be made from the frontend
 	w.Header().Set("Access-Control-Allow-Origin", RedirectBaseURL)
 
-	// Redirect the user to Google's OAuth 2.0 server
 	http.Redirect(w, r, redirectURL, http.StatusTemporaryRedirect)
 }
 
 // GoogleCallback handles the callback from Google's OAuth server
 func GoogleCallback(w http.ResponseWriter, r *http.Request) {
-	// Validate the state to prevent CSRF attacks
 	if err := validateState(r); err != nil {
 		log.Printf("State validation failed: %v", err)
 		http.Redirect(w, r, "/auth-error?type=invalid_state", http.StatusTemporaryRedirect)
@@ -64,7 +60,6 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get the user information from the Google UserInfo endpoint
 	user, err := getGoogleUser(token)
 	if err != nil {
 		log.Printf("Failed to get user info: %v\n", err)
@@ -72,15 +67,13 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if user already exists
 	var userID int
 	err = util.DB.QueryRow("SELECT id FROM tblUsers WHERE email = ?", user.Email).Scan(&userID)
 
 	isNewUser := false
-	
+
 	// If user doesn't exist, create a new one
 	if errors.Is(err, sql.ErrNoRows) {
-		// Check if username is already taken
 		var count int
 		err = util.DB.QueryRow("SELECT COUNT(*) FROM tblUsers WHERE username = ?", user.Name).Scan(&count)
 		if err != nil {
@@ -93,7 +86,7 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 			// Username is taken, generate a unique one by appending a random suffix
 			user.Name = fmt.Sprintf("%s_%s", user.Name, user.Sub[:6])
 		}
-		
+
 		// Create new user
 		result, err := util.DB.Exec(
 			"INSERT INTO tblUsers(username, email) VALUES(?, ?)",
@@ -104,7 +97,7 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/auth-error?type=user_creation_failed", http.StatusTemporaryRedirect)
 			return
 		}
-		
+
 		id, _ := result.LastInsertId()
 		userID = int(id)
 		isNewUser = true
