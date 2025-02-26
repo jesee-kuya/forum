@@ -34,7 +34,7 @@ func InitRoutes() *http.ServeMux {
 
 	r.HandleFunc("/auth/google", openauth.GoogleAuth)
 	r.HandleFunc("/auth/google/callback", openauth.GoogleCallback)
-	
+
 	r.HandleFunc("/auth/github", openauth.GitHubAuth)
 	r.HandleFunc("/auth/github/callback", openauth.GitHubCallback)
 	return r
