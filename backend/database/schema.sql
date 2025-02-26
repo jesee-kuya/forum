@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS tblUsers (
   username TEXT UNIQUE NOT NULL, 
   email TEXT UNIQUE NOT NULL,
   user_password TEXT NULL,
+  auth_provider TEXT NOT NULL DEFAULT '',
   joined_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
