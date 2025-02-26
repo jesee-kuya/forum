@@ -126,17 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
     history.replaceState(null, '', window.location.pathname);
   }
 
-  // Attach event listeners to OAuth buttons
-  document.querySelector('.google-btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    window.location.href = '/auth/google/callback';
-  });
-
-  document.querySelector('.github-btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    window.location.href = '/auth/github/callback';
-  });
-
   // Handle regular form submission
   signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();

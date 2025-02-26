@@ -22,17 +22,6 @@ document.addEventListener('DOMContentLoaded', function () {
     history.replaceState(null, '', window.location.pathname);
   }
 
-  // Attach event listeners to OAuth buttons
-  document.querySelector('.google-btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    window.location.href = '/auth/google/signin';
-  });
-
-  document.querySelector('.github-btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    window.location.href = '/auth/github/signin';
-  });
-
   signinForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const signinFormData = new URLSearchParams(new FormData(signinForm));
