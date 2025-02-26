@@ -126,6 +126,16 @@ document.addEventListener('DOMContentLoaded', () => {
     history.replaceState(null, '', window.location.pathname);
   }
 
+  document.querySelector('.google-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '/auth/google';
+  });
+
+  document.querySelector('.github-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '/auth/github';
+  });
+
   // Handle regular form submission
   signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();

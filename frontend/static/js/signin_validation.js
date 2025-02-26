@@ -22,6 +22,16 @@ document.addEventListener('DOMContentLoaded', function () {
     history.replaceState(null, '', window.location.pathname);
   }
 
+  document.querySelector('.google-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '/auth/google';
+  });
+
+  document.querySelector('.github-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '/auth/github';
+  });
+
   signinForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const signinFormData = new URLSearchParams(new FormData(signinForm));
