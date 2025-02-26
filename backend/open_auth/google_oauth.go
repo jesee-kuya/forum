@@ -47,7 +47,7 @@ func GoogleAuth(w http.ResponseWriter, r *http.Request) {
 func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	if err := validateState(r); err != nil {
 		log.Printf("State validation failed: %v", err)
-		http.Redirect(w, r, "/auth-error?type=invalid_state", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/sign-in?error=invalid_state", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -56,19 +56,29 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	token, err := exchangeGoogleToken(code)
 	if err != nil {
 		log.Printf("Token exchange failed: %v\n", err)
-		http.Redirect(w, r, "/auth-error?type=token_exchange_failed", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/sign-in?error=token_exchange_failed", http.StatusTemporaryRedirect)
 		return
 	}
 
 	user, err := getGoogleUser(token)
 	if err != nil {
 		log.Printf("Failed to get user info: %v\n", err)
-		http.Redirect(w, r, "/auth-error?type=user_info_failed", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/sign-in?error=user_info_failed", http.StatusTemporaryRedirect)
 		return
 	}
 
-	var userID int
-	err = util.DB.QueryRow("SELECT id FROM tblUsers WHERE email = ?", user.Email).Scan(&userID)
+	var (
+		userID       int
+		authProvider string
+	)
+	err = util.DB.QueryRow("SELECT id, auth_provider FROM tblUsers WHERE email = ?", user.Email).Scan(&userID, &authProvider)
+
+	// If the email exists but with a different provider
+	if err == nil && authProvider != "google" {
+		log.Printf("Email already registered with %s: %v", authProvider, user.Email)
+		http.Redirect(w, r, "/sign-in?error=email_exists&provider="+authProvider, http.StatusTemporaryRedirect)
+		return
+	}
 
 	isNewUser := false
 
@@ -78,7 +88,7 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 		err = util.DB.QueryRow("SELECT COUNT(*) FROM tblUsers WHERE username = ?", user.Name).Scan(&count)
 		if err != nil {
 			log.Printf("Database error checking username: %v", err)
-			http.Redirect(w, r, "/auth-error?type=database_error", http.StatusTemporaryRedirect)
+			http.Redirect(w, r, "/sign-in?error=database_error", http.StatusTemporaryRedirect)
 			return
 		}
 
@@ -89,12 +99,12 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 
 		// Create new user
 		result, err := util.DB.Exec(
-			"INSERT INTO tblUsers(username, email) VALUES(?, ?)",
-			user.Name, user.Email,
+			"INSERT INTO tblUsers(username, email, auth_provider) VALUES(?, ?, ?)",
+			user.Name, user.Email, "google",
 		)
 		if err != nil {
 			log.Printf("User creation failed: %v", err)
-			http.Redirect(w, r, "/auth-error?type=user_creation_failed", http.StatusTemporaryRedirect)
+			http.Redirect(w, r, "/sign-in?error=user_creation_failed", http.StatusTemporaryRedirect)
 			return
 		}
 
@@ -103,7 +113,7 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 		isNewUser = true
 	} else if err != nil {
 		log.Printf("Database error: %v", err)
-		http.Redirect(w, r, "/auth-error?type=database_error", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/sign-in?error=database_error", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -117,7 +127,7 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	err = repositories.DeleteSessionByUser(userID)
 	if err != nil {
 		log.Printf("Failed to delete session token: %v", err)
-		http.Redirect(w, r, "/auth-error?type=session_error", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/sign-in?error=session_error", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -134,7 +144,7 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	err = repositories.StoreSession(userID, sessionToken, expiryTime)
 	if err != nil {
 		log.Printf("Failed to store session token: %v", err)
-		http.Redirect(w, r, "/auth-error?type=session_error", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/sign-in?error=session_error", http.StatusTemporaryRedirect)
 		return
 	}
 
