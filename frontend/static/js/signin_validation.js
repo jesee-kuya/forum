@@ -22,15 +22,14 @@ document.addEventListener('DOMContentLoaded', function () {
     history.replaceState(null, '', window.location.pathname);
   }
 
-  // Attach event listeners to OAuth buttons
   document.querySelector('.google-btn').addEventListener('click', (e) => {
     e.preventDefault();
-    window.location.href = '/auth/google/signin';
+    window.location.href = '/auth/google';
   });
 
   document.querySelector('.github-btn').addEventListener('click', (e) => {
     e.preventDefault();
-    window.location.href = '/auth/github/signin';
+    window.location.href = '/auth/github';
   });
 
   signinForm.addEventListener('submit', async (e) => {

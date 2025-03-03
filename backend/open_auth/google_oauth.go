@@ -1,4 +1,4 @@
-package auth
+package openauth
 
 import (
 	"database/sql"
@@ -15,9 +15,18 @@ import (
 	"github.com/jesee-kuya/forum/backend/util"
 )
 
-// GoogleSignIn initiates the Google sign-in process by redirecting the user to Google's OAuth 2.0 server for authentication.
-func GoogleSignIn(w http.ResponseWriter, r *http.Request) {
-	// Generate a random state and set it as a cookie to prevent CSRF attacks
+const (
+	GoogleAuthURL  = "https://accounts.google.com/o/oauth2/v2/auth"
+	GoogleTokenURL = "https://oauth2.googleapis.com/token"
+	GoogleUserInfo = "https://www.googleapis.com/oauth2/v3/userinfo"
+)
+
+type GoogleUser struct {
+	Sub, Name, Email string
+}
+
+// GoogleAuth initiates the Google authentication process (signup or signin)
+func GoogleAuth(w http.ResponseWriter, r *http.Request) {
 	state := generateStateCookie(w)
 
 	// Construct the Google OAuth 2.0 authorization URL with necessary parameters
@@ -25,38 +34,32 @@ func GoogleSignIn(w http.ResponseWriter, r *http.Request) {
 		"%s?client_id=%s&redirect_uri=%s&response_type=code&scope=openid email profile&state=%s&prompt=select_account&access_type=offline",
 		GoogleAuthURL,
 		util.GoogleClientID,
-		url.QueryEscape("http://localhost:9000/auth/google/signin/callback"),
+		url.QueryEscape(RedirectBaseURL+"/auth/google/callback"),
 		state,
 	)
 
-	// Set the CORS header to allow the request to be made from the frontend
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:9000")
+	w.Header().Set("Access-Control-Allow-Origin", RedirectBaseURL)
 
-	// Redirect the user to Google's OAuth 2.0 server
 	http.Redirect(w, r, redirectURL, http.StatusTemporaryRedirect)
 }
 
-// GoogleSignInCallback handles the callback from the Google OAuth 2.0 server after the user has granted the necessary permissions.
-func GoogleSignInCallback(w http.ResponseWriter, r *http.Request) {
-	// Validate the state to prevent CSRF attacks
+// GoogleCallback handles the callback from Google's OAuth server
+func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	if err := validateState(r); err != nil {
-		log.Println("Invalid state")
+		log.Printf("State validation failed: %v", err)
 		http.Redirect(w, r, "/sign-in?error=invalid_state", http.StatusTemporaryRedirect)
 		return
 	}
 
 	// Get the authorization code from the query parameter
 	code := r.URL.Query().Get("code")
-
-	// Exchange the authorization code for an access token
-	token, err := exchangeGoogleTokenSignIn(code)
+	token, err := exchangeGoogleToken(code)
 	if err != nil {
 		log.Printf("Token exchange failed: %v\n", err)
 		http.Redirect(w, r, "/sign-in?error=token_exchange_failed", http.StatusTemporaryRedirect)
 		return
 	}
 
-	// Get the user information from the Google UserInfo endpoint
 	user, err := getGoogleUser(token)
 	if err != nil {
 		log.Printf("Failed to get user info: %v\n", err)
@@ -64,19 +67,57 @@ func GoogleSignInCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if the user exists in the database
-	var userID int
-	err = util.DB.QueryRow("SELECT id FROM tblUsers WHERE email = ?", user.Email).Scan(&userID)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			http.Redirect(w, r, "/sign-up?error=no_account", http.StatusTemporaryRedirect)
+	var (
+		userID       int
+		authProvider string
+	)
+	err = util.DB.QueryRow("SELECT id, auth_provider FROM tblUsers WHERE email = ?", user.Email).Scan(&userID, &authProvider)
+
+	// If the email exists but with a different provider
+	if err == nil && authProvider != "google" {
+		log.Printf("Email already registered with %s: %v", authProvider, user.Email)
+		http.Redirect(w, r, "/sign-in?error=email_exists&provider="+authProvider, http.StatusTemporaryRedirect)
+		return
+	}
+
+	isNewUser := false
+
+	// If user doesn't exist, create a new one
+	if errors.Is(err, sql.ErrNoRows) {
+		var count int
+		err = util.DB.QueryRow("SELECT COUNT(*) FROM tblUsers WHERE username = ?", user.Name).Scan(&count)
+		if err != nil {
+			log.Printf("Database error checking username: %v", err)
+			http.Redirect(w, r, "/sign-in?error=database_error", http.StatusTemporaryRedirect)
 			return
 		}
+
+		if count > 0 {
+			// Username is taken, generate a unique one by appending a random suffix
+			user.Name = fmt.Sprintf("%s_%s", user.Name, user.Sub[:6])
+		}
+
+		// Create new user
+		result, err := util.DB.Exec(
+			"INSERT INTO tblUsers(username, email, auth_provider) VALUES(?, ?, ?)",
+			user.Name, user.Email, "google",
+		)
+		if err != nil {
+			log.Printf("User creation failed: %v", err)
+			http.Redirect(w, r, "/sign-in?error=user_creation_failed", http.StatusTemporaryRedirect)
+			return
+		}
+
+		id, _ := result.LastInsertId()
+		userID = int(id)
+		isNewUser = true
+	} else if err != nil {
 		log.Printf("Database error: %v", err)
 		http.Redirect(w, r, "/sign-in?error=database_error", http.StatusTemporaryRedirect)
 		return
 	}
 
+	// Create session token
 	sessionToken := handler.CreateSession()
 
 	// Delete any existing sessions for this user
@@ -107,19 +148,21 @@ func GoogleSignInCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// http.Redirect(w, r, "/home", http.StatusSeeOther)
-	http.Redirect(w, r, "/home?status=success", http.StatusSeeOther)
+	// Redirect based on whether this is a new user or not
+	if isNewUser {
+		http.Redirect(w, r, "/home?status=new_user", http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, "/home?status=returning_user", http.StatusSeeOther)
+	}
 }
 
-/*
-exchangeGoogleTokenSignIn exchanges the authorization code for an access token from Google. It returns the access token that can be used to access the user's information.
-*/
-func exchangeGoogleTokenSignIn(code string) (string, error) {
+// exchangeGoogleToken exchanges the authorization code for an access token
+func exchangeGoogleToken(code string) (string, error) {
 	data := url.Values{
 		"code":          {code},
 		"client_id":     {util.GoogleClientID},
 		"client_secret": {util.GoogleClientSecret},
-		"redirect_uri":  {"http://localhost:9000/auth/google/signin/callback"},
+		"redirect_uri":  {RedirectBaseURL + "/auth/google/callback"},
 		"grant_type":    {"authorization_code"},
 	}
 

@@ -126,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
     history.replaceState(null, '', window.location.pathname);
   }
 
-  // Attach event listeners to OAuth buttons
   document.querySelector('.google-btn').addEventListener('click', (e) => {
     e.preventDefault();
     window.location.href = '/auth/google';
