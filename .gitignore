@@ -1,2 +1,3 @@
 uploads/
 backend/database/forum.db
+.env

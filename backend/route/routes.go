@@ -6,6 +6,7 @@ import (
 
 	"github.com/jesee-kuya/forum/backend/handler"
 	"github.com/jesee-kuya/forum/backend/middleware"
+	openauth "github.com/jesee-kuya/forum/backend/open_auth"
 )
 
 func InitRoutes() *http.ServeMux {
@@ -32,5 +33,11 @@ func InitRoutes() *http.ServeMux {
 
 	r.HandleFunc("/validate", handler.ValidateInputHandler)
 
+
+	r.HandleFunc("/auth/google", openauth.GoogleAuth)
+	r.HandleFunc("/auth/google/callback", openauth.GoogleCallback)
+
+	r.HandleFunc("/auth/github", openauth.GitHubAuth)
+	r.HandleFunc("/auth/github/callback", openauth.GitHubCallback)
 	return r
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -13,6 +14,12 @@ import (
 )
 
 func main() {
+	err := util.LoadEnv(".env")
+	if err != nil {
+		fmt.Println("Error loading .env file:", err)
+		return
+	}
+
 	util.Init()
 	defer util.DB.Close()
 

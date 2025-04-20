@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="/frontend/static/css/style.css" />
     <script defer src="/frontend/static/js/script.js"></script>
+    <script defer src="/frontend/static/js/comments_toggler.js"></script>
     <script defer src="/frontend/static/js/reactions.js"></script>
     <script defer src="/frontend/static/js/format_time.js"></script>
 
@@ -194,18 +195,23 @@
           <div class="post-operations">
             <input type="file" name="uploaded-file" />
 
-            <button type="submit">Post</button>
+            <button style="color: white;" type="submit">Post</button>
           </div>
         </form>
       </section>
 
-      <button class="floating-create-post-btn">
-        <img
-          class="web-icon"
-          src="/frontend/static/assets/plus-solid.svg"
-          alt="create-post"
-        />
-      </button>
+      <div class="floating-create-post-btn-container">
+        <p>Create a Post</p>
+        
+
+        <button class="floating-create-post-btn">
+          <img
+            class="web-icon"
+            src="/frontend/static/assets/plus-solid.svg"
+            alt="create-post"
+          />
+        </button>
+      </div>
 
       {{ range .Posts}}
       <article class="post">
@@ -304,7 +310,7 @@
                 type="text"
                 name="comment"
                 class="comment-box"
-                placeholder="Write a comment..."
+                placeholder="Write a comment..." required
               />
               <button class="submit-comment">
                 <img
@@ -382,7 +388,7 @@
 
 {{ define "status"}}
 <img src="/frontend/static/img/profile-image.jpeg" alt="Profile Picture" />
-<p>Hello <strong style="text-transform: uppercase">{{.Name}}</strong> 👋</p>
+<p>Hello <strong>{{.Name}}</strong> 👋</p>
 <form action="/logout" method="POST">
   <button class="logout-button">Log Out</button>
 </form>

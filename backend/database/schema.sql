@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS tblUsers (
   id INTEGER PRIMARY KEY,
   username TEXT UNIQUE NOT NULL, 
   email TEXT UNIQUE NOT NULL,
-  user_password TEXT NOT NULL,
+  user_password TEXT NULL,
+  auth_provider TEXT NOT NULL DEFAULT '',
   joined_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -42,6 +43,6 @@ CREATE TABLE IF NOT EXISTS tblSessions (
   id INTEGER PRIMARY KEY,
   user_id INTEGER NOT NULL,
   session_token TEXT NOT NULL UNIQUE,
-  expires_at TIMESTAMP NOT NULL,
+  expires_at TIMESTAMP NULL,
   FOREIGN KEY (user_id) REFERENCES tblUsers (id)
 );
