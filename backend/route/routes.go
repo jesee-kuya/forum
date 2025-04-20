@@ -31,5 +31,6 @@ func InitRoutes() *http.ServeMux {
 	r.HandleFunc("/filter", middleware.RateLimiter(handler.FilterPosts, 50, time.Second))
 
 	r.HandleFunc("/validate", handler.ValidateInputHandler)
+
 	return r
 }
