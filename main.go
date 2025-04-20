@@ -4,10 +4,12 @@ import (
 	"crypto/tls"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/jesee-kuya/forum/backend/route"
 	"github.com/jesee-kuya/forum/backend/util"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -20,6 +22,18 @@ func main() {
 		return
 	}
 	r := route.InitRoutes()
+
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
+	certPath := os.Getenv("CERT_PATH")
+	keyPath := os.Getenv("KEY_PATH")
+
+	if certPath == "" || keyPath == "" {
+		log.Fatal("Certificate path or key path not specified")
+	}
 
 	server := &http.Server{
 		Addr:         port,
@@ -35,7 +49,7 @@ func main() {
 	}
 
 	log.Printf("Server started at https://localhost%s\n", port)
-	if err = server.ListenAndServeTLS("cert.pem", "key.pem"); err != nil {
+	if err = server.ListenAndServeTLS(certPath, keyPath); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
 }
