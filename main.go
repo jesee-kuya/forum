@@ -1,14 +1,13 @@
 package main
 
 import (
-	"crypto/tls"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/jesee-kuya/forum/backend/route"
 	"github.com/jesee-kuya/forum/backend/util"
-	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {
@@ -20,28 +19,23 @@ func main() {
 		log.Fatalf("Error validating port: %v", err)
 		return
 	}
-	router := route.InitRoutes()
-
-	certManager := autocert.Manager{
-		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist("localhost"),
-		Cache:      autocert.DirCache("certs"),
-	}
+	r := route.InitRoutes()
 
 	server := &http.Server{
 		Addr:         port,
-		Handler:      router,
+		Handler:      r,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
-		TLSConfig: &tls.Config{
-			GetCertificate: certManager.GetCertificate,
-		},
 	}
 
-	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
+	url := fmt.Sprintf("https://localhost:%v", port)
 
-	log.Printf("Server started at http://localhost%s\n", port)
-	if err = server.ListenAndServe(); err != nil {
+	go http.ListenAndServe("+" + port, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, url+r.RequestURI, http.StatusMovedPermanently)
+	}))
+
+	log.Printf("Server started at https://localhost%s\n", port)
+	if err = server.ListenAndServeTLS("cert.pem", "key.pem"); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
 }
