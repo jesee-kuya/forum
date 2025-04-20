@@ -10,7 +10,6 @@ import (
 
 	"github.com/jesee-kuya/forum/backend/route"
 	"github.com/jesee-kuya/forum/backend/util"
-	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -30,11 +29,6 @@ func main() {
 	}
 	r := route.InitRoutes()
 
-	err = godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-
 	certPath := os.Getenv("CERT_PATH")
 	keyPath := os.Getenv("KEY_PATH")
 
@@ -47,6 +41,7 @@ func main() {
 		Handler:      r,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  10 * time.Second,
 		TLSConfig: &tls.Config{
 			CipherSuites: []uint16{
 				tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
