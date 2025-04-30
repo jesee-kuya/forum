@@ -1,6 +1,8 @@
-# forum-authentication
+# forum-security
 
 This project is a web forum that allows users to communicate, share posts, comment, and interact with one another through likes/dislikes, filtering, and more.
+
+Absolutely! Here’s your updated `Objectives` section following the format you provided:
 
 ---
 
@@ -17,15 +19,28 @@ This project is a web forum that allows users to communicate, share posts, comme
 
 - **Filtering**:  
   Implement filtering for posts by:
-
   - Categories
   - Created posts (for the logged-in user)
   - Liked posts (for the logged-in user)
 
 - **Authentication**:  
-   A user can create an account by using the following third-party services:
+  A user can create an account by using the following third-party services:
   - Google
   - GitHub
+
+- **HTTPS (Hypertext Transfer Protocol Secure)**:  
+  - Encrypted connection must be implemented using an SSL certificate. You can either self-generate or use certificates from trusted Certificate Authorities (CAs). 
+
+- **Rate Limiting**:  
+  The implementation of rate limiting must be present to prevent abuse and protect server resources.
+
+- **Password and Database Encryption**:  
+  - Clients' passwords must be securely encrypted (using bcrypt).
+
+- **Sessions and Cookies**:  
+  - Clients' session cookies must be unique.
+  - The session state should be stored on the server and associated with a unique session identifier.
+  - This approach ensures clients cannot directly access or manipulate session data, improving resilience against attacks.
 
 ---
 
@@ -116,11 +131,20 @@ This project is a web forum that allows users to communicate, share posts, comme
 
    GITHUB_CLIENT_ID=
    GITHUB_CLIENT_SECRET=
+
+   CERT_PATH=./cert.pem
+   KEY_PATH=./key.pem
    ```
 
    Replace the values with your own credentials obtained from Google and GitHub.
 
-3. Compile and run the program with a file as input:
+3. Run this command to generate a self-signed certificate(for local use only)
+    ```bash
+    openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+    ```
+
+
+4. Compile and run the program with a file as input:
 
    ```bash
    go run main.go

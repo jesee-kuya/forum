@@ -1,9 +1,11 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/jesee-kuya/forum/backend/route"
@@ -25,17 +27,31 @@ func main() {
 		log.Fatalf("Error validating port: %v", err)
 		return
 	}
-	router := route.InitRoutes()
+	r := route.InitRoutes()
+
+	certPath := os.Getenv("CERT_PATH")
+	keyPath := os.Getenv("KEY_PATH")
+
+	if certPath == "" || keyPath == "" {
+		log.Fatal("Certificate path or key path not specified")
+	}
 
 	server := &http.Server{
 		Addr:         port,
-		Handler:      router,
+		Handler:      r,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  10 * time.Second,
+		TLSConfig: &tls.Config{
+			CipherSuites: []uint16{
+				tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+			},
+		},
 	}
 
-	log.Printf("Server started at http://localhost%s\n", port)
-	if err = server.ListenAndServe(); err != nil {
+	log.Printf("Server started at https://localhost%s\n", port)
+	if err = server.ListenAndServeTLS(certPath, keyPath); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
 }
