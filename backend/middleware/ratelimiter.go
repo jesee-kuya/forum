@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"log"
+	"net"
 	"net/http"
 	"sync"
 	"time"
@@ -9,31 +9,51 @@ import (
 	"github.com/jesee-kuya/forum/backend/util"
 )
 
+type client struct {
+	timestamps []time.Time
+	mu         sync.Mutex
+}
+
 var (
-	requests = make(map[string]int)
-	mu       sync.Mutex
+	clients     = make(map[string]*client)
+	clientsLock sync.Mutex
 )
 
 func RateLimiter(next http.HandlerFunc, limit int, duration time.Duration) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		mu.Lock()
-		defer mu.Unlock()
+		ip, _, err := net.SplitHostPort(r.RemoteAddr)
+		if err != nil {
+			util.ErrorHandler(w, "Invalid IP address", http.StatusInternalServerError)
+			return
+		}
 
-		ip := r.RemoteAddr
-		requests[ip]++
+		clientsLock.Lock()
+		c, ok := clients[ip]
+		if !ok {
+			c = &client{}
+			clients[ip] = c
+		}
+		clientsLock.Unlock()
 
-		go func() {
-			time.Sleep(duration)
-			mu.Lock()
-			defer mu.Unlock()
-			requests[ip]--
-		}()
+		c.mu.Lock()
+		defer c.mu.Unlock()
 
-		if requests[ip] > limit {
-			log.Println("Too many requests from", ip)
+		now := time.Now()
+		// Filter out expired timestamps
+		valid := []time.Time{}
+		for _, t := range c.timestamps {
+			if now.Sub(t) <= duration {
+				valid = append(valid, t)
+			}
+		}
+		c.timestamps = valid
+
+		if len(c.timestamps) >= limit {
 			util.ErrorHandler(w, "Too many requests", http.StatusTooManyRequests)
 			return
 		}
+
+		c.timestamps = append(c.timestamps, now)
 		next(w, r)
 	}
 }
