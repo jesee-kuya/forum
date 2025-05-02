@@ -1,3 +1,6 @@
 uploads/
 backend/database/forum.db
 .env
+check.sh
+cert.pem
+key.pem
